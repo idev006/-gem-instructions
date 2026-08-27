@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Acceptance Tests
 
-Version: 1.2.0
+Version: 1.3.0
 
 ## Critical gates
 
@@ -32,6 +32,14 @@ Version: 1.2.0
 26. Category usage counts, legend coverage, focus distribution, and answer/color frequency plan must be frozen before visual prompt assembly.
 27. `LINE_TOPOLOGY_QA = CRITICAL` must pass: no accidental double lines, broken joins, ambiguous shared borders, unintended open regions, or unusable sliver cells.
 28. Shared region borders must read as single clear boundaries and must not collide with question text.
+29. `PRINT_LINE_CLARITY_QA = CRITICAL` must pass.
+30. `LINE_RENDER_STYLE = CLEAN_VECTOR_LIKE`: line art must look clean and single-pass, not sketchy, fuzzy, pencil-like, or rough.
+31. Internal tile borders must use a consistent medium stroke; hairline micro-segments are not allowed.
+32. No obvious broken/fuzzy/double strokes when viewed at normal worksheet scale.
+33. Micro-tile density must be reduced if line quality deteriorates; `CRISP_LINES > MICRO_TILE_DENSITY`.
+34. Avoid unnecessary starburst junctions; junction complexity should normally remain simple enough that regions are visually unambiguous.
+35. Main activity must remain pure black line + white fill when `MAIN_ART_COLOR_MODE = MONOCHROME`; no beige/gray/yellow tint leakage.
+36. Every coloring region must be large enough to color practically on A4; tiny decorative micro-cells that cannot be colored are a FAIL.
 
 ## Dry-run reference case
 
@@ -55,7 +63,7 @@ Expected:
 - triangle primary shape
 - triangle-dominant mosaic
 - primary-shape coverage target about >=85%
-- micro tiles > 30 allowed
+- micro tiles > 30 allowed, but density must remain print-safe
 - 30 grouped question regions
 - question-region boundaries derived from triangle groups
 - garden recognizability from triangle clusters
@@ -63,8 +71,11 @@ Expected:
 - no large freeform flowers/leaves/clouds replacing the mosaic
 - controlled tile scale across the page
 - clean topology with no double lines/broken joins/sliver cells
+- clean vector-like strokes with uniform medium internal borders
+- no sketch texture, fuzzy edges, rough pencil effect, hairline segments, or crowded starburst junctions
+- pure monochrome main activity area
 - A4 Portrait default
-- monochrome main art + colored legend preview
+- colored legend preview allowed
 
 ## Audit regression case — Thai category worksheet
 
@@ -117,8 +128,15 @@ FAIL if:
 - circular question containers dominate flower centers
 - top and bottom of page use visibly unrelated tile-scale systems
 - ground mosaic contains accidental double lines or tiny sliver cells
+- internal mosaic lines appear broken, fuzzy, rough, doubled, or sketch-like
+- many tiny triangles create starburst noise or hairline fragments
+- main artwork contains accidental pale color/tint
 
-PASS when those elements are reconstructed from triangle clusters while maintaining readable question areas.
+PASS when:
+- those elements are reconstructed from triangle clusters
+- micro-tile count is restrained enough for crisp line rendering
+- line edges are clean, continuous, vector-like and printable
+- question areas remain readable and easy to color
 
 ## Multi-subject regression set
 
@@ -136,9 +154,13 @@ PASS when those elements are reconstructed from triangle clusters while maintain
 - primary shape obvious at first glance
 - theme recognizable
 - controlled tile scale
+- controlled tile density
 - no clutter
 - no tiny question text
 - no question collisions
 - no decorative freeform art dominating tiles
 - question-region boundaries remain compatible with the primary tiling grammar
 - line topology is closed, clean and practical for student coloring
+- crisp, uniform, clean vector-like black strokes
+- no broken/fuzzy/double/sketch lines
+- no accidental color leakage in main artwork
