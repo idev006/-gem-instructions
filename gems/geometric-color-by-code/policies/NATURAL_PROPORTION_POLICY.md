@@ -1,144 +1,126 @@
 # Natural Proportion Policy
 
-Version: 1.0.0
-Status: Gem-specific production policy
+Version: 1.1.0
+Status: Canonical companion policy for Geometric Color-by-Code v1.6.0
 
 ## Purpose
-
-เพิ่มจังหวะและสัดส่วนที่พบในธรรมชาติเข้าสู่การจัดองค์ประกอบของ Geometric Color-by-Code โดยไม่ลดความถูกต้อง ความอ่านง่าย ความสามารถในการระบายสี หรือความคมของเส้น
-
-แนวคิดหลัก:
+ใช้สัดส่วนและจังหวะที่ได้รับแรงบันดาลใจจากธรรมชาติช่วยจัด composition โดยไม่ลด correctness, mapping integrity, readability, colorability หรือ print quality
 
 ```text
-ACADEMIC CORRECTNESS
-→ COLOR/MAPPING INTEGRITY
-→ GEOMETRIC GRAMMAR
-→ USABLE COLORING AREAS
-→ NATURAL PROPORTION / RHYTHM
-→ DECORATION
+CORRECTNESS
+> READABILITY
+> COLORING USABILITY
+> LINE CLARITY
+> GEOMETRIC GRAMMAR
+> NATURAL HARMONY
+> DECORATION
 ```
 
-Natural proportion เป็น **composition guide** ไม่ใช่ข้อบังคับให้ทุกระยะหรือทุกมุมต้องเท่าค่าทางคณิตศาสตร์แบบ exact.
+Natural proportion เป็น **composition guide** ไม่ใช่ข้อบังคับให้ทุกระยะ/มุมเป็นค่าทางคณิตศาสตร์ exact
 
-## Supported composition systems
-
+## Supported parameters
 ```text
-COMPOSITION_SYSTEM = AUTO | BALANCED | NATURAL_PROPORTION | SYMMETRIC | RADIAL | CUSTOM
-GOLDEN_RATIO_GUIDE = YES | NO | AUTO
-PHYLLOTAXIS_MODE = OFF | AUTO | GOLDEN_ANGLE_INSPIRED | RADIAL_SPIRAL
-FIBONACCI_RHYTHM = OFF | AUTO | ENABLED
-RADIAL_SYMMETRY = OFF | AUTO | ENABLED
+COMPOSITION_SYSTEM = AUTO | STANDARD | NATURAL_HARMONY | CUSTOM
+GOLDEN_SECTION_GUIDE = AUTO | YES | NO
+FIBONACCI_RHYTHM = AUTO | YES | NO
+PHYLLOTAXIS_MODE = AUTO | OFF | GOLDEN_ANGLE_INSPIRED | RADIAL_SPIRAL
+RADIAL_SYMMETRY = AUTO | OFF | LIGHT | HIGH
 PETAL_COUNT_LOGIC = AUTO | NATURAL_PATTERN | USER_DEFINED
 FOCAL_POINT_PLACEMENT = AUTO | CENTER | GOLDEN_SECTION | RULE_OF_THIRDS | CUSTOM
-SCALE_PROGRESSION = UNIFORM | CONTROLLED | NATURAL_HIERARCHY
+NATURAL_SCALE_HIERARCHY = YES | NO
 NATURAL_PATTERN_STRENGTH = SUBTLE | MODERATE | STRONG
+COMPOSITION_BALANCE = AUTO | SYMMETRIC | NATURAL_BALANCED
+SYMMETRY_MODE = AUTO | BILATERAL | RADIAL | APPROXIMATE_NATURAL | NONE
+QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM | GRID | CUSTOM
+QUESTION_DISTRIBUTION_BALANCE = REQUIRED | RELAXED
 ```
 
-## Golden ratio guidance
-
-เมื่อ `GOLDEN_RATIO_GUIDE = YES` หรือ AUTO แล้วเหมาะกับ composition:
-- ใช้ golden section เพื่อช่วยวาง focal hierarchy หรือแบ่งสัดส่วนพื้นที่หลัก
-- ใช้เป็น guide สำหรับขนาดสัมพัทธ์ขององค์ประกอบใหญ่-กลาง-เล็ก
-- ห้ามบีบพื้นที่คำถามหรือ legend เพียงเพื่อให้ได้ค่า ~1.618 แบบเคร่งครัด
-- ห้ามอ้างว่า composition เป็น exact golden ratio หากไม่ได้คำนวณและตรวจจริง
-
-## Golden-angle / phyllotaxis guidance
-
-เมื่อเหมาะกับธีม เช่น ทานตะวัน ดอกไม้ เมล็ด ใบไม้ หรือ radial motif:
-- ใช้ golden-angle-inspired spacing ประมาณ 137.5° เป็นแนวทางในการกระจายองค์ประกอบรอบจุดศูนย์กลาง
-- สามารถ approximate ด้วย primary-shape tile groups ได้
-- ห้ามสร้าง micro tiles เล็กเกิน `MIN_COLORABLE_CELL_SIZE` เพื่อเลียนแบบเมล็ดจำนวนมาก
-- ถ้าความละเอียดไม่พอ ให้ใช้ **grouped seed/petal clusters** แทนการวาดเมล็ดทุกเมล็ด
+## Golden section
+- ใช้ช่วยวาง focal hierarchy/พื้นที่หลัก
+- ใช้ช่วยกำหนดสัดส่วนใหญ่-กลาง-เล็ก
+- ห้ามบีบ content หรือ legend เพื่อไล่ ~1.618 แบบเคร่งครัด
+- ห้ามเรียก exact golden ratio หากไม่ได้คำนวณและตรวจ
 
 ## Fibonacci rhythm
+- ใช้ 3, 5, 8, 13 เป็นกลุ่ม/จังหวะเมื่อเหมาะสม
+- ใช้กับ petals, radial bands, leaf groups, scale hierarchy ได้
+- ไม่ต้องใช้ทุกองค์ประกอบ
+- question count และ colorability มี precedence
 
-เมื่อ `FIBONACCI_RHYTHM = ENABLED` หรือ AUTO:
-- ใช้จำนวนกลุ่ม/จังหวะ เช่น 3, 5, 8, 13 เมื่อเหมาะสมกับ visual rhythm
-- ใช้ในการจัด petal groups, leaf groups, radial bands, scale hierarchy หรือ repetition count
-- ไม่จำเป็นต้องใช้ Fibonacci ทุกองค์ประกอบ
-- ความเหมาะสมต่อจำนวนข้อและพื้นที่ระบายสีมี precedence
+## Phyllotaxis / golden-angle-inspired rhythm
+- ใช้กับดอกไม้ เมล็ด radial motifs ได้
+- golden-angle ~137.5° เป็น guide/inspiration
+- ถ้ารายละเอียดจริงแน่นเกินไป ให้ใช้ grouped wedges / grouped spiral bands
+- ห้ามสร้าง micro-seed/petal cells เล็กกว่า `MIN_COLORABLE_CELL_SIZE`
 
-## Radial symmetry / petal logic
+## Balance / symmetry
+`SYMMETRY_MODE = AUTO` ต้องเลือกให้เหมาะกับธีม:
+- BILATERAL
+- RADIAL
+- APPROXIMATE_NATURAL
+- NONE
 
-สำหรับวัตถุธรรมชาติที่มี symmetry:
-- ดอกไม้สามารถใช้ 5-fold, 6-fold, 8-fold หรือรูปแบบอื่นตามความเหมาะสม
-- ถ้าใช้ `PETAL_COUNT_LOGIC = NATURAL_PATTERN` ให้เลือกจำนวนกลีบ/กลุ่มที่ให้ balance และรองรับ primary-shape grammar
-- question regions อาจกระจายตามกลีบ/วงแหวน แต่ต้องยังมีพื้นที่ข้อความเพียงพอ
+เป้าหมายคือ dynamic balance ไม่ใช่ mirror symmetry 100% ทุกงาน
 
-## Natural hierarchy
+## Natural scale hierarchy
+- focal element หลัก 1 จุด/กลุ่ม
+- secondary elements ขนาดรอง
+- supporting motifs ขนาดเล็กกว่า
+- scale transition ต้องสัมพันธ์กับ `TILE_SCALE_VARIATION = CONTROLLED`
 
-`SCALE_PROGRESSION = NATURAL_HIERARCHY`:
-- มี focal element หลัก 1 จุดหรือกลุ่ม
-- มี secondary elements ขนาดรอง
-- มี supporting micro motifs ขนาดเล็กกว่า
-- การเปลี่ยนขนาดต้อง smooth และสอดคล้องกับ `TILE_SCALE_VARIATION = CONTROLLED`
+## Question flow
+เมื่อ `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM`:
+- question regions ต้องกระจายตามสายตา/จังหวะ composition
+- ห้ามเปลี่ยน verified question count, answers, codes หรือ colors
+- readability และ text-safe area มี precedence เหนือ natural rhythm
 
-## Theme examples
-
-### สวนดอกไม้ + TRIANGLE
-- focal flower วางใกล้ golden-section guide หรือ center-balanced position
-- petal clusters ใช้ radial rhythm
-- seed center ใช้ grouped spiral clusters ที่ได้แรงบันดาลใจจาก phyllotaxis
-- ดอกข้างเคียงลดขนาดตาม natural hierarchy
-- ใบไม้กระจายเป็น rhythmic clusters ไม่ต้อง mirror แข็งทุกจุด
-
-### ทานตะวัน
-- center seed field ใช้ spiral/radial cluster logic
-- ห้ามวาดเมล็ดจิ๋วถี่เกินไป; ใช้ 8–13 grouped wedges/spiral bands เมื่อเหมาะสม
-- petal ring ใช้ radial symmetry และ primary-shape clusters
-
-### ใต้ทะเล / เปลือกหอย
-- ใช้ spiral-inspired scale progression ได้
-- ห้ามอ้าง Fibonacci spiral exact หากเป็นเพียง visual inspiration
-
-## Interaction with primary-shape grammar
-
-Natural proportion **ไม่แทนที่** primary-shape construction.
-
+## Interaction with primary shape
 ```text
-NATURAL PROPORTION controls placement / scale / rhythm
+NATURAL HARMONY controls placement / scale / rhythm
 PRIMARY SHAPE controls construction grammar
 ```
 
-ตัวอย่าง:
-- golden-angle guide ช่วยกำหนดตำแหน่ง petal clusters
-- แต่ petal clusters ยังต้องสร้างจาก TRIANGLE / RHOMBUS / HEXAGON ตาม `PRIMARY_SHAPE`
+ถ้า PRIMARY_SHAPE=TRIANGLE กลีบ/เมล็ด/ใบไม้ที่ใช้ natural rhythm ยังต้องสร้างจาก triangle-derived clusters เป็นหลัก
 
-## Interaction with Color-by-Code content
+## Truthfulness
+Natural Harmony Blueprint ต้องบอกว่าแต่ละหลักเป็น:
+- EXACT/CALCULATED
+- APPROXIMATE
+- INSPIRED
+- NOT_USED
 
-- จำนวนข้อและ mapping ถูกล็อกก่อน composition
-- natural layout engine ห้ามเปลี่ยน verified question text / answer / color mapping
-- ถ้า natural pattern count ไม่เท่ากับ question count ให้ group tiles หรือใช้ supporting motifs แทนการบิดจำนวนข้อ
+ห้ามใช้คำว่า exact หากไม่มีการคำนวณและตรวจ
 
-## QA gates
-
-PASS เมื่อ:
-- composition มี focal hierarchy ชัด
-- natural rhythm ช่วยให้งานดูสมดุลโดยไม่ลด usability
-- ไม่มี forced golden-ratio distortion
-- primary-shape grammar ยังคงชัด
-- question text อ่านง่าย
+## QA PASS
+- focal hierarchy ชัด
+- visual rhythm ช่วย composition
+- primary-shape grammar ยังชัด
+- question flow อ่านง่าย
 - minimum colorable area ผ่าน
-- tile density และ line clarity ผ่าน
+- ไม่มี micro-detail excess
+- ไม่มี forced-ratio distortion
+- symmetry/balance เหมาะกับธีม
 
-FAIL เมื่อ:
-- อ้าง exact golden ratio / Fibonacci / golden angle โดยไม่มีการตรวจ
-- บีบข้อความหรือช่องระบายสีเพื่อบังคับสัดส่วน
-- ใช้ micro-detail เล็กเกินไปเพื่อเลียนแบบธรรมชาติ
-- natural pattern กลายเป็น decoration ที่ทำลาย geometric grammar
+## QA FAIL
+- natural system ทำให้โจทย์อ่านยาก
+- exact claim ไม่มีหลักฐาน
+- phyllotaxis detail เล็กเกินระบาย
+- natural pattern ทำลาย primary-shape grammar
+- question distribution ถูกบิดเพื่อความสวยจน mapping/usability เสีย
 
 ## Recommended defaults
-
 ```text
 COMPOSITION_SYSTEM = AUTO
-GOLDEN_RATIO_GUIDE = AUTO
-PHYLLOTAXIS_MODE = AUTO
+GOLDEN_SECTION_GUIDE = AUTO
 FIBONACCI_RHYTHM = AUTO
+PHYLLOTAXIS_MODE = AUTO
 RADIAL_SYMMETRY = AUTO
 PETAL_COUNT_LOGIC = AUTO
 FOCAL_POINT_PLACEMENT = AUTO
-SCALE_PROGRESSION = NATURAL_HIERARCHY
+NATURAL_SCALE_HIERARCHY = YES
 NATURAL_PATTERN_STRENGTH = MODERATE
+COMPOSITION_BALANCE = AUTO
+SYMMETRY_MODE = AUTO
+QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM
+QUESTION_DISTRIBUTION_BALANCE = REQUIRED
 ```
-
-AUTO ใช้ natural proportion เมื่อช่วยให้ theme/composition ดีขึ้น และ fallback เป็น balanced/symmetric composition เมื่อ readability หรือ mapping ต้องมาก่อน
