@@ -2,6 +2,19 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.1.0 — 2026-08-27
+
+- Hardened the Gem from a real-output audit of a Thai category worksheet.
+- Added `LEGEND_COVERAGE_POLICY = NO_ORPHAN_LEGEND_ENTRY`; every student-facing legend entry must be used by at least one question/region by default.
+- Added category/focus planning parameters: `CATEGORY_SET`, `FOCUS_CATEGORY`, `CATEGORY_FOCUS_MODE`, `FOCUS_SHARE_TARGET`, and `CATEGORY_DISTRIBUTION`.
+- Defined focus semantics so phrases such as `เน้นแม่กง` resolve to an intentionally higher question share for the focus category, normally targeting about 40–60% when the user does not provide a custom ratio.
+- Added `PREFER_ATOMIC_RESPONSE = YES` for vocabulary/classification tasks to prefer clear single words over unnecessary phrases.
+- Strengthened `SHAPE_DOMINANCE = HIGH`: target approximately >=80% structural tiling rhythm from the primary shape and restrict large freeform structural areas to a minor role (target approximately <=15–20%).
+- Added explicit FAIL rule for conventional freeform object silhouettes with geometric patterns merely overlaid on top.
+- Expanded the Verified Content Blueprint to include category usage counts, focus share, legend entries, legend usage counts, and legend coverage validation before rendering.
+- Updated `OUTPUT_CONTRACT.md`, `policies/COLOR_MAPPING_POLICY.md`, `policies/GEOMETRY_LAYOUT_POLICY.md`, `qa/ACCEPTANCE_TESTS.md`, and `qa/REGRESSION_TESTS.md` to v1.1.0.
+- Added `qa/AUDIT_REMEDIATION_PLAN_2026-08-27.md` documenting the audit findings, decisions, and closure criteria.
+
 ## Geometric Color-by-Code 1.0.0 — 2026-08-27
 
 - Added new production Gem at `gems/geometric-color-by-code/`.
