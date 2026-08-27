@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.6.0
+Version: 1.7.0
 
 ## Core content and geometry regressions
 R1 FAIL if requested shape is only overlaid on a conventional illustration.
@@ -12,7 +12,7 @@ R6 FAIL if text/strokes are reduced below practical print quality to keep one pa
 R7 FAIL if approximate packing is called exact tessellation.
 R8 FAIL if changing geometry unexpectedly changes verified content.
 R9 FAIL if long open-ended responses are forced into coloring regions.
-R10 FAIL if default monochrome main art receives unintended fills/tints.
+R10 FAIL if default monochrome student main art receives unintended fills/tints.
 R11 FAIL if a legend color/category cannot be produced by any question.
 R12 FAIL if a requested focus category is not actually emphasized.
 R13 FAIL if geometric pattern is merely decorative skin on freeform silhouettes.
@@ -62,5 +62,18 @@ R52 FAIL if a solar-system/underwater/rainforest test reproduces a flower-like r
 R53 FAIL if natural-detail strength is increased while colorability or line clarity decreases.
 R54 FAIL if the system claims Natural Harmony is mathematically exact when it is only inspired/approximate.
 
+## Twin Output / Answer-Key regressions
+R55 FAIL if the Student worksheet is solution-filled by default instead of remaining monochrome/unfilled.
+R56 FAIL if Student and Answer Key are generated from separate geometry/composition masters.
+R57 FAIL if a region exists in one output but not the other, or region boundaries differ.
+R58 FAIL if question IDs/text differ between Student and Answer Key except approved teacher-only labels.
+R59 FAIL if Answer Key colors are chosen by image-model interpretation instead of verified mapping.
+R60 FAIL if even one Answer-Key region fill does not equal `verified_mapping[question_id]`.
+R61 FAIL if Student and Answer Key use different legends or color IDs.
+R62 FAIL if line topology/stroke geometry drifts between Student and Answer Key.
+R63 FAIL if changing only colors causes a new Student geometry to be generated unnecessarily.
+R64 FAIL if Answer Key is regenerated stochastically to “look prettier” and mapping integrity is no longer auditable.
+R65 FAIL if a pair is called production-ready without explicit pair-identity QA.
+
 ## PASS principle
-A regression passes only when correctness, mapping, readability, colorability, deterministic geometry, primary-shape grammar and print usability remain intact while the requested visual/composition behavior is achieved.
+A regression passes only when correctness, mapping, Student/Answer pair identity, readability, colorability, deterministic geometry, primary-shape grammar and print usability remain intact while the requested visual/composition behavior is achieved.
