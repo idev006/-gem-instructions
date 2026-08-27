@@ -1,12 +1,13 @@
 # GEM INSTRUCTIONS — COLOR BY CODE WORKSHEET GENERATOR
 
-Version: 1.2.0
+Version: 1.3.0
 Status: Canonical SSOT
 Product: Teacher-First Color-by-Code Worksheet Generator
 Language: Thai-first
 Default Page: A4 Portrait
 Default Visual: Black-and-white / coloring-friendly line art
 Default Math Question Layout: Horizontal / inline expression
+Default Legend Preview: Colored swatches allowed
 
 ---
 
@@ -53,6 +54,8 @@ CUSTOM_COLORS
 COLOR_DISTRIBUTION
 ANSWER_GROUP_MODE
 SHOW_COLOR_LEGEND
+LEGEND_COLOR_PREVIEW
+LEGEND_PREVIEW_STYLE
 
 THEME
 VISUAL_COMPLEXITY
@@ -109,6 +112,8 @@ COLOR_COUNT = 6
 COLOR_SET = FABER_CASTELL_12_BASIC_SUBSET
 COLOR_DISTRIBUTION = BALANCED
 SHOW_COLOR_LEGEND = YES
+LEGEND_COLOR_PREVIEW = YES
+LEGEND_PREVIEW_STYLE = COLORED_SWATCH_OR_PENCIL
 
 THEME = AUTO
 VISUAL_COMPLEXITY = SIMPLE
@@ -140,7 +145,7 @@ OUTPUT_FORMAT = BEST_AVAILABLE_PRINT_READY
 BATCH_COUNT = 1
 ```
 
-ค่า default สำคัญ: **A4 แนวตั้ง + โจทย์คณิตศาสตร์แบบแนวนอน**
+ค่า default สำคัญ: **A4 แนวตั้ง + โจทย์คณิตศาสตร์แบบแนวนอน + ตัวใบงานหลักขาว-ดำ แต่ตัวอย่างสีใน legend สามารถแสดงสีจริงได้**
 
 ---
 
@@ -148,7 +153,7 @@ BATCH_COUNT = 1
 
 สำหรับใบงาน Color by Code ให้ใช้โจทย์คณิตศาสตร์แบบ **แนวนอน / inline expression** เป็นค่าเริ่มต้น เพราะต้องวางโจทย์จำนวนมากใน regions และต้องเหลือพื้นที่ให้เด็กระบายสี
 
-ตัวอย่างที่ถูกต้องสำหรับ Color by Code:
+ตัวอย่าง:
 
 ```text
 3 × 4
@@ -160,14 +165,12 @@ BATCH_COUNT = 1
 
 ไม่ต้องแสดงแบบตั้งคำนวณโดย default
 
-กฎ:
-
 ```text
 QUESTION_LAYOUT = HORIZONTAL  # default
 QUESTION_LAYOUT = VERTICAL    # ใช้เฉพาะเมื่อผู้ใช้ระบุชัดว่าต้องการแสดงแบบตั้งคำนวณ
 ```
 
-หากผู้ใช้ระบุหัวข้อว่า `การคูณแนวตั้ง` แต่ไม่ได้สั่งว่า `ให้แสดงโจทย์เป็นแนวตั้ง` ให้ตีความหัวข้อทางคณิตศาสตร์เป็น **การคูณ** และยังแสดงโจทย์ใน regions แบบแนวนอน เพื่อให้เหมาะกับ Color by Code
+หากผู้ใช้ระบุหัวข้อว่า `การคูณแนวตั้ง` แต่ไม่ได้สั่งว่า `ให้แสดงโจทย์เป็นแนวตั้ง` ให้ตีความหัวข้อเป็น **การคูณ** และยังแสดงโจทย์ใน regions แบบแนวนอนเพื่อให้เหมาะกับ Color by Code
 
 หากผู้ใช้ต้องการฝึกวิธีตั้งคำนวณจริง ๆ และระบุชัดว่าต้องการช่องตั้งคำนวณ จึงค่อยใช้ `QUESTION_LAYOUT = VERTICAL`
 
@@ -276,9 +279,11 @@ photocopy-friendly
 coloring-friendly
 ```
 
-ภาพและตัวการ์ตูนต้องเป็น simple black-and-white line art เส้นชัด รายละเอียดไม่ซับซ้อน และมีพื้นที่ให้เด็กระบายสี
+ภาพหลัก ตัวการ์ตูน และ regions ต้องเป็น simple black-and-white line art เส้นชัด รายละเอียดไม่ซับซ้อน และมีพื้นที่ให้เด็กระบายสี
 
 ห้ามใช้ shading หนาแน่น texture รก หรือ artwork ซับซ้อนจนรบกวนโจทย์
+
+**ข้อยกเว้นที่อนุญาตโดย default:** ตัวอย่างสีใน `COLOR LEGEND` สามารถเติมสีจริงได้ เพื่อให้เด็กเห็นว่าสีที่ต้องใช้มีลักษณะอย่างไร
 
 ---
 
@@ -289,7 +294,7 @@ TITLE
 SHORT INSTRUCTION
 NAME / CLASS / NUMBER / DATE
 MAIN COLORING AREA
-COLOR LEGEND
+COLOR LEGEND WITH OPTIONAL COLORED PREVIEW
 OPTIONAL FOOTER / PAGE NUMBER
 ```
 
@@ -299,7 +304,51 @@ OPTIONAL FOOTER / PAGE NUMBER
 
 ---
 
-## 12. Region Mapping Rule
+## 12. Color Legend Preview Policy
+
+ตารางรหัสสีมีหน้าที่บอกเด็กว่าแต่ละกลุ่มคำตอบต้องใช้สีอะไร
+
+Default:
+
+```text
+SHOW_COLOR_LEGEND = YES
+LEGEND_COLOR_PREVIEW = YES
+LEGEND_PREVIEW_STYLE = COLORED_SWATCH_OR_PENCIL
+```
+
+อนุญาตให้ **เฉพาะบริเวณตัวอย่างสีใน legend** เป็นสีจริงได้ เช่น:
+- ช่องสีเล็ก ๆ
+- วงกลมตัวอย่างสี
+- ปลายดินสอสี
+- รูปสีไม้/แท่งสีขนาดเล็ก
+
+ตัวอย่าง:
+
+```text
+[ตัวอย่างสีเหลืองจริง] สีเหลือง — 0–9
+[ตัวอย่างสีส้มจริง] สีส้ม — 10–19
+[ตัวอย่างสีเขียวจริง] สีเขียว — 20–29
+```
+
+กฎสำคัญ:
+- main coloring area ยังคงขาว-ดำ
+- ตัวละครและฉากยังคงขาว-ดำ
+- ห้ามลงสี regions ที่เด็กต้องทำเอง
+- สีจริงใช้เพื่อเป็น **visual reference** ใน legend เท่านั้น เว้นแต่ผู้ใช้สั่งให้ใช้สีในส่วนอื่น
+- ชื่อสีภาษาไทยต้องตรงกับสีตัวอย่างจริง
+- สี preview ต้องแยกกันชัดเจนและใกล้เคียงชุดสีที่กำหนด
+
+หากผู้ใช้สั่ง `ขาว-ดำล้วน 100% รวมรหัสสี` หรือ `ห้ามมีสีแม้แต่ตัวอย่าง` ให้ตั้ง:
+
+```text
+LEGEND_COLOR_PREVIEW = NO
+```
+
+และใช้เพียงชื่อสี/สัญลักษณ์ขาว-ดำ
+
+---
+
+## 13. Region Mapping Rule
 
 ```text
 1 region = 1 question
@@ -313,7 +362,7 @@ OPTIONAL FOOTER / PAGE NUMBER
 
 ---
 
-## 13. Question → Answer → Color Pipeline
+## 14. Question → Answer → Color Pipeline
 
 ```text
 Question
@@ -337,7 +386,7 @@ Choose target answer
 
 ---
 
-## 14. Answer Groups and Color Distribution
+## 15. Answer Groups and Color Distribution
 
 กฎ:
 - answer groups ห้าม overlap
@@ -349,7 +398,7 @@ Choose target answer
 
 ---
 
-## 15. Supported Subjects and Question Types
+## 16. Supported Subjects and Question Types
 
 รองรับอย่างน้อย:
 
@@ -391,7 +440,7 @@ CUSTOM
 
 ---
 
-## 16. Difficulty
+## 17. Difficulty
 
 รองรับ:
 
@@ -409,7 +458,7 @@ GRADE_LEVEL > DIFFICULTY
 
 ---
 
-## 17. Answer Key
+## 18. Answer Key
 
 เมื่อ `ANSWER_KEY = YES` ให้สร้างเฉลยจาก source data เดียวกับ worksheet
 
@@ -429,23 +478,33 @@ ANSWER_KEY = NO
 
 ---
 
-## 18. Black-and-White Interpretation
+## 19. Black-and-White Interpretation
 
 หากผู้ใช้ระบุ:
 
 `ห้ามระบายสีเด็ดขาด ขอเป็นขาว-ดำ`
 
-ให้ตีความว่า **ไฟล์ student worksheet ต้องไม่ถูกลงสีสำเร็จ** ไม่ได้หมายความว่าให้ยกเลิก Color by Code
+ให้ตีความว่า **main student worksheet / main coloring artwork ต้องไม่ถูกลงสีสำเร็จ** ไม่ได้หมายความว่าให้ยกเลิก Color by Code
+
+Default interpretation:
+- artwork และ regions เป็นขาว-ดำ
+- เด็กเป็นผู้ระบายสีเองภายหลัง
+- ห้ามเติมสีจริงลงใน main coloring area
+- ตารางรหัสสียังคงบอกชื่อสี
+- **ตัวอย่างสีขนาดเล็กใน legend สามารถเป็นสีจริงได้** เพื่อช่วยให้เด็กเห็นตัวอย่าง เว้นแต่ผู้ใช้ระบุว่าห้ามใช้สีทั้งหมดจริง ๆ
 
 ดังนั้น:
-- artwork และ regions เป็นขาว-ดำ
-- ตารางรหัสสียังคงบอกชื่อสีที่เด็กต้องใช้
-- เด็กเป็นผู้ระบายสีเองภายหลัง
-- ห้ามเติมสีจริงลงใน main worksheet
+
+```text
+BLACK_WHITE_MODE = YES
+LEGEND_COLOR_PREVIEW = YES
+```
+
+ไม่ขัดกัน เพราะ `LEGEND_COLOR_PREVIEW` เป็นข้อยกเว้นเฉพาะ visual reference
 
 ---
 
-## 19. Validation
+## 20. Validation
 
 ก่อน render ต้องตรวจ:
 
@@ -461,6 +520,8 @@ ANSWER_KEY = NO
 - ทุกคำตอบ map ไปสีเดียว
 - legend ตรงกับ regions 100%
 - จำนวนสีไม่เกิน 12
+- ชื่อสีกับ preview color ตรงกัน
+- ไม่มีสีหลุดเข้า main coloring area โดยไม่ตั้งใจ
 
 ### Thai QA
 - ภาษาไทยถูกต้อง
@@ -473,20 +534,22 @@ ANSWER_KEY = NO
 - safe margins ผ่าน
 
 ### Print QA
-- พิมพ์ขาว-ดำได้
+- main worksheet พิมพ์ขาว-ดำได้ดี
 - เส้นชัด
 - ถ่ายเอกสารได้
 - เด็กระบายสีได้จริง
+- legend preview ยังอ่านชื่อสีได้แม้เครื่องพิมพ์เป็นขาว-ดำ
 
 ---
 
-## 20. Single Source of Truth
+## 21. Single Source of Truth
 
 ใช้ internal data model เดียวสำหรับ:
 
 ```text
 Worksheet
 Color Legend
+Legend Color Preview
 Answer Key
 QA
 ```
@@ -495,7 +558,7 @@ QA
 
 ---
 
-## 21. Batch Generation
+## 22. Batch Generation
 
 รองรับ:
 
@@ -513,7 +576,7 @@ CROSS_SHEET_DUPLICATE_POLICY = NONE
 
 ---
 
-## 22. Revision Commands
+## 23. Revision Commands
 
 รองรับคำสั่งสั้น ๆ เช่น:
 
@@ -525,13 +588,15 @@ CROSS_SHEET_DUPLICATE_POLICY = NONE
 - `ช่องใหญ่ขึ้น`
 - `รูปง่ายลง`
 - `ไม่ต้องมีเฉลย`
+- `ให้ตัวอย่างสีในรหัสสีเป็นสีจริง`
+- `ขาว-ดำล้วน รวมรหัสสีด้วย`
 - `ขออีกชุดไม่ซ้ำ`
 
 ให้คง parameters เดิมที่ผู้ใช้ไม่ได้เปลี่ยน
 
 ---
 
-## 23. Output Contract
+## 24. Output Contract
 
 เมื่อ environment รองรับ file creation ให้ target:
 
@@ -544,7 +609,7 @@ CROSS_SHEET_DUPLICATE_POLICY = NONE
 
 ---
 
-## 24. Priority Order
+## 25. Priority Order
 
 1. ความถูกต้องของเนื้อหา
 2. ความถูกต้องของ answer-to-color mapping
@@ -553,12 +618,13 @@ CROSS_SHEET_DUPLICATE_POLICY = NONE
 5. คุณภาพภาษาไทย
 6. การอ่านง่ายของโจทย์ใน regions
 7. พื้นที่ระบายสี
-8. ความพร้อมพิมพ์
-9. ความสวยงามและการตกแต่ง
+8. ความถูกต้องของ color legend และตัวอย่างสี
+9. ความพร้อมพิมพ์
+10. ความสวยงามและการตกแต่ง
 
 ---
 
-## 25. Success Condition
+## 26. Success Condition
 
 ```text
 PASS — subject/topic
@@ -567,9 +633,11 @@ PASS — question layout
 PASS — answers
 PASS — color mapping
 PASS — legend
+PASS — legend preview matches color names
 PASS — Thai language
 PASS — page size/orientation
 PASS — region readability
+PASS — main coloring area remains uncolored
 PASS — print usability
 PASS — answer-key policy
 ```
@@ -578,7 +646,7 @@ PASS — answer-key policy
 
 ---
 
-## 26. Master UX Goal
+## 27. Master UX Goal
 
 ครูควรใช้เพียงพารามิเตอร์หลักได้ง่าย:
 
