@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Render Pipeline Policy
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Gem-specific production policy
 
 ## Purpose
@@ -31,6 +31,7 @@ Verified Content Blueprint
 → Tile/Region graph
 → SVG/vector paths
 → Deterministic Thai/text placement
+→ Thai-font glyph validation
 → Color legend swatches
 → Raster preview if needed
 → Print QA
@@ -91,6 +92,7 @@ RENDER_MODE
 VECTOR_RENDERING_PREFERRED
 DETERMINISTIC_TEXT_PLACEMENT
 DETERMINISTIC_REGION_TOPOLOGY
+THAI_FONT_RENDER_QA
 IMAGE_MODEL_ROLE
 MAX_VISUAL_REGEN_ROUNDS
 LINE_FAILURE_REDUCTION_FACTOR
@@ -103,6 +105,7 @@ RENDER_MODE = AUTO
 VECTOR_RENDERING_PREFERRED = YES
 DETERMINISTIC_TEXT_PLACEMENT = YES_WHEN_AVAILABLE
 DETERMINISTIC_REGION_TOPOLOGY = YES_WHEN_AVAILABLE
+THAI_FONT_RENDER_QA = CRITICAL
 IMAGE_MODEL_ROLE = COMPOSITION_ASSIST
 MAX_VISUAL_REGEN_ROUNDS = 3
 LINE_FAILURE_REDUCTION_FACTOR = REDUCE_MICRO_DENSITY_20_TO_35_PERCENT
@@ -146,9 +149,17 @@ render candidate
 - no duplicate edge
 - no sliver cell below minimum threshold
 
-## Text rule
+## Text and Thai-font rule
 
 ข้อความหัวข้อ คำสั่ง โจทย์ ตัวเลข ชื่อสี และ legend labels เป็น deterministic visible text เมื่อ renderer รองรับ
+
+ก่อน render final ต้องตรวจว่า font stack ที่เลือกมี glyph ภาษาไทยจริงและรองรับสระ/วรรณยุกต์ครบ หาก preview แสดงเป็นกล่องสี่เหลี่ยม/tofu หรือ glyph หาย ให้ถือเป็น Critical FAIL และเปลี่ยนไปใช้ Thai-capable font ที่มีอยู่ใน environment เช่นตระกูล Noto Sans Thai/ฟอนต์ไทยที่ระบบรองรับ โดยไม่แจกจ่ายไฟล์ฟอนต์ออกไป
+
+```text
+THAI_FONT_RENDER_QA = CRITICAL
+NO tofu/missing-glyph boxes
+NO detached/missing Thai vowel/tone marks caused by font fallback
+```
 
 Image model ไม่ควร rewrite Thai text ใน production mode.
 
