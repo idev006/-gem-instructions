@@ -2,6 +2,25 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.6.0 — 2026-08-27
+
+- Finalized the Geometric Color-by-Code Gem as **v1.6.0 — Natural Harmony Integration**.
+- Promoted Natural Harmony into the canonical parameter model with `COMPOSITION_SYSTEM`, `GOLDEN_SECTION_GUIDE`, `FIBONACCI_RHYTHM`, `PHYLLOTAXIS_MODE`, `RADIAL_SYMMETRY`, `PETAL_COUNT_LOGIC`, `FOCAL_POINT_PLACEMENT`, `NATURAL_SCALE_HIERARCHY`, `COMPOSITION_BALANCE`, `SYMMETRY_MODE`, `QUESTION_FLOW`, and `QUESTION_DISTRIBUTION_BALANCE`.
+- Defined Natural Harmony as a composition guide for placement, scale, rhythm, focal hierarchy and balance; primary shape remains the construction grammar.
+- Added truthfulness rules distinguishing exact/calculated natural proportions from approximate/inspired use.
+- Added question-flow planning so question regions follow visual rhythm without mutating verified content or mapping.
+- Hardened cross-theme behavior to prevent mechanical reuse of flower symmetry for unrelated themes.
+- Final production rendering remains `VECTOR_FIRST_REQUIRED`; generative raster is concept/mockup only for final printable boundaries.
+- Updated `GEM_INSTRUCTIONS_PRODUCTION.md`, `USER_GUIDE.md`, `OUTPUT_CONTRACT.md`, `README.md`, Natural Proportion and Reference Version policies, usage examples, acceptance tests and regression tests.
+- Added `qa/V1_6_FINALIZATION_CHECKLIST.md` as the final production hardening checklist.
+
+## Geometric Color-by-Code 1.5.0 — 2026-08-27
+
+- Made deterministic/vector geometry mandatory for production-final coloring boundaries.
+- Added deterministic shared-edge topology and deterministic Thai/text placement expectations for final print.
+- Restricted image-model-only raster output to preview/mockup status for line-quality purposes.
+- Required production raster previews/exports to derive from the vector master.
+
 ## Geometric Color-by-Code 1.4.0 — 2026-08-27
 
 - Promoted the canonical Gem to v1.4.0 after visual review of the improved triangle-garden worksheet.
