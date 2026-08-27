@@ -42,18 +42,40 @@ WRONG: themed illustration → geometric grid drawn on top
 - Color legend: real color preview allowed
 - Answer key: enabled
 
-## Documents
+## Document map
 
+### Core
 - `GEM_INSTRUCTIONS_PRODUCTION.md` — canonical Gem behavior and parameter contract
 - `USER_GUIDE.md` — practical teacher/user guide
 - `OUTPUT_CONTRACT.md` — required pipeline outputs and integrity rules
-- `examples/USAGE_EXAMPLES.md` — sample commands and edge cases
-- `policies/GEOMETRY_LAYOUT_POLICY.md` — shape grammar, tiling, silhouette, region construction
-- `policies/COLOR_MAPPING_POLICY.md` — color/code mapping and legend integrity
-- `policies/PAGE_FORMAT_POLICY.md` — page size, orientation, print layout and pagination
+- `CONVERSATION_STARTERS.md` — ready-to-use starter commands
+
+### Examples
+- `examples/USAGE_EXAMPLES.md` — minimal, detailed, revision and edge-case commands
+
+### Policies
+- `policies/GEOMETRY_LAYOUT_POLICY.md` — shape grammar, tiling, silhouette and question-region construction
+- `policies/COLOR_MAPPING_POLICY.md` — answer/code/color mapping and legend integrity
+- `policies/PAGE_FORMAT_POLICY.md` — page size, orientation, print layout, density and pagination
+
+### QA
 - `qa/ACCEPTANCE_TESTS.md` — critical production acceptance tests
 - `qa/REGRESSION_TESTS.md` — recurring failure-prevention tests
-- `qa/DRY_RUN_REPORT.md` — dry-run findings and hardening record
+- `qa/DRY_RUN_REPORT.md` — 9-round dry-run findings and hardening record
+
+## Documentation completeness gate
+
+A change is not considered complete if it changes user-visible behavior but leaves related documentation inconsistent. Update, as applicable:
+
+```text
+Canonical instruction
+→ User guide
+→ Output contract
+→ Policies
+→ Usage examples / conversation starters
+→ Acceptance & regression tests
+→ Changelog
+```
 
 ## Design priority
 
