@@ -1,13 +1,11 @@
 # Geometric Color-by-Code — คู่มือการใช้งาน
 
-Version: 1.5.0
+Version: 1.6.0
 
 ## ใช้ทำอะไร
-
-ใช้สร้างใบงาน Color by Code ที่ภาพหลักเกิดจากรูปทรงเรขาคณิตแบบ mosaic / tessellation เช่น สามเหลี่ยม สี่เหลี่ยม ข้าวหลามตัด หรือหกเหลี่ยม โดยเน้นความถูกต้อง ความสวยงาม ความอ่านง่าย และคุณภาพงานพิมพ์จริง
+ใช้สร้างใบงาน Color by Code ที่ภาพหลักเกิดจากรูปทรงเรขาคณิตแบบ mosaic / tessellation และสามารถใช้ Natural Harmony ช่วยจัดองค์ประกอบให้สวย สมดุล และมีจังหวะคล้ายธรรมชาติ โดยยังคงความถูกต้อง ความอ่านง่าย และคุณภาพงานพิมพ์
 
 ## สิ่งที่ผู้ใช้ควรกำหนด
-
 ขั้นต่ำที่แนะนำ:
 - ระดับชั้น
 - วิชา
@@ -18,159 +16,110 @@ Version: 1.5.0
 - ธีม
 - mosaic/tessellation style
 
-ค่าอื่นปล่อย AUTO ได้
+กำหนดเพิ่มได้:
+- Natural Harmony
+- golden-section guide
+- Fibonacci rhythm
+- phyllotaxis/golden-angle-inspired rhythm
+- symmetry/balance mode
+- focal hierarchy
+- question flow
 
-## ค่าเริ่มต้นสำคัญ
-
+## Defaults
 ```text
-A4 แนวตั้ง
-24 ข้อ
-6 สี
+A4 Portrait
+24 questions
+6 colors
 PRIMARY_SHAPE = TRIANGLE
 SHAPE_DOMINANCE = HIGH
 PRIMARY_SHAPE_COVERAGE_TARGET ≈ 85%
 QUESTION_REGION_MODE = GROUPED_TILES
-TILE_SCALE_VARIATION = CONTROLLED
 MAIN_ART_COLOR_MODE = MONOCHROME
 LEGEND_COLOR_PREVIEW = YES
+COMPOSITION_SYSTEM = AUTO
+NATURAL_SCALE_HIERARCHY = YES
+QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM
 PRODUCTION_FINAL_RENDER_MODE = VECTOR_FIRST_REQUIRED
 ```
 
-## ตัวอย่างคำสั่งพื้นฐาน
-
+## ตัวอย่างคำสั่ง
 ```text
 สร้างใบงาน Color by Code
-ระดับชั้น ป.3
-วิชา คณิตศาสตร์
-หัวข้อ การบวกเลข 1 หลัก
+ป.3 คณิตศาสตร์ การบวกเลข 1 หลัก
 30 ข้อ 6 สี
-ธีม สวนดอกไม้
-ใช้รูปสามเหลี่ยมเป็นรูปทรงหลัก
+ธีมสวนดอกไม้
+ใช้สามเหลี่ยมเป็นรูปทรงหลัก
 ทำเป็น mosaic
+ใช้ Natural Harmony
+ให้ดอกหลักเป็น focal point
+ใช้ golden-section guide และ Fibonacci/radial rhythm เมื่อเหมาะสม
+ให้ question regions ไหลตามจังหวะของภาพ
 A4 แนวตั้ง
 ```
 
-## Natural Proportion / Natural Harmony
-
-หากต้องการ composition ที่มีจังหวะเหมือนธรรมชาติ สามารถสั่งเพิ่มได้ เช่น:
-
-```text
-ใช้ Natural Proportion
-ให้จุดเด่นของภาพวางตาม golden-section guide
-ให้ดอกไม้ใช้ radial symmetry และ Fibonacci-inspired rhythm
-ถ้ามีดอกทานตะวัน ให้ใช้ phyllotaxis / golden-angle-inspired arrangement
-รักษาพื้นที่โจทย์ให้อ่านง่ายและระบายสีได้จริง
-```
-
-ระบบรองรับแนวคิด:
-- Golden ratio / golden section เป็น composition guide
-- Golden-angle-inspired spacing ประมาณ 137.5°
-- Fibonacci-inspired repetition เช่น 3, 5, 8, 13 เมื่อเหมาะสม
-- Radial symmetry
-- Natural scale hierarchy
-- Phyllotaxis-inspired seed/petal grouping
-
-ข้อสำคัญ: สิ่งเหล่านี้เป็น **guide** ไม่ใช่ข้อบังคับให้ทุกองค์ประกอบต้องมีค่า exact ทางคณิตศาสตร์ ความอ่านง่ายและความถูกต้องมาก่อนเสมอ
-
-อ่านเพิ่ม: `policies/NATURAL_PROPORTION_POLICY.md`
-
-## Reference Versions
-
-มี reference baseline 3 ระดับ:
+## Natural Harmony
+Natural Harmony ใช้กับ placement, scale, rhythm, focal hierarchy และ balance เท่านั้น
 
 ```text
-REFERENCE_WOW
-= benchmark ด้านความประทับใจ ความมีชีวิตชีวา และ theme richness
-
-REFERENCE_BEAUTIFUL
-= benchmark ด้านความสะอาด balance negative space และ readability
-
-REFERENCE_NATURAL_HARMONY_V3
-= เป้าหมายรวมข้อดีของสองแบบ + natural proportion/rhythm
+NATURAL HARMONY = composition guide
+PRIMARY SHAPE = construction grammar
 ```
 
-อ่านเพิ่ม: `policies/REFERENCE_VERSION_POLICY.md`
+- Golden section ใช้เป็น guide ไม่บังคับ exact 1.618
+- Fibonacci ใช้เป็นจังหวะ 3/5/8/13 เมื่อเหมาะสม
+- Phyllotaxis/golden-angle ~137.5° ใช้เป็น inspiration ได้
+- ห้ามสร้าง micro-detail เล็กจนระบายสีไม่ได้
+- `SYMMETRY_MODE = AUTO` อาจเลือก bilateral, radial, approximate natural balance หรือ none
 
-## สิ่งที่ระบบทำอัตโนมัติ
+## Question Flow
+`QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM`
 
-1. ตรวจหัวข้อและระดับชั้น
-2. สร้างและตรวจคำถาม/คำตอบ
-3. วาง distribution ของคำตอบ/สี
-4. ล็อก mapping และ legend
-5. สร้าง tile grammar
-6. เลือก composition system
-7. ถ้าเหมาะสม วาง natural proportion / focal hierarchy
-8. สร้าง theme จาก tile clusters
-9. รวม micro tiles เป็น question regions
-10. ตรวจ minimum colorable area
-11. กำหนด stroke hierarchy
-12. final geometry/text แบบ deterministic/vector สำหรับ production print
-13. ตรวจ Thai/text rendering
-14. ตรวจ line/topology/visual/print QA
+ตำแหน่งโจทย์ต้องสนับสนุนสายตาและ composition แต่ห้ามเปลี่ยนจำนวนข้อ คำตอบ mapping หรือ readability
 
-## หลักการคุณภาพเส้น
-
+## Production Quality
 ```text
 CRISP_LINES > MICRO_TILE_DENSITY
 READABILITY > GEOMETRIC_DETAIL
 ```
 
-ถ้า micro mosaic แน่นจนเส้นเสีย ระบบต้องลดความหนาแน่นก่อน ไม่ใช่ทำเส้นให้บางจนพิมพ์ไม่ชัด
+Production final ต้องใช้ deterministic/vector boundaries; image model ใช้เป็น concept/mockup ได้แต่ไม่ใช่ final coloring boundary source
 
 ## Stroke hierarchy
-
 ```text
 กรอบหลัก = หนาสุด
-silhouette ของวัตถุ/ธีม = ปานกลาง
-เส้นแบ่ง tile = บางกว่าเล็กน้อยแต่ยังคม
+silhouette = ปานกลาง
+internal tile = บางกว่าเล็กน้อยแต่ยังคม
 ```
 
-## พื้นที่ระบายสีขั้นต่ำ
+## สิ่งที่ต้องหลีกเลี่ยง
+- sliver/needle cells
+- short-segment noise
+- starburst junction
+- fuzzy/double/broken strokes
+- freeform major object เมื่อ SHAPE_DOMINANCE=HIGH
+- orphan legend entry
+- false claim ว่า exact golden ratio/Fibonacci/phyllotaxis
 
-ระบบต้องหลีกเลี่ยง:
-- sliver cell
-- รูปแหลมเล็กมาก
-- segment สั้นถี่ ๆ
-- จุด starburst ที่เส้นหลายเส้นชนกัน
+## Reference Levels
+- `REFERENCE_WOW` — visual impact / richness
+- `REFERENCE_BEAUTIFUL` — cleanliness / balance / readability
+- `REFERENCE_NATURAL_HARMONY_V3` — รวมข้อดีสองแบบ + natural rhythm
 
-ถ้าพบให้ merge/simplify geometry ก่อน render
-
-## Freeform detail
-
-อนุญาตรายละเอียด freeform เล็กน้อยเพื่อให้ภาพอ่านออก เช่น หนวดผีเสื้อ ตา หรือข้อต่อก้านดอก แต่ห้ามใช้ freeform เป็นโครงสร้างหลักของภาพเมื่อ `SHAPE_DOMINANCE = HIGH`
-
-## Production render mode
-
-สำหรับ final print ใช้ deterministic/vector-first เพื่อให้:
-- เส้นคม
-- shared border เป็นเส้นเดียว
-- จำนวน region deterministic
-- ภาษาไทยไม่ถูก image model rewrite
-- raster preview มาจาก vector master
-
-Image model ใช้ช่วยคิด composition/style ได้ แต่ไม่ใช่ source ของ final printable boundaries
+Reference เป็น quality benchmark ไม่ใช่ composition template
 
 ## ตรวจงานก่อนใช้จริง
-
-- จำนวนข้อถูก
-- คำตอบถูก
-- จำนวนสีถูก
-- legend/mapping ตรง
-- ไม่มีสีใน legend ที่ไม่ได้ใช้
-- primary shape เห็นชัดทันที
-- composition ดูสมดุล
-- natural rhythm ไม่ฝืน usability
+- จำนวนข้อ/คำตอบ/สีถูก
+- mapping/legend ตรงและไม่มี orphan
+- primary shape เห็นชัด
+- natural hierarchy สวยแต่ไม่ฝืน
+- question flow สมดุล
 - ไม่มีเส้นแตก/ซ้อน/ขาด
 - ไม่มีช่องเล็กเกินระบาย
-- stroke hierarchy ชัด
-- ภาษาไทยและ glyph ถูกต้อง
-- main art ขาว-ดำตาม default
-- print-safe
+- Thai glyph ถูกต้อง
+- A4/orientation/margins ถูกต้อง
+- production raster ถ้ามีต้องมาจาก vector master
 
-## Golden Reference
-
-งานที่ผ่าน QA ระดับสูงสามารถใช้เป็น Golden Reference ได้ แต่ Golden Reference เป็น **มาตรฐานคุณภาพ** ไม่ใช่แม่แบบ composition ที่ต้องลอกทุกครั้ง
-
-อ่านเพิ่มเติม:
-- `policies/GOLDEN_REFERENCE_STANDARD.md`
+อ่านเพิ่ม:
+- `policies/NATURAL_PROPORTION_POLICY.md`
 - `policies/REFERENCE_VERSION_POLICY.md`
+- `policies/GOLDEN_REFERENCE_STANDARD.md`
