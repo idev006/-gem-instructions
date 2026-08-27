@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Output Contract
 
-Version: 1.0.0
+Version: 1.1.0
 
 ## Required output blocks
 
@@ -31,6 +31,17 @@ ORIENTATION
 ANSWER_KEY
 ```
 
+ถ้าเป็น category/focus activity ต้องเพิ่ม:
+
+```text
+CATEGORY_SET
+FOCUS_CATEGORY
+CATEGORY_FOCUS_MODE
+FOCUS_SHARE_TARGET
+LEGEND_COVERAGE_POLICY
+PREFER_ATOMIC_RESPONSE
+```
+
 ## 2. VERIFIED_CONTENT_BLUEPRINT
 
 ต้องมี source-of-truth ต่อ question:
@@ -41,11 +52,29 @@ prompt_text
 response_type
 correct_answer
 normalized_answer_code
+category_id
 color_id
 question_region_id
 ```
 
-ห้ามให้ final image prompt เปลี่ยน `prompt_text`, `correct_answer`, `normalized_answer_code`, `color_id`
+สำหรับ category activity ต้องมี aggregate block:
+
+```text
+category_set
+usage_count_per_category
+usage_count_per_color
+focus_category
+resolved_focus_share
+legend_entries
+legend_usage_count_per_entry
+legend_coverage_check
+```
+
+ห้ามให้ final image prompt เปลี่ยน `prompt_text`, `correct_answer`, `normalized_answer_code`, `category_id`, `color_id`
+
+Critical rule:
+- ทุก student-facing legend entry ต้องมี usage count >= 1 โดย default
+- focus distribution ต้องผ่าน validation ก่อน visual prompt assembly
 
 ## 3. GEOMETRY_LAYOUT_BLUEPRINT
 
@@ -56,6 +85,8 @@ primary_shape
 tiling_mode
 tessellation_family
 shape_dominance
+shape_dominance_target
+freeform_area_limit
 micro_tile_count_target_or_range
 question_region_count
 question_region_mode
@@ -69,6 +100,15 @@ legend_position
 question_placement
 ```
 
+เมื่อ `SHAPE_DOMINANCE = HIGH` ให้ blueprint ระบุเป้าหมายเชิงโครงสร้าง เช่น:
+
+```text
+shape_dominance_target = approximately >= 80% structural tiling rhythm
+freeform_area_limit = approximately <= 15–20% structural area
+```
+
+ค่าดังกล่าวเป็น design target เพื่อ audit ไม่ใช่ข้ออ้างให้ลด readability
+
 ## 4. FINAL_WORKSHEET_PROMPT
 
 Prompt ต้องประกาศชัดว่า:
@@ -76,18 +116,22 @@ Prompt ต้องประกาศชัดว่า:
 - theme ถูกสร้างจากการจัดกลุ่ม tiles
 - ห้ามสร้าง freeform scene ก่อนแล้ว overlay shape pattern
 - exact question count มาจาก verified blueprint
+- exact legend entries มาจาก verified mapping
+- no orphan legend category/color
+- focus category ต้องคง distribution ที่ verified แล้ว
 - main worksheet monochrome
 - legend preview color ได้เมื่อเปิดใช้งาน
 - no-overlap
 - print-safe
-- ห้าม image model แต่งโจทย์ คำตอบ หรือรหัสสีใหม่
+- ห้าม image model แต่งโจทย์ คำตอบ หมวด หรือรหัสสีใหม่
 
 ## Integrity rule
 
 ```text
 WORKSHEET QUESTIONS
 = ANSWER KEY QUESTIONS
-= MAPPING SOURCE
+= CATEGORY DISTRIBUTION SOURCE
+= LEGEND/MAPPING SOURCE
 ```
 
 ข้อมูลทั้งหมดต้องมาจาก data source เดียวกัน
