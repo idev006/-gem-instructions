@@ -2,6 +2,20 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.0.0 — 2026-08-27
+
+- Added new production Gem at `gems/geometric-color-by-code/`.
+- Defined `PRIMARY_SHAPE` as the construction grammar of the main image, not a decorative overlay.
+- Added tessellation/mosaic architecture: shape grammar → theme silhouette → question regions → answer/code/color mapping.
+- Separated `MICRO_TILE_COUNT` from `QUESTION_REGION_COUNT` so visually rich mosaics can contain many small tiles while preserving readable question regions.
+- Added `QUESTION_REGION_MODE = GROUPED_TILES` as the default.
+- Added theme-silhouette construction by tile grouping and minimized freeform curves.
+- Added explicit exact/approximate tessellation truthfulness rules for different shape families.
+- Added multi-subject response types and normalized answer codes.
+- Added verified content blueprint, mapping integrity, geometry blueprint, and final prompt contracts.
+- Added `USER_GUIDE.md`, `OUTPUT_CONTRACT.md`, geometry policy, usage examples, acceptance tests, regression tests, and a 9-round dry-run report.
+- Dry run converted failures involving shape-as-decoration, text density, mapping conflicts, theme recognizability, image-model text invention, revision drift, and open-ended content into regression rules.
+
 ## Themed Hub Worksheet 1.1.0 — 2026-08-27
 
 - Hardened `gems/themed-hub-worksheet/GEM_INSTRUCTIONS_PRODUCTION.md` from v1.0.0 to v1.1.0.
