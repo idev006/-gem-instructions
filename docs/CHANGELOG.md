@@ -2,6 +2,18 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.7.0 — 2026-08-27
+
+- Promoted the Gem to **v1.7.0 — Twin Output Integrity** after review of the Student/Answer-Key pair revealed that independently generated colored solutions can contain region-color mismatches even when the worksheet content is correct.
+- Made the production default a paired output: `STUDENT_WORKSHEET` (monochrome/unfilled activity regions) + `COLORED_ANSWER_KEY` (fully colored solution).
+- Added the hard rule `ONE MASTER GEOMETRY + ONE VERIFIED MAPPING → TWO RENDER VIEWS`.
+- Added canonical parameters for Student/Answer pair identity, answer-key geometry/text/fill sources, exact layout matching, and critical pair QA.
+- Required Student and Answer Key to share identical region IDs, boundaries, question IDs, text, legend mapping, and line master.
+- Required Answer-Key fills to come only from `VERIFIED_COLOR_MAPPING`; a single incorrectly colored region is now a Critical FAIL.
+- Prohibited independently regenerating the Answer Key with stochastic image generation or allowing the image model to reinterpret answers/colors.
+- Added `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md`.
+- Updated canonical instructions, output contract, user guide, README, acceptance tests and regression tests to v1.7.0 behavior.
+
 ## Geometric Color-by-Code 1.6.0 — 2026-08-27
 
 - Finalized the Geometric Color-by-Code Gem as **v1.6.0 — Natural Harmony Integration**.
@@ -159,4 +171,4 @@ All notable changes to the canonical Gem instructions are recorded here.
 ## Worksheet Gem 1.0.0 — 2026-08-27
 
 - Established the initial canonical production Gem instruction.
-- Added teacher-first natural-language interaction, A4 defaults, multiplication digit constraints, math validation, adaptive layout, answer-key generation, and QA behavior.
+- Added teacher-first natural-language interaction, A4 defaults, multiplication digit constraints, math validation, answer-key generation, and QA behavior.
