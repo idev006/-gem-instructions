@@ -2,6 +2,21 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Color-by-Code 1.4.0 — 2026-08-27
+
+- Hardened the Gem into a true multi-subject Color-by-Code engine.
+- Defined “supports every subject/topic” as support for topics that can be converted into short, unambiguous, mappable responses.
+- Added `CONTENT_RESPONSE_TYPE` with NUMERIC, WORD, SHORT_TEXT, CHOICE, CATEGORY, TRUE_FALSE, MATCH_CODE, and AUTO modes.
+- Added a universal Subject/Topic Adapter to select suitable question form, response type, validation method, and color-mapping strategy by subject.
+- Added normalized answer codes so non-math subjects do not need numeric answer ranges.
+- Defined strict mapping integrity: one color may represent many answers/codes, but one normalized answer/code may map to only one color.
+- Replaced the ambiguous `BLACK_WHITE_MODE` concept with separate `MAIN_ART_COLOR_MODE = MONOCHROME` and `LEGEND_COLOR_PREVIEW = YES` defaults.
+- Clarified that only legend color samples may be colored by default; the main worksheet remains black-and-white for student coloring.
+- Renamed the default palette to the brand-neutral `BASIC_12_COLORED_PENCIL_PALETTE`; do not attribute it to a specific SKU/brand without verified source data.
+- Added explicit open-ended-topic conversion rules and subject-specific validation for mathematics, languages, science, social studies, health, and other factual subjects.
+- Preserved A4 Portrait as the default page and horizontal inline math as the default Color-by-Code math layout.
+- Canonical file: `gem/COLOR_BY_CODE_GEM_INSTRUCTIONS_PRODUCTION.md`.
+
 ## Color-by-Code 1.3.0 — 2026-08-27
 
 - Added `LEGEND_COLOR_PREVIEW` and `LEGEND_PREVIEW_STYLE` parameters.
