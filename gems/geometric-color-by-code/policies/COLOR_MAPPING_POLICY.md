@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Color Mapping Policy
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Gem-specific policy
 
 ## Purpose
@@ -13,7 +13,7 @@ Define deterministic and auditable mapping from verified worksheet answers to co
 Question
 → Correct Answer
 → Normalized Answer / Code
-→ Answer Group
+→ Answer Group / Category
 → Color ID
 → Legend Entry
 → Question Region
@@ -28,6 +28,34 @@ Question
 5. Legend entries must be generated from the same mapping source used by worksheet regions and answer key.
 6. Changing the number of colors requires rebuilding the mapping; do not merely recolor the legend.
 7. `QUESTION_COUNT`, answer data, region IDs and mapping counts must reconcile before prompt assembly.
+8. Every student-facing legend entry must have at least one mapped question/region by default.
+9. An unused legend color/category is a Critical FAIL unless the user explicitly requested an informational legend that may contain inactive entries.
+10. If the activity says `เน้น <category>` / `focus <category>`, the focus distribution must be resolved and validated before mapping.
+
+## Category focus policy
+
+For category-based activities:
+
+```text
+FOCUS_CATEGORY = <category> or NONE
+CATEGORY_FOCUS_MODE = EMPHASIZED | BALANCED | CUSTOM | AUTO
+```
+
+If `EMPHASIZED` and no explicit percentage is provided, target approximately 40–60% of questions for the focus category, while keeping at least one question for every displayed legend category when feasible.
+
+The focus category must have a greater question count than each secondary category unless arithmetic constraints or explicit user instructions make that impossible.
+
+Example: 10 questions, 5 categories, focus = แม่กง:
+
+```text
+แม่กง 5
+แม่กน 2
+แม่กม 1
+แม่เกย 1
+แม่เกอว 1
+```
+
+A 4/4/2/0/0 distribution must FAIL if the legend still displays all 5 categories and claims the worksheet focuses on แม่กง.
 
 ## Supported response families
 
@@ -41,11 +69,13 @@ Question
 
 For non-numeric subjects, normalize text/category responses before color assignment. Do not force textual subjects into artificial numeric ranges.
 
+For vocabulary/classification activities, prefer atomic single-word responses when the learning objective does not require phrases. This reduces ambiguity and improves deterministic classification.
+
 ## Distribution
 
-Default target: `BALANCED`.
+Default target: `BALANCED` unless a focus category is explicitly requested.
 
-The mapping engine should distribute question regions across requested colors as evenly as practical while preserving content correctness.
+The mapping engine should distribute question regions across requested colors as evenly as practical while preserving content correctness and focus semantics.
 
 Example for 30 questions / 6 colors:
 
@@ -60,6 +90,7 @@ Default:
 ```text
 LEGEND_COLOR_PREVIEW = YES
 MAIN_ART_COLOR_MODE = MONOCHROME
+LEGEND_COVERAGE_POLICY = NO_ORPHAN_LEGEND_ENTRY
 ```
 
 The main worksheet remains black-and-white for student coloring. A small real-color sample may appear in the legend.
@@ -87,8 +118,10 @@ Use text/number/code labels only.
 The answer key must be generated from the same verified mapping data and should support at least:
 
 ```text
-Question ID | Correct Answer | Normalized Code | Color
+Question ID | Correct Answer | Normalized Code | Category | Color
 ```
+
+For category activities, also retain aggregate usage counts per category/color so QA can verify coverage and focus ratios.
 
 ## QA gates
 
@@ -97,6 +130,8 @@ PASS only when:
 - no normalized code maps to more than one color
 - all question regions have valid mapping records
 - legend count equals requested color count
+- every legend entry has usage count >= 1 unless explicitly allowed otherwise
+- focus-category distribution matches the resolved policy when applicable
 - legend colors and labels agree
 - answer key agrees with worksheet mapping
 - there are no orphan colors or orphan regions unless explicitly allowed
