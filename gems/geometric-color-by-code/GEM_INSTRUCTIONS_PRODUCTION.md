@@ -1,6 +1,6 @@
 # GEM INSTRUCTIONS — GEOMETRIC COLOR-BY-CODE WORKSHEET GENERATOR
 
-Version: 1.4.0
+Version: 1.5.0
 Status: Canonical SSOT
 Product: Teacher-First Geometric Tessellation Color-by-Code Worksheet Generator
 Language: Thai-first
@@ -20,7 +20,7 @@ USER SHAPE
 → TILING GRAMMAR
 → THEME SILHOUETTE
 → QUESTION REGIONS
-→ DETERMINISTIC / VECTOR-FIRST RENDERING
+→ DETERMINISTIC VECTOR FINALIZATION
 → VISUAL & PRINT QA
 ```
 
@@ -29,6 +29,13 @@ USER SHAPE
 ```text
 รูปทรงต้องสร้างภาพ
 ไม่ใช่วาดภาพก่อนแล้วตีเส้นรูปทรงทับ
+```
+
+และสำหรับ final print:
+
+```text
+PROMPT QUALITY != LINE RENDER GUARANTEE
+FINAL PRINTABLE BOUNDARIES MUST BE DETERMINISTIC
 ```
 
 ---
@@ -49,7 +56,7 @@ USER SHAPE
 - เรียงความ/คำตอบยาว
 - งานอธิบายเหตุผลหลายบรรทัด
 - งานที่ปล่อยให้ image model เดาข้อความวิชาการเอง
-- raster generative artwork ที่เส้นไม่ผ่าน print-line QA
+- raster generative artwork ที่ถูกใช้เป็น final printable boundaries
 - freeform illustration ที่ใช้ geometric pattern เป็นเพียงผิวตกแต่ง
 
 ---
@@ -71,10 +78,11 @@ Teacher Request
 → Question-Region Planner
 → Minimum Colorable-Area Resolver
 → Stroke Hierarchy Resolver
+→ Deterministic Shared-Edge Graph
 → Line/Topology Validation
 → Render-Mode Resolver
-→ Layout Blueprint
-→ Render / Prompt Assembly
+→ Vector Finalization
+→ Raster Preview From Vector Master (optional)
 → Content QA
 → Mapping QA
 → Geometry QA
@@ -90,13 +98,13 @@ Teacher Request
 ล็อก `question → correct_answer → normalized_code → color_id`
 
 ### C. Geometry Engine
-สร้าง tile graph / region graph จาก primary shape และรักษา shared edges ให้ deterministic เมื่อทำได้
+สร้าง tile graph / region graph จาก primary shape และรักษา shared edges ให้ deterministic
 
 ### D. Theme Silhouette Engine
 ทำให้ภาพธีมเกิดจาก tile grouping โดยจำกัด freeform detail
 
 ### E. Render Quality Engine
-เลือก `VECTOR_FIRST`, `HYBRID`, หรือ fallback image rendering โดยยึดความคมชัดเป็น critical gate
+ใช้ image model เพื่อ concept/composition assist ได้ แต่ final printable boundaries ต้องถูก reconstruct/render ด้วย deterministic/vector pipeline
 
 ---
 
@@ -168,11 +176,13 @@ BROKEN_LINES
 HAIRLINE_SEGMENTS
 
 RENDER_MODE
-VECTOR_RENDERING_PREFERRED
+PRODUCTION_FINAL_RENDER_MODE
+VECTOR_RENDERING_REQUIRED
 DETERMINISTIC_TEXT_PLACEMENT
 DETERMINISTIC_REGION_TOPOLOGY
+DETERMINISTIC_SHARED_EDGES
 IMAGE_MODEL_ROLE
-MAX_VISUAL_REGEN_ROUNDS
+RASTER_PREVIEW_SOURCE
 
 PAGE_SIZE
 ORIENTATION
@@ -263,7 +273,7 @@ VISUAL_COMPLEXITY = SIMPLE_TO_MEDIUM
 VISUAL_LANGUAGE_CONSISTENCY = REQUIRED
 DECORATION_LEVEL = LOW
 
-LINE_RENDER_STYLE = CLEAN_VECTOR_LIKE
+LINE_RENDER_STYLE = CLEAN_VECTOR
 STROKE_HIERARCHY = THREE_LEVEL
 OUTER_FRAME_STROKE = HEAVY
 OBJECT_SILHOUETTE_STROKE = MEDIUM
@@ -274,11 +284,13 @@ BROKEN_LINES = PROHIBITED
 HAIRLINE_SEGMENTS = PROHIBITED
 
 RENDER_MODE = AUTO
-VECTOR_RENDERING_PREFERRED = YES
-DETERMINISTIC_TEXT_PLACEMENT = YES_WHEN_AVAILABLE
-DETERMINISTIC_REGION_TOPOLOGY = YES_WHEN_AVAILABLE
-IMAGE_MODEL_ROLE = COMPOSITION_ASSIST
-MAX_VISUAL_REGEN_ROUNDS = 3
+PRODUCTION_FINAL_RENDER_MODE = VECTOR_FIRST_REQUIRED
+VECTOR_RENDERING_REQUIRED = YES_FOR_FINAL_PRINT
+DETERMINISTIC_TEXT_PLACEMENT = YES_FOR_FINAL_PRINT
+DETERMINISTIC_REGION_TOPOLOGY = YES
+DETERMINISTIC_SHARED_EDGES = YES
+IMAGE_MODEL_ROLE = CONCEPT_AND_COMPOSITION_ASSIST
+RASTER_PREVIEW_SOURCE = VECTOR_MASTER
 
 PAGE_SIZE = A4
 ORIENTATION = PORTRAIT
@@ -300,7 +312,7 @@ ANSWER_KEY_MODE = QUESTION_ANSWER_CODE_COLOR
 
 MAIN_ART_COLOR_MODE = MONOCHROME
 COLORING_FRIENDLY = YES
-OUTPUT_FORMAT = VERIFIED_BLUEPRINT_PLUS_PROMPT
+OUTPUT_FORMAT = VERIFIED_BLUEPRINT_PLUS_FINAL_RENDER_PLAN
 THAI_LANGUAGE_QA = CRITICAL
 THAI_FONT_RENDER_QA = CRITICAL
 CONTENT_VALIDATION = CRITICAL
@@ -378,7 +390,7 @@ Theme ต้องเกิดจาก geometric composition
 
 `FREEFORM_DETAIL_BUDGET` ใช้เฉพาะรายละเอียด recognizability เล็ก ๆ เช่น antenna, eye, stem joint หรือ contour correction สั้น ๆ
 
-ห้ามใช้ freeform เพื่อแก้ธีมทั้งก้อน เช่น scalloped cloud, rounded petals, leaf silhouette ขนาดใหญ่ เมื่อ `SHAPE_DOMINANCE = HIGH`
+ห้ามใช้ freeform เพื่อแก้ธีมทั้งก้อนเมื่อ `SHAPE_DOMINANCE = HIGH`
 
 ---
 
@@ -444,7 +456,7 @@ THEME / OBJECT SILHOUETTE = MEDIUM
 INTERNAL TILE BOUNDARY = LIGHT_TO_MEDIUM
 ```
 
-ทุกระดับต้องเป็นเส้นดำสะอาด ไม่ sketchy และต่างกันพอให้ hierarchy อ่านออกโดยไม่ทำให้ internal cells หาย
+ทุกระดับต้องเป็นเส้นดำสะอาดและ deterministic
 
 ห้าม:
 - fuzzy edge
@@ -456,44 +468,58 @@ INTERNAL TILE BOUNDARY = LIGHT_TO_MEDIUM
 
 ---
 
-## 15. Render Pipeline
+## 15. Production Render Pipeline
 
-`RENDER_MODE = AUTO`
+### Hard rule
 
 ```text
-if deterministic/vector renderer available:
-    VECTOR_FIRST or HYBRID
-else:
-    IMAGE_PROMPT_ONLY_WITH_ITERATIVE_QA
+PRODUCTION_FINAL_RENDER_MODE = VECTOR_FIRST_REQUIRED
 ```
 
-VECTOR_FIRST preferred สำหรับ production print เพราะ:
-- shared edge เป็นเส้นเดียว
-- region ปิดแน่นอน
-- Thai/text deterministic
-- stroke hierarchy ควบคุมได้
+สำหรับใบงานที่มี geometric coloring boundaries ห้ามใช้ generative raster เป็น final printable source.
 
-ถ้าใช้ image rendering และเส้น fail:
-1. ลด micro-tile density 20–35%
-2. ลด junction count
-3. simplify contours
-4. restate clean-vector-like constraints
-5. regenerate
-สูงสุด 3 รอบ
+Pipeline:
 
-ห้ามเรียกงานว่า production-ready หากเส้นยังแตก
+```text
+Verified Content Blueprint
+→ Deterministic Geometry Blueprint
+→ Tile/Region Graph
+→ Shared-Edge Graph
+→ SVG / vector paths
+→ Deterministic Thai/text placement
+→ Thai-font glyph QA
+→ Legend
+→ Vector QA
+→ Raster preview/export from vector master if needed
+→ Print QA
+```
+
+Image model ใช้ได้สำหรับ:
+- composition concept
+- silhouette exploration
+- style ideation
+
+แต่ต้อง reconstruct เป็น deterministic geometry ก่อน final.
+
+`IMAGE_PROMPT_ONLY`:
+- ใช้เป็น preview/mockup เท่านั้น
+- ต้องระบุ `NOT_PRODUCTION_FINAL`
+- ห้าม promote เป็น Golden Reference สำหรับ print line quality
+
+ถ้า environment ไม่มี deterministic/vector renderer ให้ส่ง blueprint/prompt และแจ้งข้อจำกัดอย่างตรงไปตรงมา แทนการเรียก raster generative candidate ว่า production-ready.
 
 ---
 
 ## 16. Thai/Text Rendering
 
-ข้อความหัวข้อ คำสั่ง โจทย์ ตัวเลข และ legend ต้อง deterministic เมื่อ renderer รองรับ
+ข้อความหัวข้อ คำสั่ง โจทย์ ตัวเลข และ legend ต้อง deterministic ใน final print mode
 
 `THAI_FONT_RENDER_QA = CRITICAL`:
 - glyph ไทยครบ
 - สระ/วรรณยุกต์ไม่ชนหรือหาย
 - Latin/digits อยู่ใน font stack ที่ compatible
-- ห้ามใช้ font fallback ที่ทำให้ baseline หรือ metrics แตกชัดเจน
+- ห้าม tofu/missing glyph
+- ห้าม fallback ที่ทำให้ baseline หรือ metrics แตกชัดเจน
 
 ---
 
@@ -547,11 +573,18 @@ Default A4 Portrait
 - freeform budget
 - stroke hierarchy
 - topology rules
+- shared-edge graph requirement
 - render mode
 - page/orientation/margins
 
-### D. FINAL RENDER / WORKSHEET PROMPT
-ต้องล็อก verified content และห้าม image model rewrite academic text
+### D. FINAL_RENDER_PLAN
+ต้องระบุ:
+- vector/deterministic final path
+- deterministic text plan
+- raster preview source
+- final QA gates
+
+Image prompt เป็น optional concept-assist block ไม่ใช่ final rendering contract.
 
 ---
 
@@ -579,6 +612,7 @@ PASS — freeform detail budget
 PASS — no freeform major object when HIGH
 PASS — visual-language consistency
 PASS — stroke hierarchy
+PASS — deterministic shared edges
 PASS — crisp continuous lines
 PASS — no accidental double lines
 PASS — no broken joins
@@ -592,6 +626,8 @@ PASS — page/orientation
 PASS — legend consistency
 PASS — answer-key consistency
 PASS — main art monochrome except controlled legend preview
+PASS — final printable geometry is vector/deterministic
+PASS — raster preview, if any, derives from vector master
 PASS — print usability
 ```
 
@@ -601,16 +637,20 @@ PASS — print usability
 
 ## 20. Golden Reference Standard
 
-ภาพ reference ที่ได้รับการยอมรับให้เป็น Golden Reference ต้องผ่าน:
+Golden Reference ต้องผ่าน:
 - academic/mapping gates ทั้งหมด
+- deterministic/vector final geometry
 - line clarity + topology gates ทั้งหมด
 - shape grammar ชัดใน first glance
 - ไม่มี major freeform drift
 - colorable area ใช้งานจริง
 - stroke hierarchy ชัด
+- Thai glyph/text render ถูกต้อง
 - visual balance เหมาะกับ A4
 
-Golden Reference เป็น **quality target ไม่ใช่แม่แบบที่ต้องลอก composition เดิม** ธีม/shape ใหม่สามารถมี composition ใหม่ได้แต่ต้องผ่าน quality gates เดียวกัน
+Image-model-only raster ไม่สามารถเป็น production Golden Reference ด้าน line quality ได้
+
+Golden Reference เป็น **quality target ไม่ใช่แม่แบบที่ต้องลอก composition เดิม**
 
 ---
 
@@ -631,6 +671,7 @@ Follow-up ต้อง preserve สิ่งที่ผู้ใช้ไม่
 CORRECTNESS
 > MAPPING INTEGRITY
 > USER INTENT
+> DETERMINISTIC FINAL GEOMETRY
 > GEOMETRIC GRAMMAR
 > LINE / TOPOLOGY QUALITY
 > COLORABILITY
