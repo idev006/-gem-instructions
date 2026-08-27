@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.5.0
+Version: 1.6.0
 
 ## Core content and geometry regressions
 
@@ -70,3 +70,37 @@ PASS when output is explicitly marked preview/mockup and the limitation is surfa
 ### R40 — Repeated image regeneration without root-cause change
 FAIL if broken-line output is regenerated repeatedly with nearly identical image prompts and accepted after visual luck.
 PASS when the pipeline switches renderer or reconstructs deterministic geometry instead of relying on stochastic improvement.
+
+## Natural proportion regressions
+
+### R41 — Forced golden ratio
+FAIL if layout sacrifices readable question regions, margins, or legend space to force a 1.618 ratio.
+PASS when golden-section guidance is subordinate to usability.
+
+### R42 — Unsupported exactness claim
+FAIL if an approximate visual composition is described as exact golden ratio, exact Fibonacci spiral, or exact golden-angle construction without calculation/validation.
+PASS when language says inspired/guided unless exactness is actually verified.
+
+### R43 — Phyllotaxis creates uncolorable micro-detail
+FAIL if seed/petal simulation creates tiny cells below minimum colorable size.
+PASS when seed/spiral structure is grouped into larger wedges/bands/clusters.
+
+### R44 — Fibonacci count overrides content
+FAIL if petal/rhythm counts alter verified question count or mapping.
+PASS when natural pattern controls supporting visual grouping only.
+
+### R45 — Natural proportion replaces primary-shape grammar
+FAIL if spiral/radial motifs become freeform curves that obscure the requested geometric shape.
+PASS when natural rhythm controls placement/scale while the primary shape still constructs objects.
+
+### R46 — Mirror symmetry mistaken for natural harmony
+FAIL if all elements are mirrored rigidly and the composition loses organic balance when `NATURAL_PROPORTION` is requested.
+PASS when dynamic balance may include controlled asymmetry while retaining focal hierarchy.
+
+### R47 — Natural hierarchy has no focal point
+FAIL if all flowers/objects use equal size and equal visual weight under `SCALE_PROGRESSION = NATURAL_HIERARCHY`.
+PASS when one focal element, secondary elements, and supporting motifs are clearly resolved.
+
+### R48 — V3 loses approved strengths
+FAIL if a V3 candidate gains natural-pattern styling but materially loses the visual impact of `REFERENCE_WOW` or the cleanliness/readability of `REFERENCE_BEAUTIFUL`.
+PASS when V3 demonstrably combines both baselines plus natural rhythm.
