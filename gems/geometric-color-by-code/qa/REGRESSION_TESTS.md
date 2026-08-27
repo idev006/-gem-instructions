@@ -1,107 +1,72 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.4.0
+Version: 1.5.0
 
-## R1 — Shape becomes decoration only
-FAIL if requested shape is only overlaid on a conventional illustration.
-PASS when tile grammar constructs most of the themed image.
+## Core content and geometry regressions
 
-## R2 — Question count forces bad micro density
-FAIL if question count is used as the tile count and creates tiny cells.
-PASS when micro tiles and question regions are independent.
+R1 FAIL if requested shape is only overlaid on a conventional illustration.
+R2 FAIL if question count is forced to equal micro-tile count and creates tiny cells.
+R3 FAIL if major theme elements are freeform under HIGH dominance.
+R4 FAIL if one normalized answer maps to multiple colors.
+R5 FAIL if visual generation may rewrite verified academic text or mappings.
+R6 FAIL if text/strokes are reduced below practical print quality to keep one page.
+R7 FAIL if approximate packing is called exact tessellation.
+R8 FAIL if changing geometry unexpectedly changes verified content.
+R9 FAIL if long open-ended responses are forced into coloring regions.
+R10 FAIL if default monochrome main art receives unintended fills/tints.
+R11 FAIL if a legend color/category cannot be produced by any question.
+R12 FAIL if a requested focus category is not actually emphasized.
+R13 FAIL if geometric pattern is merely decorative skin on freeform silhouettes.
+R14 FAIL if primary-shape coverage is materially below the resolved HIGH target.
+R15 FAIL when unnecessary multi-word content creates classification ambiguity.
+R16 FAIL if distribution is discovered only after visual generation.
+R17 FAIL when large circle/leaf/cloud containers abandon primary-shape grammar.
+R18 FAIL when page areas use unrelated tile-size systems.
+R19 FAIL when shared edges appear as parallel/doubled strokes.
+R20 FAIL when intended coloring cells are visually open.
+R21 FAIL when a child cannot practically color a sliver/needle cell.
+R22 FAIL when rounded/scalloped motifs dominate a triangle mosaic.
+R23 FAIL when answer/color distribution is left to the image model.
+R24 FAIL when question text collides with tile borders.
+R25 FAIL when hairline rendering breaks during rasterization/printing.
+R26 FAIL when stroke hierarchy is flat and harms readability.
+R27 FAIL when excessive junctions create starburst noise.
+R28 FAIL when very short segments add visual noise without structural value.
+R29 FAIL if density is not reduced after line-quality failure.
+R30 FAIL when Thai font fallback causes missing/misaligned glyphs.
+R31 FAIL if a prior Golden Reference composition is copied instead of only inheriting quality gates.
+R32 FAIL when fuzzy/broken generative raster is accepted as production-final.
 
-## R3 — Freeform theme drift
-FAIL if major flowers/clouds/leaves/wings/body shapes are freeform under HIGH dominance.
-PASS when they are built primarily from shape clusters.
+## Render-pipeline regressions
 
-## R4 — Mapping conflict
-FAIL if one normalized answer maps to multiple colors.
+### R33 — Prompt-only line-quality optimism
+FAIL if the system assumes a stronger prompt can guarantee crisp geometric boundaries from an image model.
+PASS when prompt-only output is treated as preview and final print boundaries are reconstructed deterministically.
 
-## R5 — Image model invents academic text
-FAIL if visual generation may rewrite questions/answers/legend mappings.
+### R34 — Image-model raster used as vector substitute
+FAIL if generative raster is called vector-like/vector-quality merely because it visually resembles vector art.
+PASS only when final geometry comes from actual deterministic paths/edge graph.
 
-## R6 — Over-dense single page
-FAIL if text or strokes are reduced below practical print quality.
-PASS when micro detail is reduced or pagination is used first.
+### R35 — Shared edge rendered twice
+FAIL if two adjacent regions independently draw the same border and produce doubled/uneven line weight.
+PASS when a shared-edge graph stores/renders one logical edge once.
 
-## R7 — False tessellation claim
-FAIL if approximate packing is described as exact tessellation.
+### R36 — Raster-only Golden Reference
+FAIL if an image-model-only raster is promoted to Golden Reference for production print.
+PASS only when the Golden Reference has deterministic/vector final geometry or an equivalent renderer with auditable topology.
 
-## R8 — Revision drift
-FAIL if changing geometry unexpectedly changes verified question content.
+### R37 — Production PNG not derived from master
+FAIL if production PNG/JPG is generated independently from the vector/deterministic master.
+PASS when raster preview/export is rendered from the same master geometry and text source.
 
-## R9 — Open-ended misuse
-FAIL if long responses are forced into coloring regions.
+### R38 — Thai text delegated to image model
+FAIL if final Thai title, instruction, question, color label, or answer key text is generated/re-written inside image generation.
+PASS when final visible academic text is placed deterministically and passes Thai font/glyph QA.
 
-## R10 — Main-art color leakage
-FAIL if default monochrome student artwork receives unintended fills/tints.
+### R39 — Renderer fallback hidden from user
+FAIL if vector/deterministic rendering is unavailable but the system silently labels image-only output production-ready.
+PASS when output is explicitly marked preview/mockup and the limitation is surfaced.
 
-## R11 — Orphan legend entry
-FAIL if a legend color/category cannot be produced by any question.
-
-## R12 — Focus not actually emphasized
-FAIL if a requested focus category ties a secondary category without a valid reason.
-
-## R13 — Freeform silhouette with geometric skin
-FAIL if geometric pattern is only decorative texture on a freeform object.
-
-## R14 — HIGH dominance with low coverage
-FAIL if primary-shape structural rhythm is materially below the resolved target.
-
-## R15 — Ambiguous phrase where atomic item suffices
-FAIL when unnecessary multi-word content makes classification ambiguous.
-
-## R16 — Distribution planned after render
-FAIL if category/answer/color usage is discovered only after visual generation.
-
-## R17 — Question regions abandon shape grammar
-FAIL when large circle/leaf/cloud containers dominate a shape-based worksheet.
-
-## R18 — Uncontrolled tile-scale split
-FAIL when page areas use unrelated tile-size systems.
-
-## R19 — Double lines
-FAIL when shared edges appear as parallel strokes.
-
-## R20 — Broken joins / open regions
-FAIL when intended coloring cells are not visually closed.
-
-## R21 — Tiny sliver cells
-FAIL when a child cannot practically color a cell.
-
-## R22 — Freeform nature elements in triangle mosaic
-FAIL when rounded/scalloped motifs dominate instead of triangle clusters.
-
-## R23 — Answer/color distribution left to image model
-FAIL when balanced usage should have been deterministic.
-
-## R24 — Border/text collision
-FAIL when question text touches or crosses multiple borders.
-
-## R25 — Hairline rendering
-FAIL when internal lines are so thin that rasterization/printing makes them broken or inconsistent.
-
-## R26 — Flat stroke hierarchy
-FAIL when outer frame, silhouette and internal tiles all use visually identical heavy stroke and reduce readability.
-PASS when `frame > silhouette > internal tile` is clearly perceived.
-
-## R27 — Starburst junction noise
-FAIL when many tiny edges converge at one point and create a dark burst or apparent broken-line artifact.
-PASS after merge/stagger/simplification.
-
-## R28 — Minimum segment violation
-FAIL when numerous very short segments create visual noise without educational/structural benefit.
-
-## R29 — Excessive micro-detail after line failure
-FAIL if regeneration keeps the same dense geometry after line-quality failure.
-PASS when density/junction count is intentionally reduced.
-
-## R30 — Thai font fallback failure
-FAIL when Thai glyphs, marks, baseline, or digits visibly mismatch due to unsupported fallback.
-
-## R31 — Golden-reference imitation
-FAIL if the system copies a prior Golden Reference composition even when a new theme/shape calls for a different layout.
-PASS when only quality gates are inherited.
-
-## R32 — Raster candidate mislabeled production-final
-FAIL when fuzzy/broken generative lines are accepted despite vector/deterministic rendering being available or required.
+### R40 — Repeated image regeneration without root-cause change
+FAIL if broken-line output is regenerated repeatedly with nearly identical image prompts and accepted after visual luck.
+PASS when the pipeline switches renderer or reconstructs deterministic geometry instead of relying on stochastic improvement.
