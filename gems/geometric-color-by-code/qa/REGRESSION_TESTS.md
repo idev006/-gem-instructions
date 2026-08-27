@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.2.0
+Version: 1.3.0
 
 ## R1 — Shape becomes decoration only
 FAIL if triangle/rhombus is requested but worksheet is a normal cartoon scene with a few geometric overlays.
@@ -97,3 +97,33 @@ PASS when an answer/color frequency plan exists first, targeting about 5 regions
 ## R24 — Border/text collision
 FAIL when question text touches or crosses multiple tile borders in a way that reduces readability.
 PASS when question placement preserves a clear text-safe area or uses a controlled label anchor.
+
+## R25 — Sketch-like / fragmented line rendering
+FAIL when tile borders look rough, fuzzy, broken, scratchy, pencil-like, or visibly fragmented at normal viewing scale.
+PASS when line art is clean, smooth, vector-like, continuous, and single-pass.
+
+## R26 — Excessive micro-density causes line failure
+FAIL when additional micro triangles create noisy intersections, short fragments, or broken-looking strokes.
+PASS when micro-tile density is reduced until every tile boundary remains clear and printable.
+
+## R27 — Hairline segment misuse
+FAIL when small tiles rely on very thin hairline edges that disappear or become inconsistent in print.
+PASS when internal borders remain a stable medium stroke and tiny geometry is simplified instead.
+
+## R28 — Starburst junction noise
+FAIL when many edges converge at one point and create a dark, messy starburst that obscures cell boundaries.
+PASS when junctions are simplified, usually to 2–3 meaningful edges, while preserving the mosaic silhouette.
+
+## R29 — Main-art tint leakage
+FAIL when monochrome main artwork contains beige, gray, pale yellow, colored shading, or accidental wash.
+PASS when main activity is black line + white fill only, with actual color restricted to the legend when enabled.
+
+## R30 — Wrong quality tradeoff
+FAIL when detail is preserved at the cost of crisp lines.
+PASS when the system follows:
+
+```text
+CRISP_LINES > MICRO_TILE_DENSITY
+READABILITY > GEOMETRIC_DETAIL
+PRINT_USABILITY > DECORATIVE_COMPLEXITY
+```
