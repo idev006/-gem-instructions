@@ -1,129 +1,107 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.3.0
+Version: 1.4.0
 
 ## R1 — Shape becomes decoration only
-FAIL if triangle/rhombus is requested but worksheet is a normal cartoon scene with a few geometric overlays.
-PASS only when requested-shape tiling constructs most of the main image.
+FAIL if requested shape is only overlaid on a conventional illustration.
+PASS when tile grammar constructs most of the themed image.
 
-## R2 — Question count equals micro-tile count by force
-FAIL if 30 questions force exactly 30 tiny tiles and reduce aesthetic quality/readability.
-PASS when micro tiles may exceed 30 and are grouped into 30 question regions.
+## R2 — Question count forces bad micro density
+FAIL if question count is used as the tile count and creates tiny cells.
+PASS when micro tiles and question regions are independent.
 
-## R3 — Theme destroys geometric grammar
-FAIL if freeform flowers/butterflies/animals dominate the scene.
-PASS when theme elements are recognizable from geometric tile clusters.
+## R3 — Freeform theme drift
+FAIL if major flowers/clouds/leaves/wings/body shapes are freeform under HIGH dominance.
+PASS when they are built primarily from shape clusters.
 
 ## R4 — Mapping conflict
-FAIL if the same normalized answer maps to two colors.
-PASS when mapping is deterministic and legend/answer key share one source.
+FAIL if one normalized answer maps to multiple colors.
 
 ## R5 — Image model invents academic text
-FAIL if final prompt asks image model to create or rewrite questions/answers.
-PASS when verified content is locked before visual prompt assembly.
+FAIL if visual generation may rewrite questions/answers/legend mappings.
 
 ## R6 — Over-dense single page
-FAIL if text becomes tiny to fit high question counts.
-PASS when decoration is reduced, grouping changes, then pagination is used.
+FAIL if text or strokes are reduced below practical print quality.
+PASS when micro detail is reduced or pagination is used first.
 
 ## R7 — False tessellation claim
-FAIL if circle packing is called exact tessellation while gaps remain.
-PASS when exact/approximate/cell-pattern mode is identified correctly.
+FAIL if approximate packing is described as exact tessellation.
 
-## R8 — Revision regenerates unrelated content
-FAIL if changing triangle to hexagon changes the question set.
-PASS when only geometry/layout layers regenerate unless user requests new content.
+## R8 — Revision drift
+FAIL if changing geometry unexpectedly changes verified question content.
 
-## R9 — Open-ended subject misuse
-FAIL if long essay answers are inserted into mosaic tiles.
-PASS when activity is adapted to factual short-response/category/choice/true-false form.
+## R9 — Open-ended misuse
+FAIL if long responses are forced into coloring regions.
 
-## R10 — Legend/main-art color leakage
-FAIL if main student activity is pre-colored when default monochrome is active.
-PASS when color is limited to legend previews unless explicitly requested otherwise.
+## R10 — Main-art color leakage
+FAIL if default monochrome student artwork receives unintended fills/tints.
 
 ## R11 — Orphan legend entry
-FAIL when the legend shows a color/category that no question can produce.
-PASS when every legend entry has usage count >= 1 unless the user explicitly requests an informational inactive entry.
+FAIL if a legend color/category cannot be produced by any question.
 
-## R12 — Focus category is not actually emphasized
-FAIL if worksheet says `เน้นแม่กง` but แม่กง ties with another category for highest count without explicit rationale.
-PASS when resolved focus category has a clearly greater count than each secondary category, normally around 40–60% of questions unless otherwise requested.
+## R12 — Focus not actually emphasized
+FAIL if a requested focus category ties a secondary category without a valid reason.
 
 ## R13 — Freeform silhouette with geometric skin
-FAIL if elephant, bird, house, flower, etc. is first drawn as a large conventional freeform silhouette and geometric pattern is merely inserted inside or around it.
-PASS when major components are themselves constructed from grouped cells derived from the primary-shape grammar.
+FAIL if geometric pattern is only decorative texture on a freeform object.
 
-## R14 — HIGH dominance but large freeform areas remain
-FAIL if `SHAPE_DOMINANCE = HIGH` while large curved/polygonal freeform regions dominate the main composition.
-PASS when roughly >=85% of structural tiling rhythm derives from the primary shape and freeform structural area remains minor.
+## R14 — HIGH dominance with low coverage
+FAIL if primary-shape structural rhythm is materially below the resolved target.
 
-## R15 — Ambiguous phrase used where atomic word suffices
-FAIL when a classification worksheet uses multi-word phrases that introduce unnecessary classification ambiguity even though a single word would test the same objective.
-PASS when `PREFER_ATOMIC_RESPONSE = YES` selects clear single-word items where possible.
+## R15 — Ambiguous phrase where atomic item suffices
+FAIL when unnecessary multi-word content makes classification ambiguous.
 
-## R16 — Category plan created after rendering
-FAIL if category counts are discovered only after image generation.
-PASS when category set, focus share, usage counts, legend coverage, verified items, and mapping are frozen before visual prompt assembly.
+## R16 — Distribution planned after render
+FAIL if category/answer/color usage is discovered only after visual generation.
 
-## R17 — Question regions abandon primary-shape grammar
-FAIL when triangle mosaic uses large circular flower centers or freeform leaves as primary question containers.
-PASS when question regions derive from grouped triangle cells or use only small label anchors when required for readability.
+## R17 — Question regions abandon shape grammar
+FAIL when large circle/leaf/cloud containers dominate a shape-based worksheet.
 
 ## R18 — Uncontrolled tile-scale split
-FAIL when one half of the page uses very large sparse tiles and another half uses unrelated tiny dense tiles without coherent transition.
-PASS when `TILE_SCALE_VARIATION = CONTROLLED` and the entire page reads as one mosaic system.
+FAIL when page areas use unrelated tile-size systems.
 
-## R19 — Accidental double lines
-FAIL when shared borders appear as parallel/doubled lines due to overlapping objects or contour corrections.
-PASS when each shared border reads as one clean boundary.
+## R19 — Double lines
+FAIL when shared edges appear as parallel strokes.
 
 ## R20 — Broken joins / open regions
-FAIL when cell borders do not meet cleanly and a coloring region appears open or ambiguous.
-PASS when every intended region is visually closed and topology is unambiguous.
+FAIL when intended coloring cells are not visually closed.
 
 ## R21 — Tiny sliver cells
-FAIL when contour corrections create tiny narrow regions that are impractical for children to color.
-PASS when sliver cells are merged/simplified while preserving mapping integrity.
+FAIL when a child cannot practically color a cell.
 
 ## R22 — Freeform nature elements in triangle mosaic
-FAIL when triangle garden uses conventional rounded flower petals, freeform leaf silhouettes, scalloped clouds, or rounded butterfly wings as dominant shapes.
-PASS when these objects are constructed primarily from triangle clusters.
+FAIL when rounded/scalloped motifs dominate instead of triangle clusters.
 
 ## R23 — Answer/color distribution left to image model
-FAIL when 30 questions / 6 colors have no frozen usage-frequency plan before render.
-PASS when an answer/color frequency plan exists first, targeting about 5 regions per color when content-valid.
+FAIL when balanced usage should have been deterministic.
 
 ## R24 — Border/text collision
-FAIL when question text touches or crosses multiple tile borders in a way that reduces readability.
-PASS when question placement preserves a clear text-safe area or uses a controlled label anchor.
+FAIL when question text touches or crosses multiple borders.
 
-## R25 — Sketch-like / fragmented line rendering
-FAIL when tile borders look rough, fuzzy, broken, scratchy, pencil-like, or visibly fragmented at normal viewing scale.
-PASS when line art is clean, smooth, vector-like, continuous, and single-pass.
+## R25 — Hairline rendering
+FAIL when internal lines are so thin that rasterization/printing makes them broken or inconsistent.
 
-## R26 — Excessive micro-density causes line failure
-FAIL when additional micro triangles create noisy intersections, short fragments, or broken-looking strokes.
-PASS when micro-tile density is reduced until every tile boundary remains clear and printable.
+## R26 — Flat stroke hierarchy
+FAIL when outer frame, silhouette and internal tiles all use visually identical heavy stroke and reduce readability.
+PASS when `frame > silhouette > internal tile` is clearly perceived.
 
-## R27 — Hairline segment misuse
-FAIL when small tiles rely on very thin hairline edges that disappear or become inconsistent in print.
-PASS when internal borders remain a stable medium stroke and tiny geometry is simplified instead.
+## R27 — Starburst junction noise
+FAIL when many tiny edges converge at one point and create a dark burst or apparent broken-line artifact.
+PASS after merge/stagger/simplification.
 
-## R28 — Starburst junction noise
-FAIL when many edges converge at one point and create a dark, messy starburst that obscures cell boundaries.
-PASS when junctions are simplified, usually to 2–3 meaningful edges, while preserving the mosaic silhouette.
+## R28 — Minimum segment violation
+FAIL when numerous very short segments create visual noise without educational/structural benefit.
 
-## R29 — Main-art tint leakage
-FAIL when monochrome main artwork contains beige, gray, pale yellow, colored shading, or accidental wash.
-PASS when main activity is black line + white fill only, with actual color restricted to the legend when enabled.
+## R29 — Excessive micro-detail after line failure
+FAIL if regeneration keeps the same dense geometry after line-quality failure.
+PASS when density/junction count is intentionally reduced.
 
-## R30 — Wrong quality tradeoff
-FAIL when detail is preserved at the cost of crisp lines.
-PASS when the system follows:
+## R30 — Thai font fallback failure
+FAIL when Thai glyphs, marks, baseline, or digits visibly mismatch due to unsupported fallback.
 
-```text
-CRISP_LINES > MICRO_TILE_DENSITY
-READABILITY > GEOMETRIC_DETAIL
-PRINT_USABILITY > DECORATIVE_COMPLEXITY
-```
+## R31 — Golden-reference imitation
+FAIL if the system copies a prior Golden Reference composition even when a new theme/shape calls for a different layout.
+PASS when only quality gates are inherited.
+
+## R32 — Raster candidate mislabeled production-final
+FAIL when fuzzy/broken generative lines are accepted despite vector/deterministic rendering being available or required.
