@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Acceptance Tests
 
-Version: 1.5.0
+Version: 1.6.0
 
 ## Critical production gates
 
@@ -42,10 +42,35 @@ Version: 1.5.0
 36. Any image-model-only raster must be labeled preview/mockup, not production-final.
 37. Raster preview for production should be rasterized from the vector master.
 
+## Natural Proportion gates
+
+เมื่อเปิด `COMPOSITION_SYSTEM = NATURAL_PROPORTION` หรือ AUTO resolve มาใช้ natural composition ต้อง PASS เพิ่ม:
+
+38. Natural proportion improves composition without reducing readability or colorability.
+39. `GOLDEN_RATIO_GUIDE` is used as a guide, not forced exact geometry unless explicitly calculated and validated.
+40. `PHYLLOTAXIS_MODE` never creates micro-detail below minimum colorable/segment thresholds.
+41. Fibonacci-inspired repetition does not alter verified question count or mapping.
+42. Radial symmetry/petal rhythm remains compatible with the primary-shape grammar.
+43. Natural scale hierarchy has a clear focal element, secondary elements, and supporting motifs.
+44. Natural pattern does not override question safe areas, legend space, or print margins.
+45. No unsupported claim of exact golden ratio, Fibonacci spiral, or golden-angle construction.
+46. If natural rhythm conflicts with usability, usability wins and the natural pattern is simplified.
+
+## Reference V3 promotion gate
+
+A candidate may be promoted to `REFERENCE_NATURAL_HARMONY_V3` only when:
+- all critical production gates PASS
+- natural-proportion gates PASS when used
+- visual impact is not materially weaker than `REFERENCE_WOW`
+- cleanliness/readability is not materially weaker than `REFERENCE_BEAUTIFUL`
+- composition shows deliberate focal hierarchy and natural rhythm
+- geometric grammar remains obvious at first glance
+- line clarity, Thai text, mapping and colorability remain production quality
+
 ## Golden Reference promotion gate
 
 A candidate may be promoted to Golden Reference only when:
-- all critical gates above PASS
+- all applicable gates above PASS
 - academic/mapping accuracy is complete
 - final geometry master is deterministic/vector-first
 - line clarity is commercial-print quality
@@ -67,6 +92,7 @@ Input:
 ธีมสวนดอกไม้
 PRIMARY_SHAPE = TRIANGLE
 TILING_MODE = MOSAIC
+COMPOSITION_SYSTEM = NATURAL_PROPORTION
 A4 Portrait
 ```
 
@@ -75,6 +101,9 @@ Expected:
 - 6 colors
 - target about 5 regions per color when valid
 - triangle-built flowers/leaves/butterflies/clouds/ground
+- focal hierarchy inspired by natural proportion
+- petal/seed rhythms may use radial, Fibonacci or phyllotaxis-inspired grouping
+- no forced exact golden-ratio distortion
 - deterministic vector final linework
 - controlled tile density
 - no tiny sliver cells
