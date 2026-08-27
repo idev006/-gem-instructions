@@ -2,6 +2,17 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Color-by-Code 1.3.0 — 2026-08-27
+
+- Added `LEGEND_COLOR_PREVIEW` and `LEGEND_PREVIEW_STYLE` parameters.
+- Default Color-by-Code worksheet remains black-and-white in the main coloring area.
+- Allowed small real-color previews inside the color legend so children can see which color to use.
+- Colored preview may be a swatch, circle, pencil tip, or small colored-pencil icon.
+- Clarified that `BLACK_WHITE_MODE = YES` can coexist with `LEGEND_COLOR_PREVIEW = YES` because the legend preview is a controlled exception.
+- Added an explicit full-monochrome override when the user requests no color anywhere, including the legend.
+- Added QA to verify that color-name labels match the displayed preview colors and that no unintended color appears in the main coloring area.
+- Canonical file: `gem/COLOR_BY_CODE_GEM_INSTRUCTIONS_PRODUCTION.md`.
+
 ## Color-by-Code 1.2.0 — 2026-08-27
 
 - Added `QUESTION_LAYOUT` as a canonical parameter.
