@@ -1,91 +1,78 @@
 # Reference Version Policy
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Approved visual-reference policy
 
 ## Purpose
-
 เก็บคุณลักษณะของภาพอ้างอิงที่ผู้ใช้ยอมรับไว้เป็น baseline โดยไม่บังคับให้ Gem ลอก composition เดิมทุกครั้ง
 
-## Reference A — `REFERENCE_WOW`
+## REFERENCE_WOW
+User-approved visual reference
 
-สถานะ: User-approved visual reference
-
-คุณลักษณะที่ต้องรักษา:
-- มีความมีชีวิตชีวาและความรู้สึก “ว้าว” เมื่อมองครั้งแรก
-- geometric garden มีรายละเอียดมากพอให้สนุก แต่โจทย์ยังอ่านได้
-- primary shape มีบทบาทสูงและสร้าง theme ได้ชัด
-- ภาพมี focal hierarchy และองค์ประกอบหลายระดับ
-- Color-by-Code legend ชัดเจน
-
-ใช้เป็น benchmark สำหรับ:
-- visual impact
+Benchmark:
+- first-glance wow
 - thematic richness
 - child engagement
-- geometric identity
+- strong geometric identity
+- lively composition
 
-## Reference B — `REFERENCE_BEAUTIFUL`
+## REFERENCE_BEAUTIFUL
+User-approved visual reference
 
-สถานะ: User-approved visual reference
-
-คุณลักษณะที่ต้องรักษา:
-- สวย สะอาด ดูเป็นระเบียบ
-- negative space ดี
-- composition อ่านง่าย
-- symmetry/balance ชัด
-- รายละเอียดไม่แน่นเกินไป
-- visual hierarchy เหมาะกับ A4
-
-ใช้เป็น benchmark สำหรับ:
+Benchmark:
 - cleanliness
 - balance
+- negative space
 - readability
-- compositional restraint
+- controlled detail
+- A4 visual hierarchy
 
-## Reference C — `REFERENCE_NATURAL_HARMONY_V3`
+## REFERENCE_NATURAL_HARMONY_V3
+Status: Approved design target / promotion candidate class
 
-สถานะ: Development target
-
-เป้าหมายคือรวมข้อดีของ A และ B แล้วเพิ่ม Natural Proportion Engine:
-
+Definition:
 ```text
-V1 visual impact
-+ V2 cleanliness / balance
-+ golden-section-inspired focal hierarchy
-+ Fibonacci-inspired rhythm
-+ phyllotaxis / golden-angle-inspired radial composition
-+ natural scale progression
-= V3 Natural Harmony
+REFERENCE_WOW visual impact
++ REFERENCE_BEAUTIFUL cleanliness/readability
++ Natural Harmony focal hierarchy
++ golden-section-inspired placement when useful
++ Fibonacci/phyllotaxis-inspired rhythm when useful
++ dynamic natural balance
+= REFERENCE_NATURAL_HARMONY_V3
 ```
 
-V3 ไม่จำเป็นต้องสมมาตรแบบ mirror 100% เสมอไป แต่ต้องมี **dynamic balance** แบบธรรมชาติ
+V3 ไม่จำเป็นต้อง mirror symmetry 100%; dynamic balance ใช้ได้และควรเลือกตามธีม
 
 ## Evaluation matrix
-
-ทุก candidate สำหรับ V3 ให้ประเมินอย่างน้อย:
-
-| Dimension | Source target |
+| Dimension | Target |
 |---|---|
-| First-glance wow | Reference A |
-| Cleanliness | Reference B |
-| Readability | Reference B |
-| Theme richness | Reference A |
-| Geometric grammar | A + B |
-| Natural rhythm | V3 policy |
+| First-glance wow | REFERENCE_WOW |
+| Cleanliness | REFERENCE_BEAUTIFUL |
+| Readability | REFERENCE_BEAUTIFUL |
+| Theme richness | REFERENCE_WOW |
+| Geometric grammar | Canonical v1.6.0 |
+| Natural hierarchy/rhythm | Natural Proportion Policy |
+| Question flow | Canonical v1.6.0 |
 | Line clarity | Production QA |
 | Coloring usability | Production QA |
 | Academic/mapping integrity | Canonical SSOT |
 
 ## Promotion rule
-
 Candidate จะ promote เป็น `REFERENCE_NATURAL_HARMONY_V3` ได้เมื่อ:
-- ไม่ด้อยกว่า A ใน visual impact อย่างมีนัยสำคัญ
-- ไม่ด้อยกว่า B ใน cleanliness/readability
-- natural-proportion cues มองเห็นเป็น rhythm/hierarchy โดยไม่ฝืน
-- ผ่าน academic, mapping, line, topology, Thai, print และ colorability gates ทั้งหมด
+- ไม่ด้อยกว่า WOW อย่างมีนัยสำคัญด้าน visual impact
+- ไม่ด้อยกว่า BEAUTIFUL ด้าน cleanliness/readability
+- natural cues ช่วย hierarchy/rhythm โดยไม่ฝืน
+- question flow กลมกลืนกับ composition
+- ผ่าน academic, mapping, line, topology, Thai, print, colorability gates
+- final production geometry เป็น deterministic/vector
 
-## Important
+## Reference truthfulness
+Reference policy บันทึก **คุณลักษณะและเกณฑ์** ไม่ใช่การรับรองว่า raster generative image เป็น production master
 
-Reference policy บันทึก **คุณลักษณะและเกณฑ์** ไม่ถือว่าภาพ raster ที่สร้างด้วย generative image model เป็น production vector master โดยอัตโนมัติ
+Image-model candidate ที่ผู้ใช้ชอบสามารถเป็น visual reference ได้ แต่ production Golden Reference ต้อง reconstruct/finalize ตาม `RENDER_PIPELINE_POLICY.md`
 
-หากต้องใช้ reference เป็น production output ต้อง reconstruct/finalize ตาม `RENDER_PIPELINE_POLICY.md`.
+## Non-copy rule
+Reference เป็น benchmark ไม่ใช่ template:
+- ห้ามลอกตำแหน่งวัตถุเดิมทุกครั้ง
+- ห้าม reuse composition แบบ mechanical
+- ธีมใหม่ควรมี composition ที่เหมาะกับธีมแต่ผ่าน quality gates เดียวกัน
