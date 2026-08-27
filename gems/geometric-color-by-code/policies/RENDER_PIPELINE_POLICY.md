@@ -1,76 +1,101 @@
 # Geometric Color-by-Code — Render Pipeline Policy
 
-Version: 1.1.0
+Version: 2.0.0
 Status: Gem-specific production policy
 
 ## Purpose
 
-แก้ปัญหาที่ image model อาจสร้างเส้น mosaic แตก สั่น ซ้อน หรือไม่สม่ำเสมอ แม้ prompt จะระบุให้เส้นคมแล้ว โดยแยก **content/layout design** ออกจาก **final line rendering** และเลือก renderer ตามระดับความแม่นยำที่ต้องการ
+กำหนด renderer ที่เหมาะสมสำหรับใบงาน geometric Color-by-Code โดยเฉพาะงานที่ต้องการเส้นคมสำหรับพิมพ์จริง หลังการทดสอบพบว่า image model สามารถสร้าง composition ที่ดีมากได้ แต่ **ไม่สามารถรับประกันเส้น mosaic ที่คม สม่ำเสมอ และ topology ที่ deterministic ได้ทุกครั้ง** แม้ prompt จะกำหนด clean-vector-like อย่างเข้มงวด
 
-## Principle
+## Root-cause decision
+
+```text
+PROMPT QUALITY != LINE RENDER GUARANTEE
+```
+
+ดังนั้น production pipeline ต้องแยก creative composition ออกจาก final printable boundaries.
 
 ```text
 ACADEMIC CONTENT = DETERMINISTIC
 MAPPING = DETERMINISTIC
-GEOMETRIC TOPOLOGY = DETERMINISTIC WHEN AVAILABLE
-VISIBLE TEXT = DETERMINISTIC WHEN AVAILABLE
-IMAGE MODEL = COMPOSITION / STYLE ASSIST, NOT SOURCE OF TRUTH
+GEOMETRIC TOPOLOGY = DETERMINISTIC
+VISIBLE ACADEMIC TEXT = DETERMINISTIC
+FINAL PRINTABLE BOUNDARIES = DETERMINISTIC / VECTOR-FIRST
+IMAGE MODEL = CONCEPT / COMPOSITION ASSIST ONLY
 ```
 
-## Render modes
+## Production render rule
 
-### 1. VECTOR_FIRST — preferred for production print
+### VECTOR_FIRST_REQUIRED
 
-ใช้เมื่อ environment สามารถสร้าง SVG/PDF/vector geometry ได้
+สำหรับ final worksheet ที่มี geometric coloring boundaries:
+
+```text
+PRODUCTION_FINAL_RENDER_MODE = VECTOR_FIRST_REQUIRED
+```
+
+ถ้า environment รองรับ SVG/PDF/vector/deterministic drawing ให้ใช้ deterministic renderer เป็น final source เสมอ
 
 Pipeline:
 
 ```text
 Verified Content Blueprint
 → Deterministic Geometry Blueprint
-→ Tile/Region graph
-→ SVG/vector paths
+→ Tile/Region Graph
+→ Shared-edge Graph
+→ SVG / vector paths
 → Deterministic Thai/text placement
 → Thai-font glyph validation
-→ Color legend swatches
-→ Raster preview if needed
+→ Legend swatches
+→ Vector QA
+→ Raster preview (optional)
 → Print QA
 ```
 
 ข้อดี:
-- เส้นคม
-- จำนวน region deterministic
-- shared borders ไม่ซ้อน
-- text ไม่ถูก image model สะกดผิด
-- export PDF/SVG ได้เมื่อ environment รองรับ
+- เส้นคมสม่ำเสมอ
+- shared border เป็น edge เดียว
+- ไม่มี generative fuzzy/broken strokes
+- region count และ topology ตรวจสอบได้
+- ข้อความไทยและโจทย์ไม่ถูก image model rewrite
+- สามารถ export high-resolution raster preview จาก vector master ได้
 
-`VECTOR_FIRST` เป็น preferred mode เมื่อเป้าหมายคือใบงานที่นำไปขาย/พิมพ์จริงและความคมของเส้นเป็น critical requirement.
+## HYBRID_CONCEPT_ONLY
 
-### 2. HYBRID — preferred when thematic composition benefits from image model
+Image model ใช้ช่วยออกแบบ:
+- composition
+- theme silhouette idea
+- visual hierarchy
+- motif exploration
 
-Pipeline:
+แต่ผลลัพธ์จาก image model ต้องถูกแปลงเป็น deterministic tile graph/vector geometry ใหม่ก่อนถือเป็น production final.
 
 ```text
-Image model / design reasoning
-→ theme silhouette concept only
-→ convert concept to deterministic tile graph
-→ render geometry/text as vector
+IMAGE MODEL
+→ concept reference only
+→ deterministic reconstruction
+→ vector final
 ```
 
-ห้ามนำเส้นจากภาพ generative มาใช้เป็น final printable boundaries โดยตรง หากเส้นไม่ผ่าน `PRINT_LINE_CLARITY_QA`.
+ห้าม trace เส้นแตก/fuzzy จาก raster candidate มาเป็น final boundaries โดยตรง
 
-### 3. IMAGE_PROMPT_ONLY — fallback
+## IMAGE_PROMPT_ONLY
 
-ใช้เมื่อไม่มี deterministic renderer
+`IMAGE_PROMPT_ONLY` ใช้ได้เพียง:
+- concept preview
+- exploration
+- low-stakes mockup
+- environment ที่ไม่มี deterministic renderer
 
-ต้อง:
-- ใช้ strict clean-vector-like prompt
-- จำกัด micro-tile density
-- ห้าม sketch texture
-- render → visual QA → regenerate หาก fail
-- ลด geometry complexity ในรอบถัดไปก่อนเปลี่ยน style
+สถานะของ output ต้องเป็น:
 
-## Default resolution
+```text
+PREVIEW_ONLY / NOT_PRODUCTION_FINAL
+```
+
+ถ้าเกิดเส้นแตก สั่น ซ้อน หรือไม่สม่ำเสมอ **ห้าม regenerate ซ้ำแล้วเรียก production-ready** เพราะ failure เป็นข้อจำกัดของ renderer ไม่ใช่ prompt เพียงอย่างเดียว
+
+## Render-mode resolution
 
 ```text
 RENDER_MODE = AUTO
@@ -79,96 +104,83 @@ RENDER_MODE = AUTO
 AUTO resolves:
 
 ```text
-if vector/deterministic renderer available:
-    VECTOR_FIRST or HYBRID
+if final output requires printable geometric boundaries:
+    VECTOR_FIRST_REQUIRED
+elif only concept/mockup is requested:
+    IMAGE_CONCEPT_PREVIEW
 else:
-    IMAGE_PROMPT_ONLY_WITH_ITERATIVE_QA
+    choose safest deterministic path available
 ```
 
 ## Canonical render parameters
 
 ```text
 RENDER_MODE
-VECTOR_RENDERING_PREFERRED
+PRODUCTION_FINAL_RENDER_MODE
+VECTOR_RENDERING_REQUIRED
 DETERMINISTIC_TEXT_PLACEMENT
 DETERMINISTIC_REGION_TOPOLOGY
+DETERMINISTIC_SHARED_EDGES
 THAI_FONT_RENDER_QA
 IMAGE_MODEL_ROLE
-MAX_VISUAL_REGEN_ROUNDS
-LINE_FAILURE_REDUCTION_FACTOR
+RASTER_PREVIEW_SOURCE
 ```
 
-Recommended defaults:
+Defaults:
 
 ```text
 RENDER_MODE = AUTO
-VECTOR_RENDERING_PREFERRED = YES
-DETERMINISTIC_TEXT_PLACEMENT = YES_WHEN_AVAILABLE
-DETERMINISTIC_REGION_TOPOLOGY = YES_WHEN_AVAILABLE
+PRODUCTION_FINAL_RENDER_MODE = VECTOR_FIRST_REQUIRED
+VECTOR_RENDERING_REQUIRED = YES_FOR_FINAL_PRINT
+DETERMINISTIC_TEXT_PLACEMENT = YES_FOR_FINAL_PRINT
+DETERMINISTIC_REGION_TOPOLOGY = YES
+DETERMINISTIC_SHARED_EDGES = YES
 THAI_FONT_RENDER_QA = CRITICAL
-IMAGE_MODEL_ROLE = COMPOSITION_ASSIST
-MAX_VISUAL_REGEN_ROUNDS = 3
-LINE_FAILURE_REDUCTION_FACTOR = REDUCE_MICRO_DENSITY_20_TO_35_PERCENT
+IMAGE_MODEL_ROLE = CONCEPT_AND_COMPOSITION_ASSIST
+RASTER_PREVIEW_SOURCE = VECTOR_MASTER
 ```
 
-## Iterative line-quality loop
+## Shared-edge graph rule
 
-เมื่อใช้ IMAGE_PROMPT_ONLY:
-
-```text
-render candidate
-→ audit line clarity
-→ if PASS: accept
-→ if FAIL:
-   reduce micro-tile density 20–35%
-   simplify contours
-   reduce junction count
-   restate vector-like line constraints
-   regenerate
-→ repeat up to MAX_VISUAL_REGEN_ROUNDS
-```
-
-ห้าม regenerate ด้วย prompt เดิมซ้ำ ๆ โดยไม่เปลี่ยน complexity เพราะไม่ใช่การแก้ root cause
-
-## Failure escalation
-
-ถ้ายัง FAIL หลังครบจำนวนรอบ:
-- mark `IMAGE_RENDER_LINE_QUALITY = NOT_RELIABLE`
-- switch to VECTOR_FIRST/HYBRID if available
-- หรือส่ง verified blueprint/prompt พร้อมแจ้งว่าไม่ควรถือ raster generative candidate เป็น production-final
-
-ห้ามอ้างว่า production-ready หากเส้นยังแตก
-
-## Geometry graph rule
-
-สำหรับ deterministic mode ให้ใช้ graph/source-of-truth ของ boundaries:
-- shared edge ถูกเก็บเป็น edge เดียว
-- closed region ต้องมี cycle/path ที่ปิด
-- question region references tile IDs
-- no orphan edge
+Final geometry must use one source-of-truth graph:
+- shared edge stored/rendered once
+- every coloring region is a closed cycle/path
 - no duplicate edge
-- no sliver cell below minimum threshold
+- no orphan edge
+- no ambiguous overlapping boundary
+- no sliver cell below minimum colorable threshold
+- every question region references valid tile/region IDs
 
-## Text and Thai-font rule
+## Thai text rule
 
-ข้อความหัวข้อ คำสั่ง โจทย์ ตัวเลข ชื่อสี และ legend labels เป็น deterministic visible text เมื่อ renderer รองรับ
+หัวข้อ คำชี้แจง โจทย์ เลขข้อ ชื่อสี และ legend labels ต้องใช้ deterministic text placement ใน final print mode
 
-ก่อน render final ต้องตรวจว่า font stack ที่เลือกมี glyph ภาษาไทยจริงและรองรับสระ/วรรณยุกต์ครบ หาก preview แสดงเป็นกล่องสี่เหลี่ยม/tofu หรือ glyph หาย ให้ถือเป็น Critical FAIL และเปลี่ยนไปใช้ Thai-capable font ที่มีอยู่ใน environment เช่นตระกูล Noto Sans Thai/ฟอนต์ไทยที่ระบบรองรับ โดยไม่แจกจ่ายไฟล์ฟอนต์ออกไป
+Font stack ต้องผ่าน:
 
 ```text
 THAI_FONT_RENDER_QA = CRITICAL
-NO tofu/missing-glyph boxes
-NO detached/missing Thai vowel/tone marks caused by font fallback
+NO tofu / missing glyph
+NO missing vowel/tone marks
+NO broken Thai shaping
+NO mixed-font baseline mismatch that harms readability
 ```
 
-Image model ไม่ควร rewrite Thai text ใน production mode.
+ไม่แจกจ่ายไฟล์ฟอนต์ให้ผู้ใช้; ใช้ฟอนต์ที่ระบบ/renderer รองรับในการสร้าง artifact เท่านั้น
 
-## Production recommendation
+## Raster preview rule
 
-สำหรับใบงาน geometric Color-by-Code ที่ต้องการคุณภาพเชิงพาณิชย์:
+ถ้าต้องส่ง PNG/JPG preview:
+- rasterize จาก vector master ที่ความละเอียดเหมาะสม
+- ห้ามใช้ generative raster เป็น final print source
+- anti-aliasing ต้องสม่ำเสมอ
+- internal line ต้องยังต่อเนื่องเมื่อดูที่ 100%
+
+## Production acceptance statement
 
 ```text
-BEST = Verified content + deterministic SVG/PDF geometry/text
-GOOD = Hybrid composition + deterministic vector finalization
-FALLBACK = Strict image prompt + iterative visual QA
+BEST = Verified content + deterministic vector geometry/text
+ACCEPTABLE = Hybrid concept + deterministic vector reconstruction
+PREVIEW ONLY = image-model raster
 ```
+
+ห้ามอ้างว่า image-model raster เป็น production-final สำหรับ geometric Color-by-Code เมื่อความคมและความต่อเนื่องของเส้นเป็น requirement.
