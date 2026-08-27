@@ -2,34 +2,30 @@
 
 Status: Production Gem family
 Canonical instruction: `GEM_INSTRUCTIONS_PRODUCTION.md`
-Current production version: 1.4.0
+Current production version: 1.6.0 — Natural Harmony Integration
 
 ## Purpose
-
-Geometric Color-by-Code creates verified multi-subject Color-by-Code worksheet plans in which a user-selected geometric shape acts as the primary visual construction grammar. The themed picture emerges from repeated tiles/cells rather than a conventional illustration with geometry overlaid afterward.
+สร้าง verified multi-subject Color-by-Code worksheet plans ที่ใช้รูปทรงเรขาคณิตเป็น construction grammar หลัก และใช้ Natural Harmony ช่วยเรื่อง placement, scale, rhythm, focal hierarchy และ balance โดยไม่ลด correctness, mapping, readability, colorability หรือ print quality
 
 ## Core product idea
-
 ```text
 User request
 → Verified content
 → Answer/code/color mapping
-→ Geometric tiling grammar
+→ Primary-shape grammar
+→ Natural-Harmony composition
 → Theme silhouette
-→ Question-region grouping
-→ Colorability + stroke planning
-→ Render pipeline selection
-→ Final output
+→ Question-flow / regions
+→ Deterministic vector finalization
 → QA
 ```
 
 ```text
-CORRECT: shape → tiles → grouped silhouette → themed image
-WRONG: themed illustration → geometric pattern overlay
+CORRECT: shape → tiles → themed composition
+WRONG: conventional picture → geometric overlay
 ```
 
 ## Default production behavior
-
 - A4 Portrait
 - Thai-first
 - 24 questions
@@ -39,52 +35,54 @@ WRONG: themed illustration → geometric pattern overlay
 - grouped question regions
 - monochrome main artwork
 - colored legend preview allowed
-- clean vector-like lines
-- controlled tile density
-- minimum colorable-area protection
-- three-level stroke hierarchy
-- deterministic/vector rendering preferred when available
+- Natural Harmony AUTO
+- question flow follows visual rhythm
+- clean 3-level stroke hierarchy
+- deterministic/vector final printable boundaries
+
+## Reference strategy
+- `REFERENCE_WOW` — visual impact/richness
+- `REFERENCE_BEAUTIFUL` — cleanliness/balance/readability
+- `REFERENCE_NATURAL_HARMONY_V3` — combines both plus natural rhythm/hierarchy
 
 ## Document map
-
 ### Core
 - `GEM_INSTRUCTIONS_PRODUCTION.md`
 - `USER_GUIDE.md`
 - `OUTPUT_CONTRACT.md`
 - `CONVERSATION_STARTERS.md`
 
-### Examples
-- `examples/USAGE_EXAMPLES.md`
-
 ### Policies
 - `policies/GEOMETRY_LAYOUT_POLICY.md`
 - `policies/LINE_RENDERING_POLICY.md`
 - `policies/RENDER_PIPELINE_POLICY.md`
+- `policies/NATURAL_PROPORTION_POLICY.md`
+- `policies/REFERENCE_VERSION_POLICY.md`
 - `policies/GOLDEN_REFERENCE_STANDARD.md`
 - `policies/COLOR_MAPPING_POLICY.md`
 - `policies/PAGE_FORMAT_POLICY.md`
 
-### QA
+### Examples / QA
+- `examples/USAGE_EXAMPLES.md`
 - `qa/ACCEPTANCE_TESTS.md`
 - `qa/REGRESSION_TESTS.md`
+- `qa/V1_6_FINALIZATION_CHECKLIST.md`
 - `qa/DRY_RUN_REPORT.md`
 - `qa/LINE_QUALITY_REMEDIATION_REPORT_2026-08-27.md`
 
-## Quality priority
-
+## Final quality priority
 ```text
 CORRECTNESS
-> MAPPING
-> GEOMETRIC GRAMMAR
-> LINE / TOPOLOGY QUALITY
-> COLORABILITY
+> MAPPING INTEGRITY
+> USER INTENT
 > READABILITY
+> COLORING USABILITY
+> DETERMINISTIC FINAL GEOMETRY
+> LINE / TOPOLOGY QUALITY
+> GEOMETRIC GRAMMAR
+> NATURAL HARMONY
 > THAI/TEXT RENDERING
 > PRINT USABILITY
-> THEME
+> THEME RECOGNIZABILITY
 > DECORATION
 ```
-
-## Golden Reference
-
-Golden Reference means a candidate has passed all critical academic, mapping, geometry, colorability, line, text and print gates. It is a quality target, not a fixed composition template.
