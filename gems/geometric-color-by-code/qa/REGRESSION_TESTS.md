@@ -3,7 +3,6 @@
 Version: 1.6.0
 
 ## Core content and geometry regressions
-
 R1 FAIL if requested shape is only overlaid on a conventional illustration.
 R2 FAIL if question count is forced to equal micro-tile count and creates tiny cells.
 R3 FAIL if major theme elements are freeform under HIGH dominance.
@@ -20,7 +19,7 @@ R13 FAIL if geometric pattern is merely decorative skin on freeform silhouettes.
 R14 FAIL if primary-shape coverage is materially below the resolved HIGH target.
 R15 FAIL when unnecessary multi-word content creates classification ambiguity.
 R16 FAIL if distribution is discovered only after visual generation.
-R17 FAIL when large circle/leaf/cloud containers abandon primary-shape grammar.
+R17 FAIL when large freeform containers abandon primary-shape grammar.
 R18 FAIL when page areas use unrelated tile-size systems.
 R19 FAIL when shared edges appear as parallel/doubled strokes.
 R20 FAIL when intended coloring cells are visually open.
@@ -31,76 +30,37 @@ R24 FAIL when question text collides with tile borders.
 R25 FAIL when hairline rendering breaks during rasterization/printing.
 R26 FAIL when stroke hierarchy is flat and harms readability.
 R27 FAIL when excessive junctions create starburst noise.
-R28 FAIL when very short segments add visual noise without structural value.
+R28 FAIL when short segments add visual noise without structural value.
 R29 FAIL if density is not reduced after line-quality failure.
 R30 FAIL when Thai font fallback causes missing/misaligned glyphs.
 R31 FAIL if a prior Golden Reference composition is copied instead of only inheriting quality gates.
 R32 FAIL when fuzzy/broken generative raster is accepted as production-final.
 
 ## Render-pipeline regressions
+R33 FAIL if prompt wording is assumed to guarantee crisp final boundaries.
+R34 FAIL if generative raster is called vector-quality without deterministic paths.
+R35 FAIL if a shared edge is rendered twice.
+R36 FAIL if raster-only output is promoted to production Golden Reference.
+R37 FAIL if production PNG/JPG is generated independently of the vector master.
+R38 FAIL if final Thai text is delegated to the image model.
+R39 FAIL if renderer fallback is hidden from the user.
+R40 FAIL if broken-line output is repeatedly regenerated without root-cause change.
 
-### R33 — Prompt-only line-quality optimism
-FAIL if the system assumes a stronger prompt can guarantee crisp geometric boundaries from an image model.
-PASS when prompt-only output is treated as preview and final print boundaries are reconstructed deterministically.
+## Natural Harmony regressions
+R41 FAIL if layout sacrifices readability/margins/legend to force 1.618.
+R42 FAIL if approximate composition is described as exact golden ratio/Fibonacci/golden-angle without validation.
+R43 FAIL if phyllotaxis creates cells below minimum colorable size.
+R44 FAIL if Fibonacci/petal counts alter verified question count or mapping.
+R45 FAIL if natural rhythm replaces primary-shape construction grammar.
+R46 FAIL if mirror symmetry is forced when dynamic natural balance would suit the theme better.
+R47 FAIL if `NATURAL_SCALE_HIERARCHY = YES` has no clear focal / secondary / supporting levels.
+R48 FAIL if V3 gains natural styling but materially loses WOW impact or BEAUTIFUL cleanliness/readability.
+R49 FAIL if question regions are placed in leftover spaces instead of following the resolved question-flow plan.
+R50 FAIL if `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM` changes question IDs, answers, codes, colors or count.
+R51 FAIL if natural symmetry is mechanically reused across unrelated themes.
+R52 FAIL if a solar-system/underwater/rainforest test reproduces a flower-like radial composition without thematic justification.
+R53 FAIL if natural-detail strength is increased while colorability or line clarity decreases.
+R54 FAIL if the system claims Natural Harmony is mathematically exact when it is only inspired/approximate.
 
-### R34 — Image-model raster used as vector substitute
-FAIL if generative raster is called vector-like/vector-quality merely because it visually resembles vector art.
-PASS only when final geometry comes from actual deterministic paths/edge graph.
-
-### R35 — Shared edge rendered twice
-FAIL if two adjacent regions independently draw the same border and produce doubled/uneven line weight.
-PASS when a shared-edge graph stores/renders one logical edge once.
-
-### R36 — Raster-only Golden Reference
-FAIL if an image-model-only raster is promoted to Golden Reference for production print.
-PASS only when the Golden Reference has deterministic/vector final geometry or an equivalent renderer with auditable topology.
-
-### R37 — Production PNG not derived from master
-FAIL if production PNG/JPG is generated independently from the vector/deterministic master.
-PASS when raster preview/export is rendered from the same master geometry and text source.
-
-### R38 — Thai text delegated to image model
-FAIL if final Thai title, instruction, question, color label, or answer key text is generated/re-written inside image generation.
-PASS when final visible academic text is placed deterministically and passes Thai font/glyph QA.
-
-### R39 — Renderer fallback hidden from user
-FAIL if vector/deterministic rendering is unavailable but the system silently labels image-only output production-ready.
-PASS when output is explicitly marked preview/mockup and the limitation is surfaced.
-
-### R40 — Repeated image regeneration without root-cause change
-FAIL if broken-line output is regenerated repeatedly with nearly identical image prompts and accepted after visual luck.
-PASS when the pipeline switches renderer or reconstructs deterministic geometry instead of relying on stochastic improvement.
-
-## Natural proportion regressions
-
-### R41 — Forced golden ratio
-FAIL if layout sacrifices readable question regions, margins, or legend space to force a 1.618 ratio.
-PASS when golden-section guidance is subordinate to usability.
-
-### R42 — Unsupported exactness claim
-FAIL if an approximate visual composition is described as exact golden ratio, exact Fibonacci spiral, or exact golden-angle construction without calculation/validation.
-PASS when language says inspired/guided unless exactness is actually verified.
-
-### R43 — Phyllotaxis creates uncolorable micro-detail
-FAIL if seed/petal simulation creates tiny cells below minimum colorable size.
-PASS when seed/spiral structure is grouped into larger wedges/bands/clusters.
-
-### R44 — Fibonacci count overrides content
-FAIL if petal/rhythm counts alter verified question count or mapping.
-PASS when natural pattern controls supporting visual grouping only.
-
-### R45 — Natural proportion replaces primary-shape grammar
-FAIL if spiral/radial motifs become freeform curves that obscure the requested geometric shape.
-PASS when natural rhythm controls placement/scale while the primary shape still constructs objects.
-
-### R46 — Mirror symmetry mistaken for natural harmony
-FAIL if all elements are mirrored rigidly and the composition loses organic balance when `NATURAL_PROPORTION` is requested.
-PASS when dynamic balance may include controlled asymmetry while retaining focal hierarchy.
-
-### R47 — Natural hierarchy has no focal point
-FAIL if all flowers/objects use equal size and equal visual weight under `SCALE_PROGRESSION = NATURAL_HIERARCHY`.
-PASS when one focal element, secondary elements, and supporting motifs are clearly resolved.
-
-### R48 — V3 loses approved strengths
-FAIL if a V3 candidate gains natural-pattern styling but materially loses the visual impact of `REFERENCE_WOW` or the cleanliness/readability of `REFERENCE_BEAUTIFUL`.
-PASS when V3 demonstrably combines both baselines plus natural rhythm.
+## PASS principle
+A regression passes only when correctness, mapping, readability, colorability, deterministic geometry, primary-shape grammar and print usability remain intact while the requested visual/composition behavior is achieved.
