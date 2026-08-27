@@ -2,7 +2,7 @@
 
 Status: Production Gem family
 Canonical instruction: `GEM_INSTRUCTIONS_PRODUCTION.md`
-Current production version: 1.7.0 — Twin Output Integrity
+Current production version: 1.7.1 — Twin Output / Two-Page A4 Packaging
 
 ## Purpose
 สร้าง verified multi-subject Color-by-Code worksheet plans ที่ใช้รูปทรงเรขาคณิตเป็น construction grammar หลัก ใช้ Natural Harmony ช่วยเรื่อง placement/scale/rhythm เมื่อเหมาะสม และผลิต Student Worksheet + Colored Answer Key จาก geometry/mapping master เดียวกัน
@@ -15,27 +15,27 @@ User request
 → Primary-shape grammar
 → Natural-Harmony composition
 → Deterministic master geometry
-→ Student worksheet view
-→ Colored answer-key view
+→ Student worksheet A4 Portrait page
+→ Colored answer-key A4 Portrait page
 → Pair + visual + print QA
 ```
 
 ```text
-CORRECT: one master geometry + one verified mapping → two render views
-WRONG: generate student and answer-key images independently
+CORRECT: one master geometry + one verified mapping → two separate A4 portrait pages
+WRONG: generate student and answer-key images independently or place both on one page
 ```
 
 ## Default production behavior
-- A4 Portrait
 - Thai-first
-- 24 questions
-- 6 colors
+- Page 1 = Student Worksheet, A4 Portrait, monochrome/unfilled
+- Page 2 = Colored Answer Key, A4 Portrait
+- Student and Answer Key are never on the same student-facing page by default
+- 24 questions / 6 colors by default
+- 40–50 items on one Student A4 page is supported as a stress-case target only when readability/colorability/print QA pass
 - Triangle primary shape
 - HIGH shape dominance
 - Natural Harmony AUTO
-- Student main artwork = monochrome/unfilled
 - colored legend preview allowed
-- Answer Key = fully colored solution view
 - Student and Answer Key share identical region topology/text/mapping
 - clean 3-level stroke hierarchy
 - deterministic/vector final printable boundaries
@@ -44,6 +44,7 @@ WRONG: generate student and answer-key images independently
 - `REFERENCE_WOW` — visual impact/richness
 - `REFERENCE_BEAUTIFUL` — cleanliness/balance/readability
 - `REFERENCE_NATURAL_HARMONY_V3` — combines both plus natural rhythm/hierarchy
+- High-density 40–50 item single-page candidate — stress-test benchmark, not permission to reduce usability
 
 ## Document map
 ### Core
@@ -53,6 +54,7 @@ WRONG: generate student and answer-key images independently
 - `CONVERSATION_STARTERS.md`
 
 ### Policies
+- `policies/TWO_PAGE_A4_OUTPUT_POLICY.md`
 - `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md`
 - `policies/GEOMETRY_LAYOUT_POLICY.md`
 - `policies/LINE_RENDERING_POLICY.md`
@@ -76,6 +78,7 @@ WRONG: generate student and answer-key images independently
 CORRECTNESS
 > MAPPING INTEGRITY
 > STUDENT/ANSWER PAIR IDENTITY
+> TWO-PAGE A4 SEPARATION
 > USER INTENT
 > READABILITY
 > COLORING USABILITY
