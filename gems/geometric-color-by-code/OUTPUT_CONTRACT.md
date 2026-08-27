@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Output Contract
 
-Version: 1.4.0
+Version: 1.6.0
 
 ## Required output blocks
 
@@ -9,8 +9,9 @@ Version: 1.4.0
 1. `NORMALIZED_WORKSHEET_SPEC`
 2. `VERIFIED_CONTENT_BLUEPRINT`
 3. `GEOMETRY_LAYOUT_BLUEPRINT`
-4. `RENDER_QUALITY_PLAN`
-5. `FINAL_WORKSHEET_PROMPT_OR_RENDER_SPEC`
+4. `NATURAL_HARMONY_BLUEPRINT`
+5. `RENDER_QUALITY_PLAN`
+6. `FINAL_RENDER_PLAN_OR_PROMPT`
 
 ถ้ามีไฟล์จริงค่อยเพิ่ม `ARTIFACTS`; ห้ามอ้างว่า artifact ถูกสร้างแล้วถ้ายังไม่มีจริง
 
@@ -27,6 +28,7 @@ COLOR_COUNT
 PRIMARY_SHAPE
 TILING_MODE
 THEME
+COMPOSITION_SYSTEM
 PAGE_SIZE
 ORIENTATION
 RENDER_MODE
@@ -92,38 +94,67 @@ legend_position
 question_placement
 ```
 
-## 4. RENDER_QUALITY_PLAN
+## 4. NATURAL_HARMONY_BLUEPRINT
+
+ต้องระบุเมื่อ `COMPOSITION_SYSTEM` resolve เป็น NATURAL_HARMONY หรือ AUTO เลือกใช้ natural composition:
+
+```text
+composition_system
+composition_balance
+symmetry_mode
+focal_point_placement
+golden_section_guide
+fibonacci_rhythm
+phyllotaxis_mode
+radial_symmetry
+petal_count_logic
+natural_scale_hierarchy
+natural_pattern_strength
+question_flow
+question_distribution_balance
+truthfulness_note
+```
+
+`truthfulness_note` ต้องแยกให้ชัดว่า exact, calculated, approximate, inspired หรือ not-used; ห้ามเรียก exact golden ratio/Fibonacci/golden-angle หากไม่ได้คำนวณและตรวจจริง
+
+## 5. RENDER_QUALITY_PLAN
 
 อย่างน้อย:
 
 ```text
 render_mode
-vector_rendering_preferred
+production_final_render_mode
+vector_rendering_required
 deterministic_text_placement
 deterministic_region_topology
+deterministic_shared_edges
 line_render_style
 outer_frame_stroke
 object_silhouette_stroke
 internal_tile_stroke
 thai_font_render_qa
 print_line_clarity_qa
-max_visual_regen_rounds
+raster_preview_source
 ```
 
-## 5. FINAL_WORKSHEET_PROMPT_OR_RENDER_SPEC
+## 6. FINAL_RENDER_PLAN_OR_PROMPT
 
 ต้องยืนยัน:
 - exact question count
 - exact mapping/legend
 - primary shape = construction grammar
+- natural harmony controls placement/scale/rhythm only
 - theme = tile grouping
 - no freeform major object when HIGH
 - min colorable area protected
 - no sliver cells
 - no accidental starburst junction
 - clean 3-level stroke hierarchy
+- question flow supports visual rhythm when active
 - main art monochrome by default
-- deterministic Thai/text when available
+- deterministic Thai/text in final print
+- final printable boundaries are deterministic/vector
+- raster preview derives from vector master when production output is claimed
 - no overlap / print-safe
 
 ## Integrity rule
@@ -135,8 +166,10 @@ WORKSHEET QUESTIONS
 = LEGEND SOURCE
 ```
 
+Natural composition may move regions, but may not mutate verified questions, answers, codes or colors.
+
 ## Production-final rule
 
-Raster/image candidate ที่เส้นแตก ฟุ้ง ซ้อน หรือขาด **ห้าม** ถูกระบุเป็น production-final
+Generative raster linework **ห้าม** เป็น production-final coloring boundary source.
 
-ถ้า deterministic/vector renderer มี ให้ prefer vector-first or hybrid finalization.
+If image-model output is used, it is concept/mockup input and must be reconstructed/finalized through the deterministic/vector pipeline before promotion to production final or Golden Reference.
