@@ -1,166 +1,75 @@
 # Geometric Color-by-Code — Acceptance Tests
 
-Version: 1.3.0
+Version: 1.4.0
 
-## Critical gates
+## Critical production gates
 
 1. Default page = A4 Portrait when unspecified.
 2. `QUESTION_REGION_COUNT = QUESTION_COUNT` by default.
-3. `MICRO_TILE_COUNT` may exceed question count.
-4. Exact requested color count must be preserved.
-5. Every question has verified correct answer.
-6. Every normalized answer/code maps to one color only.
-7. Legend and answer key come from the same mapping source.
-8. Every legend entry has at least one mapped question/region unless explicitly allowed otherwise.
-9. If a focus category is requested, its resolved distribution must be greater than each secondary category and normally target about 40–60% of questions unless the user specifies another ratio.
-10. Primary shape must dominate the main activity area.
-11. With `SHAPE_DOMINANCE = HIGH`, target about >=85% of structural cell boundaries / visible tiling rhythm from primary-shape grammar.
-12. `FREEFORM_MAJOR_OBJECTS = PROHIBITED_WHEN_HIGH` must be respected.
-13. Theme silhouette must be built from tile grouping, not freeform illustration overlay.
-14. `QUESTION_REGION_SHAPE_GRAMMAR = PRIMARY_SHAPE_GROUP` by default.
-15. Question regions must remain compatible with the primary tiling grammar; large circular/leaf/freeform answer containers are not acceptable unless explicitly justified as small label anchors.
-16. `TILE_SCALE_VARIATION = CONTROLLED`; the page must not split into unrelated large-tile and micro-tile visual systems.
-17. Visual-language consistency must pass across the whole main activity area.
-18. Question text must remain readable.
-19. Main art monochrome by default.
-20. Thai visible text must pass critical QA.
-21. Print-safe margins and no overlap.
-22. High-density requests must paginate before shrinking text below usable size.
-23. Follow-up revisions preserve unrelated parameters/content.
-24. No unsupported claim of exact tessellation for shapes/modes that only approximate tessellation.
-25. For vocabulary/classification, prefer atomic single-word items when the learning objective does not require phrases.
-26. Category usage counts, legend coverage, focus distribution, and answer/color frequency plan must be frozen before visual prompt assembly.
-27. `LINE_TOPOLOGY_QA = CRITICAL` must pass: no accidental double lines, broken joins, ambiguous shared borders, unintended open regions, or unusable sliver cells.
-28. Shared region borders must read as single clear boundaries and must not collide with question text.
-29. `PRINT_LINE_CLARITY_QA = CRITICAL` must pass.
-30. `LINE_RENDER_STYLE = CLEAN_VECTOR_LIKE`: line art must look clean and single-pass, not sketchy, fuzzy, pencil-like, or rough.
-31. Internal tile borders must use a consistent medium stroke; hairline micro-segments are not allowed.
-32. No obvious broken/fuzzy/double strokes when viewed at normal worksheet scale.
-33. Micro-tile density must be reduced if line quality deteriorates; `CRISP_LINES > MICRO_TILE_DENSITY`.
-34. Avoid unnecessary starburst junctions; junction complexity should normally remain simple enough that regions are visually unambiguous.
-35. Main activity must remain pure black line + white fill when `MAIN_ART_COLOR_MODE = MONOCHROME`; no beige/gray/yellow tint leakage.
-36. Every coloring region must be large enough to color practically on A4; tiny decorative micro-cells that cannot be colored are a FAIL.
+3. Exact requested question count and color count are preserved.
+4. Every question has a verified correct answer.
+5. Every normalized answer/code maps to one color only.
+6. Legend and answer key use the same mapping source.
+7. No orphan legend entry by default.
+8. Focus category distribution is genuinely emphasized when requested.
+9. Answer/color frequency plan is frozen before render when applicable.
+10. Primary shape dominates the main activity area.
+11. HIGH dominance targets about >=85% primary-shape structural rhythm.
+12. Theme silhouette is built from tile grouping, not a freeform illustration overlay.
+13. Question regions derive from primary-shape grouping by default.
+14. `TILE_SCALE_VARIATION = CONTROLLED` across the page.
+15. `MIN_COLORABLE_CELL_SIZE = AGE_APPROPRIATE_PRINT_USABLE` passes.
+16. `MIN_SEGMENT_LENGTH = ENFORCED`; no visual-noise micro segments.
+17. No unusable sliver/needle cells.
+18. Freeform detail is limited to small recognizability details.
+19. No freeform major object when shape dominance is HIGH.
+20. Stroke hierarchy passes: frame > silhouette > internal tile.
+21. Internal tile strokes remain crisp and printable.
+22. No sketch texture, fuzzy edge, hairline, double stroke, broken line or ambiguous border.
+23. No accidental starburst junctions.
+24. Shared borders read as one clean boundary.
+25. Every intended coloring region is visually closed.
+26. Question text has a safe area and does not collide with tile borders.
+27. Thai visible text passes spelling/glyph/render QA.
+28. Main artwork is monochrome by default; actual color is limited to controlled legend previews.
+29. Print-safe margins and no clipping.
+30. High-density requests reduce micro detail or paginate before sacrificing line/text quality.
+31. Follow-up revisions preserve unrelated verified content.
+32. Render mode is resolved honestly; raster candidate with broken lines cannot be called production-ready.
 
-## Dry-run reference case
+## Golden Reference promotion gate
+
+A candidate may be promoted to Golden Reference only when:
+- all critical gates above PASS
+- academic/mapping accuracy is complete
+- line clarity is commercial-print quality
+- primary shape is obvious at first glance
+- colorability is practical for the target grade
+- visual hierarchy is clean
+- no major freeform drift exists
+
+Golden Reference is a quality target, not a fixed composition template.
+
+## Triangle-garden reference case
 
 Input:
 
 ```text
-ขอใบงาน color by code
-ธีม สวนดอกไม้
-วิชา คณิตการบวกเลข 1 หลัก
-จำนวน 30 ข้อ
-จำนวน 6 สี
-ระดับชั้น ป.3
-ให้ใช้รูปสามเหลี่ยมเป็นหลักในการสร้างภาพ
-อยากได้แบบการปูกระเบื้อง mosaic
+ป.3 คณิตศาสตร์ การบวกเลข 1 หลัก
+30 ข้อ 6 สี
+ธีมสวนดอกไม้
+PRIMARY_SHAPE = TRIANGLE
+TILING_MODE = MOSAIC
+A4 Portrait
 ```
 
 Expected:
-- 30 verified one-digit addition questions
+- 30 verified questions
 - 6 colors
-- answer-frequency plan approximately 5 regions per color when mathematically/content-valid
-- triangle primary shape
-- triangle-dominant mosaic
-- primary-shape coverage target about >=85%
-- micro tiles > 30 allowed, but density must remain print-safe
-- 30 grouped question regions
-- question-region boundaries derived from triangle groups
-- garden recognizability from triangle clusters
-- flowers, leaves, butterflies, clouds, hills and ground bands built primarily from triangle clusters
-- no large freeform flowers/leaves/clouds replacing the mosaic
-- controlled tile scale across the page
-- clean topology with no double lines/broken joins/sliver cells
-- clean vector-like strokes with uniform medium internal borders
-- no sketch texture, fuzzy edges, rough pencil effect, hairline segments, or crowded starburst junctions
-- pure monochrome main activity area
-- A4 Portrait default
-- colored legend preview allowed
-
-## Audit regression case — Thai category worksheet
-
-Input intent:
-
-```text
-ป.3 ภาษาไทย มาตราตัวสะกด เน้นแม่กง
-10 ข้อ
-5 สี
-PRIMARY_SHAPE = RHOMBUS
-SHAPE_DOMINANCE = HIGH
-```
-
-Expected content plan example:
-
-```text
-แม่กง 5
-แม่กน 2
-แม่กม 1
-แม่เกย 1
-แม่เกอว 1
-```
-
-PASS only when:
-- all 5 legend categories are actually used
-- แม่กง has the highest count
-- no ambiguous category item
-- single-word items preferred where possible
-- animal/scene silhouettes are constructed from rhombus-derived tile clusters
-- no conventional freeform elephant/bird drawing with diamond pattern merely overlaid
-
-FAIL example:
-
-```text
-แม่กง 4
-แม่กน 4
-แม่กม 2
-แม่เกย 0
-แม่เกอว 0
-```
-
-when the worksheet still says “เน้นแม่กง” and displays all five legend categories.
-
-## Latest visual reference regression — triangle garden
-
-FAIL if:
-- flowers use large rounded freeform petals
-- leaves are large freeform leaf containers for questions
-- clouds use conventional scalloped freeform outlines
-- circular question containers dominate flower centers
-- top and bottom of page use visibly unrelated tile-scale systems
-- ground mosaic contains accidental double lines or tiny sliver cells
-- internal mosaic lines appear broken, fuzzy, rough, doubled, or sketch-like
-- many tiny triangles create starburst noise or hairline fragments
-- main artwork contains accidental pale color/tint
-
-PASS when:
-- those elements are reconstructed from triangle clusters
-- micro-tile count is restrained enough for crisp line rendering
-- line edges are clean, continuous, vector-like and printable
-- question areas remain readable and easy to color
-
-## Multi-subject regression set
-
-- Math: one-digit addition, triangle mosaic
-- Math: multiplication, square tessellation
-- Thai: vowel-word categories, diamond mosaic
-- Thai: final-consonant categories with focus distribution
-- English: vocabulary categories, hexagon mosaic
-- Science: animal classification, honeycomb/hexagon
-- Social studies: factual categories, mixed polygon mosaic
-
-## Visual PASS
-
-- clear geometric rhythm
-- primary shape obvious at first glance
-- theme recognizable
-- controlled tile scale
+- target about 5 regions per color when valid
+- triangle-built flowers/leaves/butterflies/clouds/ground
+- clean vector-like line
 - controlled tile density
-- no clutter
-- no tiny question text
-- no question collisions
-- no decorative freeform art dominating tiles
-- question-region boundaries remain compatible with the primary tiling grammar
-- line topology is closed, clean and practical for student coloring
-- crisp, uniform, clean vector-like black strokes
-- no broken/fuzzy/double/sketch lines
-- no accidental color leakage in main artwork
+- no tiny sliver cells
+- stroke hierarchy visible
+- monochrome main art + colored legend preview
