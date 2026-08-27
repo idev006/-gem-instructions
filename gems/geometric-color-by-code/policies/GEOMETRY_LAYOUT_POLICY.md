@@ -1,10 +1,12 @@
 # Geometry Layout Policy
 
-Version: 1.2.0
+Version: 1.3.0
 
 ## Objective
 
-รักษาความสวยงามแบบปูกระเบื้อง/โมเสก โดยไม่ลดความอ่านง่ายและความถูกต้องของใบงาน และต้องทำให้รูปทรงที่ผู้ใช้กำหนดเป็น **โครงสร้างที่สร้างภาพจริง** ไม่ใช่ pattern overlay บนภาพ freeform
+รักษาความสวยงามแบบปูกระเบื้อง/โมเสก โดยไม่ลดความอ่านง่าย ความถูกต้อง และคุณภาพเส้นสำหรับการพิมพ์จริง รูปทรงที่ผู้ใช้กำหนดต้องเป็น **โครงสร้างที่สร้างภาพจริง** ไม่ใช่ pattern overlay บนภาพ freeform
+
+นโยบายเส้นเฉพาะทางให้อ่านร่วมกับ `policies/LINE_RENDERING_POLICY.md`.
 
 ## Primary-shape dominance
 
@@ -54,6 +56,8 @@ Default:
 
 ```text
 TILE_SCALE_VARIATION = CONTROLLED
+TILE_DENSITY = CONTROLLED
+MICRO_TILE_MIN_SIZE = PRINT_READABLE
 ```
 
 อนุญาตให้ tile มีหลายขนาดได้เพื่อสร้าง silhouette และพื้นที่โจทย์ แต่ทั้งหน้าต้องยังดูเป็น visual language เดียวกัน
@@ -62,11 +66,13 @@ FAIL เช่น:
 - ครึ่งบนใช้สามเหลี่ยมใหญ่มากและโปร่งมาก
 - ครึ่งล่างใช้ micro-triangle เล็กและแน่นมาก
 - ไม่มี transition หรือ scale hierarchy ที่ตั้งใจ
+- มี micro tiles จำนวนมากจนเส้นแตก/ซ้อน/เกิด starburst
 
 PASS เมื่อ:
 - มี base tile scale ที่มองเห็นได้
 - tile ใหญ่เกิดจากการรวม module เดียวกันหรือมีสัดส่วนสัมพันธ์กัน
 - density เปลี่ยนอย่างค่อยเป็นค่อยไปและมีเหตุผลเชิง composition
+- เส้นยังคมและ region ยังระบายสีได้จริงเมื่อพิมพ์ A4
 
 ## Question-region grammar
 
@@ -96,7 +102,7 @@ Theme silhouette ต้องเกิดจาก tile grouping เช่น:
 - elephant = grouped rhombus/triangle cells forming head, body, ears, trunk and legs
 - bird = mirrored/stacked polygon cells forming body, head, wing and tail
 
-กฎ: theme recognizability ต้องไม่มาก่อน readability แต่ recognizability ห้ามถูกแก้ด้วยการกลับไปวาด freeform major object
+กฎ: theme recognizability ต้องไม่มาก่อน readability และห้ามแก้ recognizability ด้วยการกลับไปวาด freeform major object
 
 ## Triangle-mosaic reference rule
 
@@ -107,10 +113,18 @@ Theme silhouette ต้องเกิดจาก tile grouping เช่น:
 - clouds ควรเป็น stepped triangle clusters ไม่ใช่ freeform cloud outline ขนาดใหญ่
 - hills/mountains/ground bands ต้องรักษา triangular rhythm
 - question regions ยังต้องสัมพันธ์กับ triangular grouping
+- หลีกเลี่ยงปลายสามเหลี่ยมสั้นมากและ starburst junction จำนวนมาก
+- ถ้ารายละเอียดของดอก/ใบทำให้เส้นแน่น ให้ลดจำนวน petals/tiles ก่อนเพิ่มเส้นย่อย
 
 ## Line / Topology Quality
 
-`LINE_TOPOLOGY_QA = CRITICAL`
+```text
+LINE_TOPOLOGY_QA = CRITICAL
+PRINT_LINE_CLARITY_QA = CRITICAL
+LINE_RENDER_STYLE = CLEAN_VECTOR_LIKE
+STROKE_WIDTH = UNIFORM_MEDIUM
+CELL_EDGE_SIMPLIFICATION = YES
+```
 
 PASS เมื่อ:
 - shared border ระหว่างสอง region อ่านเป็นเส้นเดียวชัดเจน
@@ -119,6 +133,9 @@ PASS เมื่อ:
 - ไม่มีช่องเปิดที่ทำให้ region ไม่ปิด
 - ไม่มี tiny sliver cell ที่เด็กระบายสีจริงไม่ได้
 - ไม่มี border collision กับข้อความ
+- ไม่มี sketch texture / rough-pencil look / fuzzy double edge
+- internal tile strokes มีความหนาสม่ำเสมอ
+- จุด junction เรียบง่ายและไม่รวมเส้นจำนวนมากเกินจำเป็น
 
 FAIL เมื่อพบ:
 - accidental double lines
@@ -127,26 +144,43 @@ FAIL เมื่อพบ:
 - micro gaps ระหว่าง tile ที่ควรติดกัน
 - เส้นตัดกันแบบไม่ตั้งใจ
 - sliver cell เล็กมากจาก contour correction
+- rough/fuzzy/sketch-like line quality
+- micro starburst หรือเส้นสั้นจำนวนมากจนเกิด visual noise
 
-### Sliver-cell resolution
+### Sliver / short-segment resolution
 
-ถ้า cell เล็กเกินใช้งาน:
+ถ้า cell หรือ segment เล็กเกินใช้งาน:
 1. merge กับ adjacent region ที่ mapping เข้ากันได้
 2. simplify local topology
 3. reduce contour detail
-4. preserve question/color mapping SSOT
+4. reduce micro-tile density
+5. preserve question/color mapping SSOT
 
-ห้ามปล่อย sliver cell ไว้เพียงเพื่อรักษาความเหมือนภาพต้นฉบับ
+ห้ามปล่อย sliver cell หรือ hairline segment ไว้เพียงเพื่อรักษาความเหมือนภาพต้นฉบับ
+
+## Junction complexity
+
+- prefer 2–3 meaningful edges per junction
+- หลีกเลี่ยง 5+ เส้นมาบรรจบจุดเดียวโดยไม่จำเป็น
+- shared border ต้องถูกวาดครั้งเดียว
+- ห้ามมี dangling line, overshoot หรือเส้นทะลุ junction
 
 ## Density resolution
 
-เมื่อโจทย์/ข้อความแน่นเกินไป:
-1. ลด decoration
-2. รวม tiles เป็น question regions ใหญ่ขึ้น
-3. ย้ายคำถามไป anchor zone
-4. ปรับ orientation
-5. paginate
-6. ห้ามย่อตัวอักษรจนอ่านยาก
+เมื่อโจทย์/ข้อความ/เส้นแน่นเกินไป:
+1. ลด micro-tile density
+2. ลด decoration
+3. simplify contours
+4. รวม tiles เป็น question regions ใหญ่ขึ้น
+5. ย้ายคำถามไป anchor zone
+6. ปรับ orientation
+7. paginate
+8. ห้ามย่อตัวอักษรหรือทำเส้น hairline เพื่อฝืนใส่รายละเอียด
+
+```text
+CRISP_LINES > MICRO_TILE_DENSITY
+READABILITY > GEOMETRIC_DETAIL
+```
 
 ## Visual-language consistency audit
 
@@ -156,6 +190,7 @@ FAIL เมื่อพบ:
 3. question regions ยังดูเป็นสมาชิกของ mosaic เดียวกันไหม
 4. มีส่วนใดดูเหมือน conventional illustration แทรกอยู่หรือไม่
 5. density transition มีเหตุผลหรือไม่
+6. line weight และ line quality สม่ำเสมอทั้งหน้าไหม
 
 ## Shape audit checklist
 
@@ -166,9 +201,17 @@ FAIL เมื่อพบ:
 4. primary-shape rhythm ต่อเนื่องพอหรือไม่
 5. question regions ยังสัมพันธ์กับ grid/tiling หรือถูกตัดเป็น freeform ขนาดใหญ่เกินไปหรือไม่
 6. line topology สะอาดและระบายสีได้จริงหรือไม่
+7. มีเส้นแตก เส้นสั่น เส้นซ้อน หรือ fuzzy edge ที่เห็นได้ด้วยตาเปล่าหรือไม่
 
-ถ้าข้อ 2 = ไม่ หรือข้อ 3 = ใช่ → Critical FAIL สำหรับ `SHAPE_DOMINANCE = HIGH`
+ถ้าข้อ 2 = ไม่, ข้อ 3 = ใช่ หรือข้อ 7 = ใช่ → Critical FAIL
+
+## Monochrome integrity
+
+เมื่อ `MAIN_ART_COLOR_MODE = MONOCHROME`:
+- main activity ต้องมีเพียง black line + white fill
+- ห้ามมี beige/gray/yellow tint, shading wash หรือ accidental color leakage
+- สีจริงใช้ได้เฉพาะ legend preview เว้นแต่ผู้ใช้สั่งต่างออกไป
 
 ## Print rule
 
-Default A4 Portrait, print-safe margin, white background, black outlines, low ink. Colored preview จำกัดไว้ที่ legend เว้นแต่ผู้ใช้สั่งเป็นอย่างอื่น
+Default A4 Portrait, print-safe margin, white background, clean black outlines, low ink, crisp vector-like lines. Colored preview จำกัดไว้ที่ legend เว้นแต่ผู้ใช้สั่งเป็นอย่างอื่น
