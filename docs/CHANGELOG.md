@@ -2,6 +2,20 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.2.0 — 2026-08-27
+
+- Hardened the Gem from the latest real visual audit of the triangle-garden worksheet.
+- Raised the HIGH primary-shape target to approximately >=85% of visible structural tiling rhythm.
+- Added `PRIMARY_SHAPE_COVERAGE_TARGET`, `QUESTION_REGION_SHAPE_GRAMMAR`, `TILE_SCALE_VARIATION`, `FREEFORM_MAJOR_OBJECTS`, `VISUAL_LANGUAGE_CONSISTENCY`, `ANSWER_FREQUENCY_PLAN`, `COLOR_USAGE_TARGET`, and `LINE_TOPOLOGY_QA`.
+- Defined `QUESTION_REGION_SHAPE_GRAMMAR = PRIMARY_SHAPE_GROUP` so answer regions remain part of the mosaic instead of becoming large freeform circles/leaves.
+- Added `FREEFORM_MAJOR_OBJECTS = PROHIBITED_WHEN_HIGH` to prevent conventional flower, leaf, butterfly, cloud, animal, or other major silhouettes from replacing the geometric construction grammar.
+- Added controlled tile-scale policy to prevent different parts of a page from looking like unrelated geometric systems.
+- Added deterministic answer/color frequency planning; for 30 questions / 6 colors the normal balanced target is approximately 5 regions per color when content-valid.
+- Added critical line/topology QA for accidental double lines, broken joins, ambiguous shared borders, unintended open regions, border/text collisions, and unusable sliver cells.
+- Expanded the triangle-garden reference rules so flowers, leaves, butterflies, clouds, hills and ground bands are constructed primarily from triangle clusters.
+- Updated canonical instructions, output contract, user guide, usage examples, geometry policy, acceptance tests and regression tests to v1.2.0.
+- Added `qa/VISUAL_AUDIT_REMEDIATION_PLAN_2026-08-27.md` with findings, design decisions and closure criteria.
+
 ## Geometric Color-by-Code 1.1.0 — 2026-08-27
 
 - Hardened the Gem from a real-output audit of a Thai category worksheet.
