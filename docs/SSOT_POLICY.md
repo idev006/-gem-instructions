@@ -1,59 +1,65 @@
 # SSOT Policy
 
+## Repository model
+
+This repository contains multiple production Gems. Each Gem has its own canonical instruction under:
+
+`gems/<gem-id>/GEM_INSTRUCTIONS_PRODUCTION.md`
+
+Repository-wide governance belongs in `docs/`.
+
 ## Canonical authority
 
-`gem/GEM_INSTRUCTIONS_PRODUCTION.md` is the canonical instruction for the production Gem.
+For any Gem, the highest authority is that Gem's own canonical file:
 
-## Precedence
+`gems/<gem-id>/GEM_INSTRUCTIONS_PRODUCTION.md`
 
-When documents conflict, use this precedence:
+A supporting policy, example, QA file, schema, or README must not silently override the canonical instruction.
 
-1. `gem/GEM_INSTRUCTIONS_PRODUCTION.md`
-2. `specs/*`
-3. `gem/OUTPUT_CONTRACT.md`
-4. `gem/TEACHER_UX_RULES.md`
-5. `qa/*`
-6. `examples/*`
-7. `README.md`
+## Precedence within a Gem
 
-A lower-precedence document must never silently override a higher-precedence document.
+1. `gems/<gem-id>/GEM_INSTRUCTIONS_PRODUCTION.md`
+2. Gem-specific `policies/*`
+3. `OUTPUT_CONTRACT.md` when present
+4. Gem-specific `qa/*`
+5. Gem-specific `examples/*`
+6. Gem-specific `README.md`
+7. Repository `README.md`
+
+Repository-wide policy in `docs/` governs structure, SSOT ownership, and change control, but should not redefine Gem behavior without updating that Gem's canonical instruction.
 
 ## Change control
 
-Any change that affects worksheet behavior must update, when applicable:
+Any change that affects a Gem's behavior should update, when applicable:
 
-- canonical Gem instruction
-- affected specification
+- the relevant canonical Gem instruction
+- affected Gem-specific policy
 - acceptance/regression tests
-- changelog
+- usage examples
+- `docs/CHANGELOG.md`
 
-## Quality gates
+## New Gem rule
 
-No release is considered production-ready unless critical gates pass:
+Every new Gem must receive a unique folder under `gems/`. Do not place multiple Gems' production instructions in one shared flat folder.
 
-- mathematical correctness
-- requested digit counts
-- place-value alignment
-- question count
-- difficulty policy
-- duplicate control
-- answer-key consistency
-- A4 layout safety
-- print usability
+Recommended structure:
+
+```text
+gems/<gem-id>/
+├── GEM_INSTRUCTIONS_PRODUCTION.md
+├── CONVERSATION_STARTERS.md   # optional
+├── OUTPUT_CONTRACT.md         # optional
+├── policies/                  # optional
+├── examples/                  # optional
+├── qa/                        # optional
+├── schemas/                   # optional
+└── assets/                    # optional
+```
 
 ## Honest completion
 
-The Gem must not claim that a PDF, DOCX, preview, or other downloadable artifact exists unless an actual file was created in the current environment.
+A Gem must not claim that a PDF, DOCX, preview, image, or other downloadable artifact exists unless that artifact was actually created in the active environment.
 
-## Design priority
+## Quality principle
 
-1. Mathematical correctness
-2. Specification compliance
-3. Curriculum appropriateness
-4. Place-value correctness
-5. Student usability
-6. Difficulty correctness
-7. Print readability
-8. Layout consistency
-9. Theme consistency
-10. Decoration
+Content correctness, specification compliance, learner appropriateness, usability, and output integrity take priority over decoration.

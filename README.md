@@ -1,70 +1,64 @@
-# Gem Instructions — Worksheet Generation SSOT
+# Gem Instructions Repository
 
-This repository is the **Single Source of Truth (SSOT)** for the teacher-first Gem instructions and supporting engineering specifications used to generate print-ready A4 mathematics worksheets.
+This repository is the **Single Source of Truth (SSOT)** for multiple production Gem instruction sets.
 
-## Project scope
+## Scalable repository structure
 
-Initial scope: configurable multiplication worksheets for Thai primary-school teachers, including:
-
-- grade level
-- multiplicand digit count
-- multiplier digit count
-- difficulty
-- question count
-- theme
-- A4 print-ready layout requirements
-- answer-key generation
-- mathematical validation
-- QA and audit rules
-
-## Canonical source
-
-The canonical Gem instruction is:
-
-`gem/GEM_INSTRUCTIONS_PRODUCTION.md`
-
-Supporting specifications must not contradict the canonical instruction. Any intentional behavior change should update the canonical file and the changelog in the same change set.
-
-## Repository structure
+Each Gem owns its own canonical instruction and supporting files under `gems/<gem-id>/`.
 
 ```text
 .
 ├── README.md
 ├── docs/
 │   ├── SSOT_POLICY.md
-│   ├── PRODUCT_VISION.md
-│   ├── ARCHITECTURE.md
 │   └── CHANGELOG.md
-├── gem/
-│   ├── GEM_INSTRUCTIONS_PRODUCTION.md
-│   ├── CONVERSATION_STARTERS.md
-│   ├── TEACHER_UX_RULES.md
-│   └── OUTPUT_CONTRACT.md
-├── specs/
-│   ├── multiplication-rules.md
-│   ├── difficulty-model.md
-│   ├── adaptive-grid.md
-│   ├── a4-print-spec.md
-│   └── worksheet-spec.schema.json
-├── qa/
-│   ├── ACCEPTANCE_TESTS.md
-│   ├── REGRESSION_TESTS.md
-│   └── QA_CHECKLIST.md
-└── examples/
-    └── teacher-prompts.md
+└── gems/
+    ├── README.md
+    ├── worksheet-generator/
+    │   ├── GEM_INSTRUCTIONS_PRODUCTION.md
+    │   ├── CONVERSATION_STARTERS.md
+    │   ├── OUTPUT_CONTRACT.md
+    │   └── qa/
+    │       └── ACCEPTANCE_TESTS.md
+    └── color-by-code/
+        ├── GEM_INSTRUCTIONS_PRODUCTION.md
+        ├── policies/
+        │   └── PAGE_FORMAT_POLICY.md
+        └── examples/
+            └── USAGE_EXAMPLES.md
 ```
 
-## Engineering principle
+## Naming rule for future Gems
+
+Create one folder per Gem:
+
+`gems/<gem-id>/`
+
+Recommended internal structure:
 
 ```text
-Teacher request
-→ normalized worksheet specification
-→ mathematical generation
-→ validation
-→ adaptive A4 layout
-→ answer key
-→ QA
-→ print-ready output
+GEM_INSTRUCTIONS_PRODUCTION.md
+CONVERSATION_STARTERS.md        # optional
+OUTPUT_CONTRACT.md              # optional
+policies/                       # optional
+examples/                       # optional
+qa/                             # optional
+schemas/                        # optional
+assets/                         # optional
 ```
 
-Mathematical correctness, curriculum fit, place-value correctness, and student usability always take priority over decoration.
+Do not mix files from different Gems in the same folder.
+
+## Current Gems
+
+### Worksheet Generator
+Canonical instruction:
+`gems/worksheet-generator/GEM_INSTRUCTIONS_PRODUCTION.md`
+
+### Color by Code
+Canonical instruction:
+`gems/color-by-code/GEM_INSTRUCTIONS_PRODUCTION.md`
+
+Repository-wide governance is kept in `docs/`.
+
+Any behavior-changing update should modify the relevant Gem's canonical file and update `docs/CHANGELOG.md` when appropriate.
