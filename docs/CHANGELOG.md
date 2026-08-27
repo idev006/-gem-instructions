@@ -1,8 +1,18 @@
 # Changelog
 
-All notable changes to the canonical Gem instruction are recorded here.
+All notable changes to the canonical Gem instructions are recorded here.
 
-## 1.2.0 — 2026-08-27
+## Color-by-Code 1.1.0 — 2026-08-27
+
+- Expanded the canonical parameter model for the Color-by-Code Gem.
+- Added explicit support for grade, subject, topic, question type, 10–100 questions, difficulty, language, 1–12 colors, custom colors, theme, visual complexity, page size, orientation, pagination, region sizing, worksheet fields, output controls, QA, seeds, worksheet IDs, batch generation, and duplicate policies.
+- Defined teacher-facing core parameters as: grade, subject, topic, question count, difficulty, color count, theme, and page size/orientation.
+- Locked default page to A4 Portrait while preserving A3/A4/A5/Letter/Legal/Custom and Portrait/Landscape support.
+- Clarified that changing page size or orientation requires layout recalculation rather than stretching an existing layout.
+- Strengthened answer-group, color-distribution, answer-key SSOT, and validation rules.
+- Canonical file: `gem/COLOR_BY_CODE_GEM_INSTRUCTIONS_PRODUCTION.md`.
+
+## Worksheet Gem 1.2.0 — 2026-08-27
 
 - Promoted Thai-first visible-language behavior to a canonical default.
 - Added critical Thai-language QA: spelling, vowel/tone marks, spacing, clarity, terminology consistency, and age appropriateness.
@@ -13,7 +23,7 @@ All notable changes to the canonical Gem instruction are recorded here.
 - Added monochrome and illustration checks to final critical QA.
 - Updated `gem/OUTPUT_CONTRACT.md` to match the canonical v1.2.0 behavior.
 
-## 1.1.0 — 2026-08-27
+## Worksheet Gem 1.1.0 — 2026-08-27
 
 - Promoted the full Teacher-First Gem V3 instruction into the canonical SSOT file.
 - Canonical file: `gem/GEM_INSTRUCTIONS_PRODUCTION.md`.
@@ -21,7 +31,7 @@ All notable changes to the canonical Gem instruction are recorded here.
 - Preserved A4 print-ready behavior, adaptive calculation grids, mathematical validation, answer-key single-source rules, auto-pagination, teacher-friendly revisions, batch behavior, and final QA gates.
 - Added explicit honest-capability rules: never claim a PDF or print-ready artifact exists unless it was actually produced and checked.
 
-## 1.0.0 — 2026-08-27
+## Worksheet Gem 1.0.0 — 2026-08-27
 
 - Established the initial canonical production Gem instruction.
 - Added teacher-first natural-language interaction, A4 defaults, multiplication digit constraints, math validation, adaptive layout, answer-key generation, and QA behavior.
