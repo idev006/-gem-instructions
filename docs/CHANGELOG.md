@@ -2,6 +2,16 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.7.1 — 2026-08-28
+
+- Locked the approved production presentation to **two separate A4 Portrait pages** by default: Page 1 = Student Worksheet, Page 2 = Colored Answer Key.
+- Added `policies/TWO_PAGE_A4_OUTPUT_POLICY.md`.
+- Updated `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md` to v1.2.0 with explicit page size, orientation, page-order, and same-page prohibition rules.
+- Added a 40–50 item single-page stress policy: preserve one Student A4 page only when readability, colorability, line quality, safe margins, and print QA still pass.
+- Defined the density-reduction order: reduce decoration and micro-detail before text size, stroke quality, safe margins, or colorable-cell size.
+- Required the Answer Key to remain a separate A4 Portrait page using identical geometry/text/mapping.
+- Updated `USER_GUIDE.md`, `README.md`, and `qa/ACCEPTANCE_TESTS.md` to document and test the two-page A4 default.
+
 ## Geometric Color-by-Code 1.7.0 — 2026-08-27
 
 - Promoted the Gem to **v1.7.0 — Twin Output Integrity** after review of the Student/Answer-Key pair revealed that independently generated colored solutions can contain region-color mismatches even when the worksheet content is correct.
