@@ -2,6 +2,18 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.4.0 — 2026-08-27
+
+- Promoted the canonical Gem to v1.4.0 after visual review of the improved triangle-garden worksheet.
+- Added `MIN_COLORABLE_CELL_SIZE`, `MIN_SEGMENT_LENGTH`, `MICRO_TILE_DENSITY_POLICY`, and `FREEFORM_DETAIL_BUDGET` to protect practical coloring usability.
+- Added a three-level stroke hierarchy: outer frame > theme/object silhouette > internal tile boundary.
+- Added strict avoidance rules for hairlines, fuzzy/sketch strokes, double strokes, broken joins, and accidental starburst junctions.
+- Added render-quality parameters and made deterministic/vector rendering the production preference when available.
+- Added `THAI_FONT_RENDER_QA` and deterministic text-placement expectations for production output.
+- Added `policies/GOLDEN_REFERENCE_STANDARD.md`; Golden Reference is defined as a quality target rather than a fixed composition template.
+- Hardened geometry policy around minimum colorable area, freeform-detail budget, controlled tile density, and starburst reduction.
+- Updated `USER_GUIDE.md`, `OUTPUT_CONTRACT.md`, `README.md`, `qa/ACCEPTANCE_TESTS.md`, and `qa/REGRESSION_TESTS.md` to v1.4 behavior.
+
 ## Geometric Color-by-Code 1.2.0 — 2026-08-27
 
 - Hardened the Gem from the latest real visual audit of the triangle-garden worksheet.
