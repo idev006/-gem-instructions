@@ -2,6 +2,23 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Themed Hub Worksheet 1.1.0 — 2026-08-27
+
+- Hardened `gems/themed-hub-worksheet/GEM_INSTRUCTIONS_PRODUCTION.md` from v1.0.0 to v1.1.0.
+- Added explicit `USE_CASES` and `NON_GOALS` to satisfy repository production standards.
+- Reworked the architecture to require `Normalized Worksheet Spec → Learning Objective → Verified Content Blueprint → Slot Blueprint → Layout Blueprint → Final Prompt`.
+- Added explicit parameter semantics for `ACTIVITY_TYPE`, `RESPONSE_TYPE`, `SLOT_LABEL_MODE`, `SLOT_CONTENT_MODE`, `CENTER_CONTENT_MODE`, and `DIFFICULTY`.
+- Added a true multi-subject adapter that resolves subject/topic/grade into learning objective, activity type, response type, slot-content rules, and validation rules.
+- Added a Verified Content Blueprint contract so important academic text, slot roles, answers, and counts are locked before visual prompt assembly.
+- Added pagination-over-compression policy for requests above the recommended 4–16 slots per page.
+- Added print-layout requirements including default 10 mm margin target, 10–12 mm safe-margin guidance, writing-space priority, and decoration reduction before compression.
+- Added edge-case handling for long text, unsuitable objects, open-ended topics, missing theme/object, and missing critical academic information.
+- Added output honesty rules and strengthened QA gates.
+- Added `gems/themed-hub-worksheet/OUTPUT_CONTRACT.md`.
+- Expanded `examples/USAGE_EXAMPLES.md` with minimal, detailed, revision, and edge-case prompts.
+- Expanded `qa/ACCEPTANCE_TESTS.md` and added `qa/REGRESSION_TESTS.md`.
+- Updated `USER_GUIDE.md` to v1.1.0 with production workflow, slot-count policy, pagination guidance, edge cases, and validation checklist.
+
 ## Color-by-Code 1.4.0 — 2026-08-27
 
 - Hardened the Gem into a true multi-subject Color-by-Code engine.
