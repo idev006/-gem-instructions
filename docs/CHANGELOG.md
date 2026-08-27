@@ -2,6 +2,16 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Color-by-Code 1.2.0 — 2026-08-27
+
+- Added `QUESTION_LAYOUT` as a canonical parameter.
+- Changed the default math presentation inside Color-by-Code regions to horizontal / inline expressions.
+- Clarified that wording such as `การคูณแนวตั้ง` describes the math topic unless the user explicitly asks to render the problems vertically.
+- Vertical calculation layout is now opt-in only for Color-by-Code worksheets.
+- Added validation to confirm rendered question layout matches the resolved `QUESTION_LAYOUT` value.
+- Preserved A4 Portrait, black-and-white, Thai-first, coloring-friendly, 10–100 question, and 1–12 color defaults/policies.
+- Canonical file: `gem/COLOR_BY_CODE_GEM_INSTRUCTIONS_PRODUCTION.md`.
+
 ## Color-by-Code 1.1.0 — 2026-08-27
 
 - Expanded the canonical parameter model for the Color-by-Code Gem.
