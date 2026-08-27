@@ -1,26 +1,27 @@
 # Twin Output & Answer-Key Integrity Policy
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Production policy
 
 ## Purpose
 
-กำหนดให้ Color-by-Code production output แยกเป็น 2 ชุดที่มาจาก source เดียวกัน:
+กำหนดให้ Color-by-Code production output แยกเป็น 2 ชุดที่มาจาก source เดียวกัน แต่ **ต้องไม่วาง Student Worksheet และ Answer Key อยู่บนหน้าเดียวกันหรือใน canvas เดียวกันโดย default**:
 
 1. `STUDENT_WORKSHEET` — ขาว-ดำ ยังไม่เติมสีในพื้นที่กิจกรรม
 2. `COLORED_ANSWER_KEY` — layout/region เดียวกัน เติมสีตาม verified mapping เท่านั้น
 
-เป้าหมายคือป้องกันความผิดพลาดที่เกิดจากการสร้างเฉลยเป็นภาพใหม่ ซึ่งอาจทำให้สีของ region ไม่ตรงกับคำตอบ แม้ worksheet และ legend จะถูกต้อง
+เป้าหมายคือป้องกันทั้ง mapping drift และปัญหาการใช้งานจริงที่เฉลยปรากฏพร้อมโจทย์ให้นักเรียนเห็น
 
-## Hard principle
+## Hard principles
 
 ```text
 ONE MASTER GEOMETRY
 ONE VERIFIED MAPPING
 TWO RENDER VIEWS
+SEPARATE OUTPUT SURFACES
 ```
 
-ห้ามสร้าง Student Sheet และ Answer Key ด้วย geometry/composition คนละชุด
+ห้ามสร้าง Student Sheet และ Answer Key ด้วย geometry/composition คนละชุด และห้ามจัดสองชุดไว้ side-by-side บนหน้าเดียวกันโดย default.
 
 ## Canonical pipeline
 
@@ -31,6 +32,7 @@ Verified Content Blueprint
 → Deterministic Master Text Layout
 → STUDENT_WORKSHEET render view
 → COLORED_ANSWER_KEY render view
+→ Separate-page / separate-file packaging
 → Pair Integrity QA
 ```
 
@@ -59,6 +61,7 @@ ANSWER_KEY_GEOMETRY_SOURCE = STUDENT_MASTER_GEOMETRY
 ANSWER_KEY_TEXT_SOURCE = VERIFIED_CONTENT_BLUEPRINT
 ANSWER_KEY_FILL_SOURCE = VERIFIED_COLOR_MAPPING
 ANSWER_KEY_LAYOUT_MATCH = EXACT
+ANSWER_KEY_PRESENTATION = SEPARATE_PAGE_OR_FILE
 ```
 
 แต่ละ region ต้องเติมสีด้วย deterministic rule:
@@ -71,6 +74,29 @@ region_id
 ```
 
 ห้าม image model เลือกสีโดยตีความโจทย์เอง
+
+## Presentation / packaging rule
+
+Default:
+
+```text
+PAIR_PRESENTATION_MODE = SEPARATE
+STUDENT_AND_ANSWER_ON_SAME_PAGE = NO
+STUDENT_AND_ANSWER_SIDE_BY_SIDE = NO
+ANSWER_KEY_AFTER_STUDENT = YES_WHEN_PACKAGED_AS_MULTI_PAGE_DOCUMENT
+```
+
+รูปแบบที่ยอมรับ:
+- Student worksheet เป็นไฟล์/หน้าแยก และ Answer Key เป็นไฟล์/หน้าแยก
+- PDF เดียวหลายหน้าได้ โดย Student มาก่อน และ Answer Key อยู่หน้าถัดไปหรือส่วนท้าย
+- Batch หลายหน้าได้ แต่ทุก answer-key page ต้องแยกจาก student page ที่สอดคล้องกัน
+
+รูปแบบที่ไม่ยอมรับโดย default:
+- Student ซ้าย + Answer Key ขวาในหน้าเดียว
+- Student ด้านบน + Answer Key ด้านล่างในหน้าเดียว
+- thumbnail เฉลยอยู่ใน Student worksheet
+
+ข้อยกเว้นมีได้เฉพาะผู้ใช้สั่งชัดเจนว่าให้ทำ comparison/proof sheet สำหรับครูหรือ QA และต้องไม่เรียก output นั้นว่า student-facing worksheet.
 
 ## Pair identity requirements
 
@@ -110,6 +136,7 @@ Production preferred:
 MASTER = deterministic SVG/vector/region graph
 Student = render(master, fill=none)
 Answer = render(master, fill=mapping[color_id])
+Package = separate(student, answer)
 ```
 
 ห้ามสร้าง Answer Key ด้วย generative image call ใหม่จากศูนย์ เพราะอาจเปลี่ยน geometry, text, หรือ color assignment
@@ -132,6 +159,8 @@ FAIL เมื่อ:
 - legend ของสองชุดไม่ตรงกัน
 - answer key ใช้ image model ตีความคำตอบ/สีใหม่
 - line topology ต่างกันระหว่าง student และ answer key
+- Student และ Answer Key ถูกวางอยู่หน้าเดียวกันโดย default
+- Answer Key ปรากฏเป็นส่วนหนึ่งของ student-facing worksheet โดยไม่ได้รับคำสั่งชัดเจน
 
 ## Output naming
 
@@ -154,6 +183,7 @@ FAIL เมื่อ:
 ```text
 MAPPING ACCURACY
 > PAIR TOPOLOGY IDENTITY
+> STUDENT/ANSWER SEPARATION
 > TEXT IDENTITY
 > LINE QUALITY
 > COLOR FIDELITY
