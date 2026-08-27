@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Acceptance Tests
 
-Version: 1.7.0
+Version: 1.7.1
 
 ## Critical production gates
 
@@ -46,32 +46,36 @@ Version: 1.7.0
 37. `STUDENT_WORKSHEET_REQUIRED = YES` by default.
 38. Student activity regions contain no solution fill color.
 39. `ANSWER_KEY = YES` produces a separate colored solution view by default.
-40. Student and Answer Key use the same `master_geometry_id` / geometry version.
-41. Student and Answer Key contain identical region IDs and region boundaries.
-42. Student and Answer Key contain identical question IDs and verified prompt text.
-43. Student and Answer Key use the same legend/mapping source.
-44. Answer Key fill colors come only from `VERIFIED_COLOR_MAPPING`.
-45. For every `region_id`, `answer_key.fill_color_id == verified_mapping[question_id]`.
-46. A single wrong answer-key region color is a Critical FAIL.
-47. Answer Key may add `เฉลย`/teacher annotation but may not change topology or academic content.
-48. Answer Key is not generated from an independent stochastic image composition.
-49. Student and Answer Key use the same line master so line clarity/topology cannot drift between the pair.
-50. Pair QA confirms `PAIR_TOPOLOGY_IDENTITY`, `PAIR_TEXT_IDENTITY`, and `PAIR_MAPPING_IDENTITY`.
+40. `PAIR_PRESENTATION_MODE = SEPARATE` by default.
+41. Student Worksheet and Answer Key must not be placed side-by-side or stacked on the same student-facing page.
+42. If packaged in one multi-page document, Student page(s) come first and Answer Key page(s) follow separately.
+43. Student and Answer Key use the same `master_geometry_id` / geometry version.
+44. Student and Answer Key contain identical region IDs and region boundaries.
+45. Student and Answer Key contain identical question IDs and verified prompt text.
+46. Student and Answer Key use the same legend/mapping source.
+47. Answer Key fill colors come only from `VERIFIED_COLOR_MAPPING`.
+48. For every `region_id`, `answer_key.fill_color_id == verified_mapping[question_id]`.
+49. A single wrong answer-key region color is a Critical FAIL.
+50. Answer Key may add `เฉลย`/teacher annotation but may not change topology or academic content.
+51. Answer Key is not generated from an independent stochastic image composition.
+52. Student and Answer Key use the same line master so line clarity/topology cannot drift between the pair.
+53. Pair QA confirms `PAIR_TOPOLOGY_IDENTITY`, `PAIR_TEXT_IDENTITY`, and `PAIR_MAPPING_IDENTITY`.
+54. Same-page comparison is allowed only when explicitly requested as teacher/QA proof output and must not be labeled as the student worksheet.
 
 ## Natural Harmony gates
 When `COMPOSITION_SYSTEM = NATURAL_HARMONY` or AUTO resolves to Natural Harmony:
-51. Focal hierarchy is visually clear.
-52. `COMPOSITION_BALANCE` and `SYMMETRY_MODE` suit the theme.
-53. Golden-section guidance does not distort content, legend, margins or question safe areas.
-54. Fibonacci rhythm is used only where useful and not forced everywhere.
-55. Phyllotaxis/golden-angle-inspired detail does not create cells below minimum colorable size.
-56. Natural Harmony does not replace primary-shape construction grammar.
-57. `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM` preserves exact content/mapping and maintains or improves readability.
-58. `QUESTION_DISTRIBUTION_BALANCE = REQUIRED` passes.
-59. Natural scale hierarchy shows focal / secondary / supporting levels coherently.
-60. No exact golden-ratio/Fibonacci/golden-angle claim without calculated evidence.
-61. Natural Harmony does not materially reduce cleanliness/readability versus `REFERENCE_BEAUTIFUL`.
-62. Natural Harmony does not materially reduce visual impact versus `REFERENCE_WOW`.
+55. Focal hierarchy is visually clear.
+56. `COMPOSITION_BALANCE` and `SYMMETRY_MODE` suit the theme.
+57. Golden-section guidance does not distort content, legend, margins or question safe areas.
+58. Fibonacci rhythm is used only where useful and not forced everywhere.
+59. Phyllotaxis/golden-angle-inspired detail does not create cells below minimum colorable size.
+60. Natural Harmony does not replace primary-shape construction grammar.
+61. `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM` preserves exact content/mapping and maintains or improves readability.
+62. `QUESTION_DISTRIBUTION_BALANCE = REQUIRED` passes.
+63. Natural scale hierarchy shows focal / secondary / supporting levels coherently.
+64. No exact golden-ratio/Fibonacci/golden-angle claim without calculated evidence.
+65. Natural Harmony does not materially reduce cleanliness/readability versus `REFERENCE_BEAUTIFUL`.
+66. Natural Harmony does not materially reduce visual impact versus `REFERENCE_WOW`.
 
 ## V3 promotion gate
 A candidate may be promoted to `REFERENCE_NATURAL_HARMONY_V3` only when all applicable critical gates PASS and final production geometry is deterministic/vector-first.
@@ -90,4 +94,5 @@ FAIL production immediately if:
 - Answer Key has even one region filled with the wrong color
 - Student and Answer Key topologies differ
 - Answer Key independently reinterprets answer/color mapping
+- Student and Answer Key appear together on the same student-facing page by default
 - a raster-only mockup is labeled production-final/Golden Reference
