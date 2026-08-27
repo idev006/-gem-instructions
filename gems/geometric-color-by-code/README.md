@@ -2,10 +2,10 @@
 
 Status: Production Gem family
 Canonical instruction: `GEM_INSTRUCTIONS_PRODUCTION.md`
-Current production version: 1.6.0 — Natural Harmony Integration
+Current production version: 1.7.0 — Twin Output Integrity
 
 ## Purpose
-สร้าง verified multi-subject Color-by-Code worksheet plans ที่ใช้รูปทรงเรขาคณิตเป็น construction grammar หลัก และใช้ Natural Harmony ช่วยเรื่อง placement, scale, rhythm, focal hierarchy และ balance โดยไม่ลด correctness, mapping, readability, colorability หรือ print quality
+สร้าง verified multi-subject Color-by-Code worksheet plans ที่ใช้รูปทรงเรขาคณิตเป็น construction grammar หลัก ใช้ Natural Harmony ช่วยเรื่อง placement/scale/rhythm เมื่อเหมาะสม และผลิต Student Worksheet + Colored Answer Key จาก geometry/mapping master เดียวกัน
 
 ## Core product idea
 ```text
@@ -14,15 +14,15 @@ User request
 → Answer/code/color mapping
 → Primary-shape grammar
 → Natural-Harmony composition
-→ Theme silhouette
-→ Question-flow / regions
-→ Deterministic vector finalization
-→ QA
+→ Deterministic master geometry
+→ Student worksheet view
+→ Colored answer-key view
+→ Pair + visual + print QA
 ```
 
 ```text
-CORRECT: shape → tiles → themed composition
-WRONG: conventional picture → geometric overlay
+CORRECT: one master geometry + one verified mapping → two render views
+WRONG: generate student and answer-key images independently
 ```
 
 ## Default production behavior
@@ -32,11 +32,11 @@ WRONG: conventional picture → geometric overlay
 - 6 colors
 - Triangle primary shape
 - HIGH shape dominance
-- grouped question regions
-- monochrome main artwork
-- colored legend preview allowed
 - Natural Harmony AUTO
-- question flow follows visual rhythm
+- Student main artwork = monochrome/unfilled
+- colored legend preview allowed
+- Answer Key = fully colored solution view
+- Student and Answer Key share identical region topology/text/mapping
 - clean 3-level stroke hierarchy
 - deterministic/vector final printable boundaries
 
@@ -53,6 +53,7 @@ WRONG: conventional picture → geometric overlay
 - `CONVERSATION_STARTERS.md`
 
 ### Policies
+- `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md`
 - `policies/GEOMETRY_LAYOUT_POLICY.md`
 - `policies/LINE_RENDERING_POLICY.md`
 - `policies/RENDER_PIPELINE_POLICY.md`
@@ -74,6 +75,7 @@ WRONG: conventional picture → geometric overlay
 ```text
 CORRECTNESS
 > MAPPING INTEGRITY
+> STUDENT/ANSWER PAIR IDENTITY
 > USER INTENT
 > READABILITY
 > COLORING USABILITY
