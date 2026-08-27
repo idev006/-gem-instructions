@@ -49,5 +49,6 @@ A Gem is not considered production-ready if it has only a prompt/instruction but
 - `worksheet-generator`
 - `color-by-code`
 - `themed-hub-worksheet`
+- `geometric-color-by-code`
 
 When adding a new Gem, create a new sibling folder. Do not place its canonical files directly at repository root or mix them with another Gem.
