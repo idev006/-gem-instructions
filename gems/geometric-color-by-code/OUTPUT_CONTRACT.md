@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Output Contract
 
-Version: 1.6.0
+Version: 1.7.0
 
 ## Required output blocks
 
@@ -10,8 +10,9 @@ Version: 1.6.0
 2. `VERIFIED_CONTENT_BLUEPRINT`
 3. `GEOMETRY_LAYOUT_BLUEPRINT`
 4. `NATURAL_HARMONY_BLUEPRINT`
-5. `RENDER_QUALITY_PLAN`
-6. `FINAL_RENDER_PLAN_OR_PROMPT`
+5. `TWIN_OUTPUT_RENDER_PLAN`
+6. `RENDER_QUALITY_PLAN`
+7. `FINAL_RENDER_PLAN_OR_PROMPT`
 
 ถ้ามีไฟล์จริงค่อยเพิ่ม `ARTIFACTS`; ห้ามอ้างว่า artifact ถูกสร้างแล้วถ้ายังไม่มีจริง
 
@@ -32,7 +33,9 @@ COMPOSITION_SYSTEM
 PAGE_SIZE
 ORIENTATION
 RENDER_MODE
+STUDENT_WORKSHEET_REQUIRED
 ANSWER_KEY
+ANSWER_KEY_RENDER_MODE
 ```
 
 ## 2. VERIFIED_CONTENT_BLUEPRINT
@@ -70,6 +73,8 @@ Academic text/mapping ที่ verified แล้วห้ามถูก image
 ต้องระบุ:
 
 ```text
+master_geometry_id
+master_geometry_version
 primary_shape
 tiling_mode
 shape_dominance_target
@@ -96,7 +101,7 @@ question_placement
 
 ## 4. NATURAL_HARMONY_BLUEPRINT
 
-ต้องระบุเมื่อ `COMPOSITION_SYSTEM` resolve เป็น NATURAL_HARMONY หรือ AUTO เลือกใช้ natural composition:
+เมื่อ active ต้องระบุ:
 
 ```text
 composition_system
@@ -115,9 +120,38 @@ question_distribution_balance
 truthfulness_note
 ```
 
-`truthfulness_note` ต้องแยกให้ชัดว่า exact, calculated, approximate, inspired หรือ not-used; ห้ามเรียก exact golden ratio/Fibonacci/golden-angle หากไม่ได้คำนวณและตรวจจริง
+`truthfulness_note` ต้องแยก exact/calculated/approximate/inspired/not-used ให้ชัด
 
-## 5. RENDER_QUALITY_PLAN
+## 5. TWIN_OUTPUT_RENDER_PLAN
+
+Production default:
+
+```text
+ONE MASTER GEOMETRY
+ONE VERIFIED MAPPING
+TWO RENDER VIEWS
+```
+
+ต้องระบุอย่างน้อย:
+
+```text
+student_output_id
+answer_key_output_id
+master_geometry_id
+student_color_mode = MONOCHROME
+student_region_fill = NONE
+answer_key_geometry_source = STUDENT_MASTER_GEOMETRY
+answer_key_text_source = VERIFIED_CONTENT_BLUEPRINT
+answer_key_fill_source = VERIFIED_COLOR_MAPPING
+answer_key_layout_match = EXACT
+pair_topology_identity = REQUIRED
+pair_text_identity = REQUIRED
+pair_mapping_identity = REQUIRED
+```
+
+Student Sheet และ Answer Key ต้องใช้ region IDs และ geometry เดียวกัน 100%; Answer Key แตกต่างได้เฉพาะ fill color, label `เฉลย`, และ teacher-only annotation ที่ไม่เปลี่ยนกิจกรรม
+
+## 6. RENDER_QUALITY_PLAN
 
 อย่างน้อย:
 
@@ -137,27 +171,24 @@ print_line_clarity_qa
 raster_preview_source
 ```
 
-## 6. FINAL_RENDER_PLAN_OR_PROMPT
+## 7. FINAL_RENDER_PLAN_OR_PROMPT
 
 ต้องยืนยัน:
 - exact question count
 - exact mapping/legend
 - primary shape = construction grammar
 - natural harmony controls placement/scale/rhythm only
-- theme = tile grouping
-- no freeform major object when HIGH
-- min colorable area protected
-- no sliver cells
-- no accidental starburst junction
-- clean 3-level stroke hierarchy
-- question flow supports visual rhythm when active
-- main art monochrome by default
+- main Student worksheet activity area is unfilled/monochrome
+- Answer Key uses identical master geometry
+- Answer Key fills every region deterministically from verified mapping
+- no answer/color reinterpretation by image model
+- no sliver cells / no starburst / clean stroke hierarchy
 - deterministic Thai/text in final print
 - final printable boundaries are deterministic/vector
-- raster preview derives from vector master when production output is claimed
+- raster previews derive from vector master
 - no overlap / print-safe
 
-## Integrity rule
+## Integrity rules
 
 ```text
 WORKSHEET QUESTIONS
@@ -166,10 +197,24 @@ WORKSHEET QUESTIONS
 = LEGEND SOURCE
 ```
 
-Natural composition may move regions, but may not mutate verified questions, answers, codes or colors.
+และ:
+
+```text
+STUDENT REGION TOPOLOGY
+= ANSWER KEY REGION TOPOLOGY
+```
+
+สำหรับทุก `region_id`:
+
+```text
+expected_color_id = verified_mapping[question_id]
+answer_key.fill_color_id == expected_color_id
+```
+
+ไม่ตรงแม้ 1 region = Critical FAIL
 
 ## Production-final rule
 
-Generative raster linework **ห้าม** เป็น production-final coloring boundary source.
+Generative raster linework **ห้าม** เป็น production-final coloring boundary source และห้ามสร้าง Answer Key ใหม่จาก independent image generation.
 
-If image-model output is used, it is concept/mockup input and must be reconstructed/finalized through the deterministic/vector pipeline before promotion to production final or Golden Reference.
+อ่านร่วมกับ `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md`.
