@@ -2,6 +2,19 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.8.1 — 2026-08-28
+
+- Hardened the Gem after a 40–50 item Grade 3 exact-division space-theme stress test showed that **pre-render Answer-First correctness does not guarantee visible output correctness when the image model redraws academic text**.
+- Identified render-time academic drift as a separate root cause from v1.8.0 mapping drift: image generation can alter equations, question numbers, visible question count, and legend values even after the verified mapping is frozen.
+- Added `policies/DETERMINISTIC_CONTENT_RENDER_POLICY.md`.
+- Set `ACADEMIC_TEXT_RENDER_MODE = DETERMINISTIC_OVERLAY` and required final question text, question IDs, legend values, and academic labels to come from verified deterministic sources rather than image-model text generation.
+- Added the hard invariant: `RENDERED CONTENT MUST MATCH VERIFIED CONTENT 100%`.
+- Added `POST_RENDER_CONTENT_PARITY = REQUIRED` with exact checks for rendered question count, unique/complete question IDs, prompt-text parity, and legend-domain parity.
+- Classified image-model-only full-page academic-text renders as **concept previews / non-conformance renders**, not valid proof that the Gem passed production QA.
+- Added high-density rules prohibiting use of generative text placement as a shortcut for fitting 40–50 items on one page.
+- Updated canonical instructions, output contract, user guide, README, acceptance tests and regression tests to v1.8.1 behavior.
+- Added `qa/RENDER_CONTENT_FIDELITY_REMEDIATION_REPORT_2026-08-28.md` documenting the observed failure mode, root cause, corrective architecture, and closure criteria.
+
 ## Geometric Color-by-Code 1.8.0 — 2026-08-28
 
 - Promoted the Gem to **v1.8.0 — Answer-First Generation Integrity** after a real Grade 3 exact-division test produced some correct arithmetic answers that were not represented in the active color legend.
