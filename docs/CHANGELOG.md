@@ -2,6 +2,20 @@
 
 All notable changes to the canonical Gem instructions are recorded here.
 
+## Geometric Color-by-Code 1.8.0 — 2026-08-28
+
+- Promoted the Gem to **v1.8.0 — Answer-First Generation Integrity** after a real Grade 3 exact-division test produced some correct arithmetic answers that were not represented in the active color legend.
+- Identified the root cause as a question-first generation path (`generate question → compute answer → try to map color`) that could escape the active legend domain.
+- Added the hard invariant: `NO QUESTION MAY PRODUCE AN ANSWER/CODE OUTSIDE THE ACTIVE LEGEND`.
+- Added `CONTENT_GENERATION_MODE = ANSWER_FIRST`, active answer/code-set resolution, preplanned color-usage counts, target answer/code assignment per region, and pre-render mapping freeze.
+- Required generated math questions to be constructed from target answers/codes and independently validated against grade/topic constraints; exact division must also pass dividend/divisor digit constraints and remainder = 0.
+- Added mandatory `ANSWER_CODE_COLOR_PLAN` to the output contract and required each question/region to retain target answer/code, verified answer, normalized code, color ID, legend entry and validation status.
+- Added `policies/ANSWER_FIRST_GENERATION_POLICY.md` and upgraded `policies/COLOR_MAPPING_POLICY.md` to v1.2.0.
+- Strengthened acceptance/regression QA to block rendering when any answer is outside the legend, any region lacks a color, usage counts do not reconcile to question count, or image generation alters academic content after mapping freeze.
+- Clarified that `ANSWER_KEY = NO` suppresses only the answer-key output; hidden verified answer/color mapping is still mandatory for Student worksheet QA.
+- Added `qa/ANSWER_FIRST_REMEDIATION_REPORT_2026-08-28.md` documenting root cause, development plan, implementation and closure criteria.
+- Updated canonical instructions, output contract, user guide and README to v1.8.0 behavior.
+
 ## Geometric Color-by-Code 1.7.1 — 2026-08-28
 
 - Locked the approved production presentation to **two separate A4 Portrait pages** by default: Page 1 = Student Worksheet, Page 2 = Colored Answer Key.
