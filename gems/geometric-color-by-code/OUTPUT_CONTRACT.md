@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Output Contract
 
-Version: 1.8.0
+Version: 1.8.1
 
 ## Required output blocks
 
@@ -11,11 +11,12 @@ Version: 1.8.0
 3. `VERIFIED_CONTENT_BLUEPRINT`
 4. `GEOMETRY_LAYOUT_BLUEPRINT`
 5. `NATURAL_HARMONY_BLUEPRINT`
-6. `OUTPUT_RENDER_PLAN`
-7. `RENDER_QUALITY_PLAN`
-8. `FINAL_RENDER_PLAN_OR_PROMPT`
+6. `CONTENT_RENDER_PLAN`
+7. `OUTPUT_RENDER_PLAN`
+8. `RENDER_QUALITY_PLAN`
+9. `FINAL_QA_REPORT`
 
-ถ้ามีไฟล์จริงค่อยเพิ่ม `ARTIFACTS`; ห้ามอ้างว่า artifact ถูกสร้างแล้วถ้ายังไม่มีจริง
+ถ้ามีไฟล์จริงค่อยเพิ่ม `ARTIFACTS`; ห้ามอ้างว่า artifact ถูกสร้างแล้วถ้ายังไม่มีจริง.
 
 ## 1. NORMALIZED_WORKSHEET_SPEC
 
@@ -31,17 +32,15 @@ CONTENT_GENERATION_MODE
 PRIMARY_SHAPE
 TILING_MODE
 THEME
-COMPOSITION_SYSTEM
 PAGE_SIZE
 ORIENTATION
-RENDER_MODE
 STUDENT_WORKSHEET_REQUIRED
 ANSWER_KEY
 ```
 
 ## 2. ANSWER_CODE_COLOR_PLAN
 
-ต้องเกิดก่อน generated questions และต้องระบุ:
+ต้องเกิดก่อน generated questions:
 
 ```text
 content_generation_mode = ANSWER_FIRST
@@ -92,15 +91,11 @@ validation_status == PASS
 Aggregate:
 
 ```text
-usage_count_per_answer_or_category
 usage_count_per_color
-focus_category
-resolved_focus_share
-legend_entries
-legend_usage_count
 legend_coverage_check
 answer_frequency_check
 out_of_legend_answer_count = 0
+expected_question_ids
 ```
 
 Academic text/mapping ที่ verified แล้วห้ามถูก image model rewrite.
@@ -113,7 +108,26 @@ Academic text/mapping ที่ verified แล้วห้ามถูก image
 
 เมื่อ active ต้องระบุ composition system, balance, symmetry, focal hierarchy, golden-section/Fibonacci/phyllotaxis usage, natural scale hierarchy, question flow และ truthfulness note.
 
-## 6. OUTPUT_RENDER_PLAN
+## 6. CONTENT_RENDER_PLAN
+
+Production/test-conformance output ต้องระบุ:
+
+```text
+artwork_render_source = IMAGE_MODEL_OR_VECTOR_AS_AVAILABLE
+academic_text_render_mode = DETERMINISTIC_OVERLAY
+academic_text_render_source = VERIFIED_CONTENT_BLUEPRINT
+question_number_render_source = VERIFIED_CONTENT_BLUEPRINT
+legend_render_source = VERIFIED_MAPPING
+color_swatch_render_source = VERIFIED_PALETTE
+post_render_content_parity = REQUIRED
+```
+
+Hard rules:
+- image model may assist artwork/composition
+- image model may not invent/rewrite final questions, question numbers, legend answer values, or academic labels
+- image-model-only full-page text rendering is concept preview only, not Gem-conformance proof
+
+## 7. OUTPUT_RENDER_PLAN
 
 Student default:
 
@@ -137,40 +151,52 @@ answer_key_layout_match = EXACT
 
 เมื่อ `ANSWER_KEY = NO` ให้ suppress answer-key output เท่านั้น; hidden verified answers/mapping ยังต้องใช้สำหรับ QA.
 
-## 7. RENDER_QUALITY_PLAN
+## 8. RENDER_QUALITY_PLAN
 
 อย่างน้อย:
 
 ```text
-render_mode
-production_final_render_mode
-vector_rendering_required
-deterministic_text_placement
-deterministic_region_topology
-deterministic_shared_edges
-line_render_style
-thai_font_render_qa
-print_line_clarity_qa
-raster_preview_source
+production_final_render_mode = VECTOR_FIRST_REQUIRED
+vector_rendering_required = YES_FOR_FINAL_PRINT
+deterministic_region_topology = YES
+deterministic_shared_edges = YES
+line_render_style = CLEAN_VECTOR
+thai_font_render_qa = CRITICAL
+print_line_clarity_qa = CRITICAL
+raster_preview_source = VERIFIED_COMPOSITE
 ```
 
-## 8. FINAL_RENDER_PLAN_OR_PROMPT
+## 9. FINAL_QA_REPORT
 
-ต้องยืนยัน:
-- exact question count
-- active answer/code set resolved before question generation
-- exact mapping/legend
-- no answer/code outside active legend
-- all regions have a color mapping
-- color usage counts reconcile to question count
-- math/topic constraints validated
-- primary shape = construction grammar
-- main Student worksheet activity area is unfilled/monochrome
-- Answer Key behavior follows user instruction
-- no sliver cells / no starburst / clean stroke hierarchy
-- deterministic Thai/text in final print
-- final printable boundaries are deterministic/vector
-- raster previews derive from vector master
+ต้องยืนยันอย่างน้อย:
+
+```text
+requested_question_count
+rendered_question_count
+expected_question_ids
+rendered_question_ids
+question_id_uniqueness
+question_id_sequence_check
+prompt_text_parity_check
+active_legend_domain
+rendered_legend_domain
+legend_parity_check
+out_of_legend_answer_count
+mapping_coverage_check
+post_render_content_parity_status
+print_qa_status
+```
+
+Required parity:
+
+```text
+rendered_question_count == QUESTION_COUNT
+rendered_question_ids == expected_question_ids
+rendered_prompt_text[id] == verified_prompt_text[id]
+rendered_legend_domain == active_legend_domain
+out_of_legend_answer_count == 0
+post_render_content_parity_status == PASS
+```
 
 ## Integrity rules
 
@@ -182,21 +208,21 @@ TARGET ANSWER/CODE PLAN
 = REGION COLOR SOURCE
 ```
 
-Critical invariant:
+และ:
 
 ```text
-FOR EACH question/region:
-  normalized_answer_code IN active_legend
-  color_id = active_legend[normalized_answer_code]
+VERIFIED CONTENT BLUEPRINT
+= VISIBLE ACADEMIC CONTENT IN FINAL OUTPUT
 ```
 
-Out-of-legend answer count must be zero. ไม่ตรงแม้ 1 ข้อ = Critical FAIL และห้าม render final.
+Critical FAIL เมื่อไม่ตรงแม้ 1 ข้อ.
 
 ## Production-final rule
 
-Generative raster linework **ห้าม** เป็น production-final coloring boundary source และ image model ห้าม invent/rewrite academic questions after mapping freeze.
+Generative raster linework **ห้าม** เป็น production-final coloring boundary source และ generative image model **ห้าม** เป็น final academic-text renderer.
 
 อ่านร่วมกับ:
 - `policies/ANSWER_FIRST_GENERATION_POLICY.md`
 - `policies/COLOR_MAPPING_POLICY.md`
+- `policies/DETERMINISTIC_CONTENT_RENDER_POLICY.md`
 - `policies/TWIN_OUTPUT_ANSWER_KEY_POLICY.md`
