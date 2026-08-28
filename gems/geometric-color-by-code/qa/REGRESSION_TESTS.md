@@ -1,6 +1,6 @@
 # Geometric Color-by-Code — Regression Tests
 
-Version: 1.7.0
+Version: 1.8.0
 
 ## Core content and geometry regressions
 R1 FAIL if requested shape is only overlaid on a conventional illustration.
@@ -36,44 +36,59 @@ R30 FAIL when Thai font fallback causes missing/misaligned glyphs.
 R31 FAIL if a prior Golden Reference composition is copied instead of only inheriting quality gates.
 R32 FAIL when fuzzy/broken generative raster is accepted as production-final.
 
+## Answer-first generation regressions
+R33 FAIL if a normal generated worksheet creates questions before resolving the active answer/code set.
+R34 FAIL if any verified question answer/code is absent from the active legend.
+R35 FAIL if any region reaches render without a resolvable color ID.
+R36 FAIL if the system generates arbitrary math problems and only afterward tries to fit their answers into the legend.
+R37 FAIL if `COLOR_USAGE_PLAN` is not frozen before generated questions are created.
+R38 FAIL if the sum of usage counts per color does not equal `QUESTION_COUNT`.
+R39 FAIL if `target_answer_or_code != normalized_answer_code` after validation.
+R40 FAIL if a target numeric answer is silently replaced by an out-of-legend result because generation constraints are difficult.
+R41 FAIL if exact-division content contains a remainder or violates requested dividend/divisor digit constraints.
+R42 FAIL if image generation invents, rewrites, or recalculates academic questions after mapping freeze.
+R43 FAIL if changing color count only recolors the legend without rebuilding active code/distribution planning.
+R44 FAIL if fixed user-supplied questions are allowed to render before proving 100% legend coverage.
+
 ## Render-pipeline regressions
-R33 FAIL if prompt wording is assumed to guarantee crisp final boundaries.
-R34 FAIL if generative raster is called vector-quality without deterministic paths.
-R35 FAIL if a shared edge is rendered twice.
-R36 FAIL if raster-only output is promoted to production Golden Reference.
-R37 FAIL if production PNG/JPG is generated independently of the vector master.
-R38 FAIL if final Thai text is delegated to the image model.
-R39 FAIL if renderer fallback is hidden from the user.
-R40 FAIL if broken-line output is repeatedly regenerated without root-cause change.
+R45 FAIL if prompt wording is assumed to guarantee crisp final boundaries.
+R46 FAIL if generative raster is called vector-quality without deterministic paths.
+R47 FAIL if a shared edge is rendered twice.
+R48 FAIL if raster-only output is promoted to production Golden Reference.
+R49 FAIL if production PNG/JPG is generated independently of the vector master.
+R50 FAIL if final Thai text is delegated to the image model.
+R51 FAIL if renderer fallback is hidden from the user.
+R52 FAIL if broken-line output is repeatedly regenerated without root-cause change.
 
 ## Natural Harmony regressions
-R41 FAIL if layout sacrifices readability/margins/legend to force 1.618.
-R42 FAIL if approximate composition is described as exact golden ratio/Fibonacci/golden-angle without validation.
-R43 FAIL if phyllotaxis creates cells below minimum colorable size.
-R44 FAIL if Fibonacci/petal counts alter verified question count or mapping.
-R45 FAIL if natural rhythm replaces primary-shape construction grammar.
-R46 FAIL if mirror symmetry is forced when dynamic natural balance would suit the theme better.
-R47 FAIL if `NATURAL_SCALE_HIERARCHY = YES` has no clear focal / secondary / supporting levels.
-R48 FAIL if V3 gains natural styling but materially loses WOW impact or BEAUTIFUL cleanliness/readability.
-R49 FAIL if question regions are placed in leftover spaces instead of following the resolved question-flow plan.
-R50 FAIL if `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM` changes question IDs, answers, codes, colors or count.
-R51 FAIL if natural symmetry is mechanically reused across unrelated themes.
-R52 FAIL if a solar-system/underwater/rainforest test reproduces a flower-like radial composition without thematic justification.
-R53 FAIL if natural-detail strength is increased while colorability or line clarity decreases.
-R54 FAIL if the system claims Natural Harmony is mathematically exact when it is only inspired/approximate.
+R53 FAIL if layout sacrifices readability/margins/legend to force 1.618.
+R54 FAIL if approximate composition is described as exact golden ratio/Fibonacci/golden-angle without validation.
+R55 FAIL if phyllotaxis creates cells below minimum colorable size.
+R56 FAIL if Fibonacci/petal counts alter verified question count or mapping.
+R57 FAIL if natural rhythm replaces primary-shape construction grammar.
+R58 FAIL if mirror symmetry is forced when dynamic natural balance would suit the theme better.
+R59 FAIL if `NATURAL_SCALE_HIERARCHY = YES` has no clear focal / secondary / supporting levels.
+R60 FAIL if V3 gains natural styling but materially loses WOW impact or BEAUTIFUL cleanliness/readability.
+R61 FAIL if question regions are placed in leftover spaces instead of following the resolved question-flow plan.
+R62 FAIL if `QUESTION_FLOW = FOLLOW_VISUAL_RHYTHM` changes question IDs, answers, codes, colors or count.
+R63 FAIL if natural symmetry is mechanically reused across unrelated themes.
+R64 FAIL if a solar-system/underwater/rainforest test reproduces a flower-like radial composition without thematic justification.
+R65 FAIL if natural-detail strength is increased while colorability or line clarity decreases.
+R66 FAIL if the system claims Natural Harmony is mathematically exact when it is only inspired/approximate.
 
 ## Twin Output / Answer-Key regressions
-R55 FAIL if the Student worksheet is solution-filled by default instead of remaining monochrome/unfilled.
-R56 FAIL if Student and Answer Key are generated from separate geometry/composition masters.
-R57 FAIL if a region exists in one output but not the other, or region boundaries differ.
-R58 FAIL if question IDs/text differ between Student and Answer Key except approved teacher-only labels.
-R59 FAIL if Answer Key colors are chosen by image-model interpretation instead of verified mapping.
-R60 FAIL if even one Answer-Key region fill does not equal `verified_mapping[question_id]`.
-R61 FAIL if Student and Answer Key use different legends or color IDs.
-R62 FAIL if line topology/stroke geometry drifts between Student and Answer Key.
-R63 FAIL if changing only colors causes a new Student geometry to be generated unnecessarily.
-R64 FAIL if Answer Key is regenerated stochastically to “look prettier” and mapping integrity is no longer auditable.
-R65 FAIL if a pair is called production-ready without explicit pair-identity QA.
+R67 FAIL if the Student worksheet is solution-filled by default instead of remaining monochrome/unfilled.
+R68 FAIL if Student and Answer Key are generated from separate geometry/composition masters.
+R69 FAIL if a region exists in one output but not the other, or region boundaries differ.
+R70 FAIL if question IDs/text differ between Student and Answer Key except approved teacher-only labels.
+R71 FAIL if Answer Key colors are chosen by image-model interpretation instead of verified mapping.
+R72 FAIL if even one Answer-Key region fill does not equal `verified_mapping[question_id]`.
+R73 FAIL if Student and Answer Key use different legends or color IDs.
+R74 FAIL if line topology/stroke geometry drifts between Student and Answer Key.
+R75 FAIL if changing only colors causes a new Student geometry to be generated unnecessarily.
+R76 FAIL if Answer Key is regenerated stochastically to “look prettier” and mapping integrity is no longer auditable.
+R77 FAIL if a pair is called production-ready without explicit pair-identity QA.
+R78 FAIL if `ANSWER_KEY = NO` accidentally disables Student mapping/legend completeness validation.
 
 ## PASS principle
-A regression passes only when correctness, mapping, Student/Answer pair identity, readability, colorability, deterministic geometry, primary-shape grammar and print usability remain intact while the requested visual/composition behavior is achieved.
+A regression passes only when correctness, complete active-legend coverage, answer-first generation, mapping, Student/Answer pair identity when applicable, readability, colorability, deterministic geometry, primary-shape grammar and print usability remain intact while the requested visual/composition behavior is achieved.
