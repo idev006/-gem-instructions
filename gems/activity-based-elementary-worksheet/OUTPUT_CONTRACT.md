@@ -1,23 +1,34 @@
 # Output Contract — Activity-Based Elementary Worksheet Generator
 
-Version: 1.0.0
+Version: 1.1.0
 
 Default mode: `PROMPT_PACKAGE`
 
 ## Required section order
 
 1. `NORMALIZED_WORKSHEET_SPEC`
-2. `VERIFIED_CONTENT_BLUEPRINT`
+2. `STUDENT_CONTENT_BLUEPRINT`
 3. `LAYOUT_BLUEPRINT`
 4. `RENDER_CONSTRAINTS`
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-The user may explicitly request `PROMPT_ONLY` or `BLUEPRINT_ONLY`. Hidden validation must still run even when intermediate sections are omitted from the response.
+The user may explicitly request `PROMPT_ONLY` or `BLUEPRINT_ONLY`. Hidden validation must still run even when intermediate sections are omitted.
+
+## Internal vs user-visible data
+
+The Gem maintains two views:
+
+- `INTERNAL_VERIFIED_BLUEPRINT` — contains hidden verified answers and QA metadata.
+- `STUDENT_CONTENT_BLUEPRINT` — contains only student-facing givens, labels, icons, units, and blank response areas.
+
+When `SHOW_ANSWER_KEY = NO`, verified answers MUST NOT appear in the user-visible blueprint or final student image prompt unless the user explicitly asks to inspect QA answers.
+
+This separation is a critical release requirement.
 
 ## A. NORMALIZED_WORKSHEET_SPEC
 
-Must contain the effective values that govern the output, including at minimum when applicable:
+Include effective values that govern the output, including when applicable:
 
 ```text
 GRADE_LEVEL
@@ -38,26 +49,40 @@ SHOW_QUESTION_NUMBER
 SHOW_ANSWER_KEY
 AUTO_PAGINATION
 VISUAL_THEME
+TEXT_RENDER_MODE
 ```
 
-For time worksheets also include the active time constraints that materially affect generation.
+For time worksheets include active time constraints that materially affect generation.
 
-## B. VERIFIED_CONTENT_BLUEPRINT
+## B. STUDENT_CONTENT_BLUEPRINT
 
 For `START_TIME_END_TIME_TO_DURATION`, use columns equivalent to:
 
 ```text
-ID | ACTIVITY | ICON | START_TIME | END_TIME | VERIFIED_ANSWER
+ID | ACTIVITY | ICON | START_TIME | END_TIME | ANSWER_RENDER | UNIT_RENDER
 ```
 
 Requirements:
 
 - exactly one row per question;
-- all source values deterministic;
-- all answers independently checked;
-- verified answers may be shown in the blueprint but must remain hidden from student blanks when `SHOW_ANSWER_KEY = NO`.
+- all source values already validated internally;
+- response field is blank when answer key is disabled;
+- no hidden answer column in student-facing output;
+- no internal QA metadata leaked into render data.
 
-## C. LAYOUT_BLUEPRINT
+## C. INTERNAL_VERIFIED_BLUEPRINT
+
+Not returned by default when `SHOW_ANSWER_KEY = NO`.
+
+Internal structure should retain values equivalent to:
+
+```text
+ID | START_TIME | END_TIME | VERIFIED_DURATION_MINUTES | VERIFIED_ANSWER_DISPLAY | VALIDATION_STATUS
+```
+
+It is authoritative for calculation QA and may be exposed only when the user explicitly requests answer/QA inspection or when generating a separate answer key.
+
+## D. LAYOUT_BLUEPRINT
 
 Must specify:
 
@@ -66,22 +91,22 @@ Must specify:
 - student-header area;
 - title/instruction area;
 - question-row structure;
-- row density;
+- density;
 - answer-space requirements;
 - illustration/decorative zones;
-- safe-margin behavior.
+- safe-margin behavior;
+- treatment for multi-component answers.
 
-## D. RENDER_CONSTRAINTS
+## E. RENDER_CONSTRAINTS
 
-Must identify hard constraints that the image model must not improvise.
-
-For time worksheets include at minimum:
+At minimum:
 
 ```text
 CONTENT_LOCK = ON
 THAI_TEXT_LOCK = ON
 NUMERIC_VALUE_LOCK = ON
 QUESTION_COUNT_LOCK = ON
+ANSWER_LEAK_GUARD = ON
 STUDENT_ANSWER_BLANKS = EMPTY when SHOW_ANSWER_KEY = NO
 NO_EXTRA_QUESTIONS
 NO_OMITTED_QUESTIONS
@@ -89,14 +114,19 @@ NO_CROPPED_TEXT
 NO_TEXT_ILLUSTRATION_OVERLAP
 ```
 
-## E. QA_REPORT
+For Thai-heavy worksheets, default `TEXT_RENDER_MODE = HYBRID`, preserving clean text zones for deterministic post-render correction if needed.
 
-Show applicable gates in a compact form:
+## F. QA_REPORT
+
+Show applicable gates compactly:
 
 ```text
 INTENT_QA = PASS|FAIL
+DOMAIN_QA = PASS|FAIL
 ACADEMIC_QA = PASS|FAIL
 CALCULATION_QA = PASS|FAIL
+CONSTRAINT_QA = PASS|FAIL
+ANSWER_LEAK_QA = PASS|FAIL
 DUPLICATE_QA = PASS|FAIL
 THAI_QA = PASS|FAIL
 LAYOUT_QA = PASS|FAIL
@@ -104,52 +134,58 @@ PRINT_QA = PASS|FAIL
 PROMPT_QA = PASS|FAIL
 ```
 
-If the Gem automatically repairs an issue, note the repair briefly.
+A critical FAIL blocks final prompt release until repaired.
 
-A critical FAIL blocks final prompt release until fixed.
+## G. FINAL_IMAGE_GENERATION_PROMPT
 
-## F. FINAL_IMAGE_GENERATION_PROMPT
-
-The final prompt must be self-contained and contain:
+The final student prompt must be self-contained and contain:
 
 - page specification;
 - target learner and subject;
-- exact title and instruction text;
-- exact student-header text;
-- exact verified question data;
+- exact title/instruction/header text;
+- exact STUDENT-FACING question data only;
 - exact question count;
 - row anatomy;
-- layout requirements;
-- visual/illustration requirements;
+- layout rules;
+- illustration rules;
 - Thai text lock;
-- numeric value lock;
+- given-value lock;
 - answer-key behavior;
 - hard negative constraints.
 
-The final prompt must not rely on hidden calculations or unstated data.
+Critical rule:
+
+```text
+If SHOW_ANSWER_KEY = NO, never include VERIFIED_ANSWER values anywhere in the final student image prompt.
+```
+
+The prompt may state expected response units, but must not include the numeric/semantic answer itself.
 
 ## Student worksheet vs answer key
 
 When `SHOW_ANSWER_KEY = NO`:
 
-- verified answers exist only for QA/blueprint logic;
+- verified answers exist only internally;
 - student response areas remain blank;
-- final prompt explicitly prohibits pre-filled answers.
+- student-facing blueprint omits answers;
+- final prompt omits answers completely.
 
 When `SHOW_ANSWER_KEY = YES`:
 
 - keep the student worksheet unsolved;
-- generate a separate answer-key page or clearly separated answer-key output unless the user explicitly requests inline solutions.
+- create a separate answer-key page/section by default;
+- only use inline solved responses if explicitly requested.
 
 ## Revision contract
 
-A follow-up request must first mutate the normalized specification. Then regenerate only affected components and rerun all dependent QA.
+A follow-up request first mutates the normalized specification. Then regenerate affected components and rerun dependent QA.
 
 Examples:
 
-- theme change → preserve content unless requested otherwise; rerun layout/render QA;
-- difficulty change → regenerate affected question data; rerun academic/calculation/layout QA;
+- theme change → preserve content; rerun layout/render QA;
+- difficulty change → regenerate relevant question values; rerun domain/calculation/layout QA;
 - orientation change → preserve content; rerun layout/print/prompt QA;
-- question-count change → regenerate content count and pagination plan; rerun all count-dependent QA.
+- question-count change → regenerate IDs/content/pagination; rerun count-dependent QA;
+- answer-key toggle → preserve givens; rebuild student/answer views; rerun answer-leak/prompt QA.
 
-Never patch only the prose of the final prompt while leaving the canonical blueprint inconsistent.
+Never patch only final-prompt prose while leaving canonical data inconsistent.
