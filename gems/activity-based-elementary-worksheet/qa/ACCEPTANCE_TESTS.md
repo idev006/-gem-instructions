@@ -1,305 +1,157 @@
 # Acceptance Tests — Activity-Based Elementary Worksheet Generator
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Critical QA / Regression Suite
 
-A production release passes only when all critical tests below pass.
+A production release passes only when all critical tests pass. Critical answer-leak, mathematical, count, and layout failures block release regardless of weighted score.
 
-## Test 1 — Intent normalization
+## Core intent and structure
 
-Input:
+### Test 1 — Intent normalization
+Input: `สร้างใบงาน ป.3 คณิตศาสตร์ เรื่องการหาระยะเวลา 10 ข้อ ธีมกิจกรรมประจำวัน A4 แนวตั้ง ขาวดำ ไม่ต้องมีเฉลย`
+Expected: ป.3, คณิตศาสตร์, TIME, 10 questions, A4 portrait, monochrome, no answer key, daily-activity context.
 
-> สร้างใบงาน ป.3 คณิตศาสตร์ เรื่องการหาระยะเวลา 10 ข้อ ธีมกิจกรรมประจำวัน A4 แนวตั้ง ขาวดำ ไม่ต้องมีเฉลย
+### Test 2 — Exact question count
+For `QUESTION_COUNT = 10`, internal blueprint, student blueprint, and final prompt must each contain exactly 10 unique question IDs/rows.
 
-Expected:
+### Test 3 — Student header
+Default Thai student worksheet contains `ชื่อ ... ชั้น ... เลขที่ ...` unless disabled.
 
-- Grade = ป.3
-- Subject = คณิตศาสตร์
-- Domain = TIME
-- Question count = 10
-- A4 portrait
-- black and white
-- answer key disabled
-- daily-activity context
+### Test 4 — Prompt package completeness
+Default output contains: normalized spec, student content blueprint, layout blueprint, render constraints, QA report, final image prompt.
 
-Fail if any explicit user requirement changes silently.
+### Test 5 — Prompt-only still validates
+`PROMPT_ONLY` hides intermediate sections but still executes all internal validation.
 
-## Test 2 — Exact question count
+## TIME_ENGINE correctness
 
-For `QUESTION_COUNT = 10`, the verified content blueprint and final prompt must contain exactly 10 question rows.
+### Test 6 — Whole-hour correctness
+With EASY + whole-hour-only, every tuple satisfies `(end-start) % 60 == 0`.
+Must pass: 08:15→10:15 = 2h; 06:45→07:45 = 1h.
 
-Fail on 9, 11, omitted rows, duplicated IDs, or decorative elements mistaken for questions.
+### Test 7 — Mixed minutes correctness
+08:15→09:45 validates as 1h30m.
 
-## Test 3 — Whole-hour elapsed-time correctness
+### Test 8 — Same-day ordering
+When midnight crossing is disabled, end must be later than start.
 
-Input constraints:
+### Test 9 — Midnight guard
+20:00→08:00 is rejected/repaired when crossing midnight is disabled.
 
-```text
-DIFFICULTY = EASY
-ALLOW_FULL_HOURS_ONLY = YES
-```
+### Test 10 — Explicit midnight crossing
+When crossing midnight is enabled, 23:30→00:30 validates as 60 minutes, not a negative duration.
 
-Every generated tuple must satisfy:
+### Test 11 — Zero duration guard
+08:00→08:00 is rejected unless zero duration is explicitly allowed.
 
-```text
-(end_minutes - start_minutes) % 60 = 0
-```
+### Test 12 — Minute range validation
+Times such as 08:75 or 10:60 must be rejected/repaired.
 
-Examples that must pass:
+### Test 13 — Duration bounds
+Generated duration must remain within active MIN_DURATION/MAX_DURATION.
 
-- 08:15 → 10:15 = 2 ชั่วโมง
-- 09:30 → 11:30 = 2 ชั่วโมง
-- 06:45 → 07:45 = 1 ชั่วโมง
+### Test 14 — Minute interval constraint
+If MINUTE_INTERVAL=15, generated minute values relevant to the task must respect the active 15-minute granularity policy.
 
-Example that must fail:
+### Test 15 — Answer unit consistency
+A mixed duration such as 1h30m must not render only `ชั่วโมง` if the expected response requires minutes too.
 
-- 08:15 → 10:45 labeled as 2 ชั่วโมง
+## Answer integrity
 
-## Test 4 — Hours-and-minutes correctness
+### Test 16 — Empty student blank
+When `SHOW_ANSWER_KEY = NO`, student response areas remain blank.
 
-Input constraints:
+### Test 17 — Internal/student separation
+Internal verified blueprint may contain answers; student content blueprint must not.
 
-```text
-ALLOW_MINUTES = YES
-ANSWER_UNIT_MODE = HOURS_AND_MINUTES
-```
+### Test 18 — Final prompt answer-leak guard
+When answer key is disabled, verified answers MUST NOT appear anywhere in the final student image prompt, including comments, tables, hidden annotations, examples, or decorative text.
 
-Example:
+### Test 19 — Separate answer key
+When answer key is enabled, student worksheet remains unsolved and answers appear in a separate key/page by default.
 
-`08:15 → 09:45` must validate as `1 ชั่วโมง 30 นาที`.
+### Test 20 — Answer-key toggle revision
+Switching key NO→YES preserves givens and rebuilds only output views/key data; switching YES→NO removes all answer values from student-facing output.
 
-Fail if answer is mathematically inconsistent.
+## Diversity and semantics
 
-## Test 5 — Midnight guard
+### Test 21 — Duplicate full-question prevention
+Accidental identical tuples are prohibited unless explicitly requested.
 
-Input:
+### Test 22 — Intentional activity repetition
+`ใช้ 5 กิจกรรมนี้อย่างละ 2 ข้อ` permits repeated activity names while requiring distinct source tuples.
 
-```text
-TIME_CROSS_MIDNIGHT_ALLOWED = NO
-start = 20:00
-end = 08:00
-```
+### Test 23 — Semantic icon mapping
+Book↔reading, football↔football, watering can/plant↔watering plants. Contradictory icons fail.
 
-Expected: reject or repair before final output.
+### Test 24 — Balanced answer distribution
+`ANSWER_DISTRIBUTION=BALANCED` should not collapse all questions to one identical answer unless the objective explicitly asks for that drill.
 
-Fail if released as a same-day valid question.
+## Thai and instructional QA
 
-## Test 6 — Student answer blank remains empty
+### Test 25 — Canonical Thai terminology
+Verify: `เวลาเริ่มต้น`, `เวลาสิ้นสุด`, `ใช้เวลา`, `ชั่วโมง`, `นาที`, plus title/instruction/activity labels.
 
-Input:
+### Test 26 — `น.` consistency
+When Thai time notation uses `น.`, it is applied consistently across all rows.
 
-```text
-SHOW_ANSWER_KEY = NO
-```
+### Test 27 — Grade appropriateness
+Difficulty and wording must match the requested grade; decoration may not be used as a substitute for instructional appropriateness.
 
-Expected final image prompt must explicitly prohibit pre-filled answers.
+### Test 28 — Single learning objective
+All questions practice the declared objective unless the user explicitly requests mixed skills.
 
-Fail if the student worksheet row contains the verified answer in its answer blank.
+## Layout / print / reference QA
 
-## Test 7 — Answer key separation
+### Test 29 — Layout capacity
+25 detailed rows on one A4 portrait page triggers a density warning/repair and preferably pagination unless the user explicitly insists on one page.
 
-Input:
+### Test 30 — Auto-pagination
+When capacity is exceeded and AUTO_PAGINATION=YES, split without cropping or microscopic text.
 
-```text
-SHOW_ANSWER_KEY = YES
-```
+### Test 31 — Answer-space usability
+Multi-component answers receive enough blank space for both hours and minutes.
 
-Expected: answer key is separate from student blanks, preferably a separate page or clearly separated section.
+### Test 32 — Decoration priority
+Characters, stars, hearts, clocks, borders, and icons may not overlap text or answer areas.
 
-Fail if the student activity itself becomes pre-solved without explicit request.
+### Test 33 — Monochrome print usability
+Black-and-white mode uses white background, high-contrast line art, safe margins, and no essential color coding.
 
-## Test 8 — Duplicate full-question prevention
+### Test 34 — Reference-image independence
+Reference image informs information architecture/design grammar but does not make its numeric data canonical unless explicitly requested.
 
-Two rows with the exact same activity, start time, end time, and answer must not be released unless the user explicitly requests repetition.
+### Test 35 — No unsupported exact-copy behavior
+Do not claim pixel-perfect recreation or reproduce creator marks/watermarks/proprietary characters without authorization.
 
-Fail on accidental duplicate tuples.
+## Revision and render robustness
 
-## Test 9 — Intentional activity repetition
+### Test 36 — Theme-only revision preserves content
+Changing theme while saying `ห้ามเปลี่ยนโจทย์` preserves activities/times and only changes visual plan; dependent layout/render QA reruns.
 
-Input:
+### Test 37 — Difficulty revision regenerates content
+EASY→MEDIUM updates question tuples as needed and recalculates all answers; it must not merely change prompt wording.
 
-> ใช้ 5 กิจกรรมนี้อย่างละ 2 ข้อ
+### Test 38 — Orientation revision
+Portrait→landscape preserves content but reruns layout/print/prompt QA.
 
-Expected: repeated activity names are allowed, while the full question tuples remain distinct.
+### Test 39 — Hybrid text mode
+For Thai-heavy worksheets, HYBRID mode reserves clean text zones and does not claim guaranteed perfect model-native Thai rendering.
 
-Fail if duplicate QA wrongly rejects intentional activity reuse.
+### Test 40 — Student render source
+Final prompt must compile from STUDENT_RENDER_BLUEPRINT when answer key is disabled, never from INTERNAL_VERIFIED_BLUEPRINT.
 
-## Test 10 — Semantic icon mapping
+## Release gate
 
-Examples:
-
-- `อ่านหนังสือ` must map to a book/reading-related icon.
-- `เล่นฟุตบอล` must map to a football-related icon.
-- `รดน้ำต้นไม้` must map to plant/watering-related imagery.
-
-Fail if an icon contradicts or confuses the activity.
-
-## Test 11 — Thai canonical terminology
-
-Required canonical strings for the primary time pattern:
-
-- เวลาเริ่มต้น
-- เวลาสิ้นสุด
-- ใช้เวลา
-- ชั่วโมง
-- นาที
-
-Fail if canonical text contains misspellings or inconsistent terminology.
-
-## Test 12 — Student header
-
-Default Thai worksheet must include:
-
-`ชื่อ ... ชั้น ... เลขที่ ...`
-
-unless disabled by the user.
-
-Fail if a default student worksheet omits required identity fields without reason.
-
-## Test 13 — Layout capacity
-
-Input:
-
-> 25 detailed elapsed-time questions, A4 portrait, one page
-
-Expected: Gem identifies the density risk. Preferred behavior is pagination unless the user explicitly insists on one page.
-
-Fail if the Gem claims that a heavily compressed page is production-optimal without checking readability.
-
-## Test 14 — Auto-pagination
-
-For question counts or text lengths exceeding readable capacity and `AUTO_PAGINATION = YES`, output must split content across pages with stable headers/layout rules.
-
-Fail if content is cropped or reduced to unreadable size solely to remain on one page.
-
-## Test 15 — Theme-only revision preserves content
-
-Initial state: verified 10-row blueprint.
-
-Revision:
-
-> เปลี่ยนธีมเป็นอวกาศ แต่ห้ามเปลี่ยนโจทย์
-
-Expected:
-
-- activities unchanged;
-- start/end times unchanged;
-- verified answers unchanged;
-- visual theme changed;
-- layout/render QA rerun.
-
-Fail if academic values are regenerated.
-
-## Test 16 — Difficulty revision updates content deterministically
-
-Initial state: EASY whole-hour questions.
-
-Revision:
-
-> เปลี่ยนเป็นระดับปานกลาง ให้มีชั่วโมงและนาที
-
-Expected:
-
-- normalized difficulty updated;
-- affected question tuples regenerated or adjusted;
-- all calculations revalidated;
-- layout checked for longer answer labels.
-
-Fail if only the final prompt wording changes while old content remains incompatible.
-
-## Test 17 — No unsupported exact-copy behavior
-
-Input:
-
-> ทำให้เหมือนภาพต้นฉบับทุกพิกเซล
-
-Expected: Gem may use the reference for information architecture and general design grammar but should not claim pixel-perfect copying as its production goal.
-
-Fail if it reproduces creator marks, watermarks, logos, or proprietary characters without authorization.
-
-## Test 18 — Reference image content independence
-
-When a reference worksheet contains example time values, the Gem must not assume those are the required new worksheet values unless the user requests them.
-
-Expected: independently generate and validate canonical data.
-
-Fail if mathematical content is copied blindly from the image.
-
-## Test 19 — Final prompt content lock
-
-Final prompt must include explicit constraints equivalent to:
-
-- do not change times;
-- do not change activity names;
-- do not invent extra questions;
-- do not omit questions;
-- do not alter locked Thai text;
-- do not pre-fill student answers when answer key is disabled.
-
-Fail if critical educational data is left for the image model to improvise.
-
-## Test 20 — Print usability
-
-For `COLOR_MODE = BLACK_AND_WHITE`, final prompt must request:
-
-- white background;
-- high-contrast black line art;
-- readable text hierarchy;
-- safe margins;
-- no essential color coding.
-
-Fail if understanding the worksheet requires color.
-
-## Test 21 — Decoration priority
-
-Decorative children, stars, hearts, clocks, or borders must not:
-
-- cover text;
-- intersect answer lines;
-- reduce answer space below usable size;
-- create ambiguity about question grouping.
-
-Fail on content obstruction.
-
-## Test 22 — Output contract completeness
-
-Default `PROMPT_PACKAGE` output must include:
-
-- NORMALIZED_WORKSHEET_SPEC
-- VERIFIED_CONTENT_BLUEPRINT
-- LAYOUT_BLUEPRINT
-- RENDER_CONSTRAINTS
-- QA_REPORT
-- FINAL_IMAGE_GENERATION_PROMPT
-
-Fail if a critical section is missing without explicit user request.
-
-## Test 23 — Prompt-only mode
-
-Input:
-
-> ตรวจทุกอย่างภายในแล้วส่งเฉพาะ final prompt
-
-Expected: run the full internal validation process but return only final prompt.
-
-Fail if the Gem skips validation merely because intermediate sections are hidden.
-
-## Test 24 — No fabricated guarantee
-
-The Gem must not claim that any generative image model will render Thai text perfectly.
-
-Expected: lock canonical text and recommend post-render verification.
-
-Fail if it guarantees 100% visual text fidelity from a nondeterministic image generator.
-
-## Test 25 — Release gate
-
-Before production release, all applicable statuses must be PASS:
+All applicable statuses must be PASS:
 
 ```text
 INTENT_QA = PASS
+DOMAIN_QA = PASS
 ACADEMIC_QA = PASS
 CALCULATION_QA = PASS
+CONSTRAINT_QA = PASS
+ANSWER_LEAK_QA = PASS
 DUPLICATE_QA = PASS
 THAI_QA = PASS
 LAYOUT_QA = PASS
@@ -307,4 +159,6 @@ PRINT_QA = PASS
 PROMPT_QA = PASS
 ```
 
-A critical FAIL blocks final prompt release until repaired.
+Critical blockers: wrong count, incorrect mathematics, forbidden crossing, malformed canonical data, answer leakage, or unreadable/cropped layout.
+
+Weighted score target for dry-run release: >=95/100 AND zero critical blockers.
