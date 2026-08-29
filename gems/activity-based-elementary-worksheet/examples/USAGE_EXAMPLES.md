@@ -1,322 +1,367 @@
-# Usage Examples — Activity-Based Elementary Worksheet Generator
+# ตัวอย่างการใช้งานสำหรับครู — Activity-Based Elementary Worksheet Generator
 
-Version: 1.0.0
+Version: 1.2.0
 
-## 1. Happy path
-
-### User
-
-> สร้างใบงาน ป.3 คณิตศาสตร์ เรื่องการบอกระยะเวลาเป็นชั่วโมงและนาที 10 ข้อ ธีมกิจกรรมประจำวัน A4 แนวตั้ง ขาวดำ ไม่ต้องมีเฉลย
-
-### Expected normalization
-
-```text
-GRADE_LEVEL = ป.3
-SUBJECT = คณิตศาสตร์
-DOMAIN = TIME
-TOPIC = การบอกระยะเวลาเป็นชั่วโมงและนาที
-QUESTION_TYPE = START_TIME_END_TIME_TO_DURATION
-QUESTION_COUNT = 10
-DIFFICULTY = AUTO
-CONTEXT_MODE = EVERYDAY_ACTIVITY
-PAGE_SIZE = A4
-ORIENTATION = PORTRAIT
-COLOR_MODE = BLACK_AND_WHITE
-SHOW_STUDENT_HEADER = YES
-SHOW_ANSWER_KEY = NO
-AUTO_PAGINATION = YES
-```
-
-Expected behavior:
-
-- create 10 unique daily-activity rows;
-- calculate every elapsed-time answer internally;
-- keep student blanks empty;
-- generate semantic icons matching activities;
-- output a verified content blueprint before the final image prompt.
+เอกสารนี้ตั้งใจเขียนให้ครูสามารถ **คัดลอกตัวอย่างแล้วแก้คำไม่กี่คำ** ได้ทันที โดยไม่ต้องรู้ชื่อ Parameter
 
 ---
 
-## 2. Minimal prompt
+# 1. สั่งสั้นที่สุด
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ
 
-> ใบงาน ป.2 เรื่องเวลา 8 ข้อ
-
-### Expected behavior
-
-Infer safe defaults:
-
-- mathematics;
-- Thai language;
-- A4 portrait;
-- black and white;
-- student header;
-- no answer key;
-- simple age-appropriate elapsed-time questions.
-
-If the exact time skill is ambiguous and would materially change the worksheet, choose the simplest grade-appropriate pattern or ask one concise clarification question.
+ระบบควรเข้าใจเป็นใบงานคณิตศาสตร์ภาษาไทย A4 แนวตั้ง ขาวดำ มีชื่อ/ชั้น/เลขที่ มีหมายเลขข้อ กิจกรรมใกล้ตัว และไม่มีเฉลย
 
 ---
 
-## 3. Detailed prompt
+# 2. แบบง่าย ชั่วโมงเต็ม
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ขอแบบง่าย คำตอบเป็นชั่วโมงเต็ม
 
-> สร้างใบงาน ป.3 วิชาคณิตศาสตร์ เรื่องหาระยะเวลาจากเวลาเริ่มต้นและสิ้นสุด จำนวน 12 ข้อ ระดับปานกลาง ใช้ระบบ 24 ชั่วโมง ให้คำตอบมีทั้งชั่วโมงและนาที นาทีเป็นช่วงละ 5 นาที ไม่ข้ามเที่ยงคืน ธีมชีวิตประจำวันเด็กไทย มีหมายเลขข้อ มีช่อง ชื่อ ชั้น เลขที่ A4 แนวตั้ง ขาวดำ ไม่ต้องมีเฉลย ใช้เส้นภาพน่ารักแบบ coloring-book แต่ตกแต่งไม่เกิน 15% ของพื้นที่หน้า
+ตัวอย่างชนิดโจทย์ที่เหมาะ:
 
-### Expected normalization highlights
+- 08:15 ถึง 10:15
+- 09:30 ถึง 11:30
+- 06:45 ถึง 07:45
 
-```text
-QUESTION_COUNT = 12
-DIFFICULTY = MEDIUM
-TIME_FORMAT = 24_HOUR
-ALLOW_MINUTES = YES
-MINUTE_INTERVAL = 5
-TIME_CROSS_MIDNIGHT_ALLOWED = NO
-DECORATION_DENSITY = LOW_TO_MEDIUM
-SHOW_QUESTION_NUMBER = YES
-SHOW_ANSWER_KEY = NO
-```
-
-Expected behavior:
-
-- determine whether 12 rows remain readable on one A4 page;
-- use compact density or auto-pagination if needed;
-- ensure every duration is valid and grade appropriate.
+นาทีเริ่มและสิ้นสุดอาจไม่ใช่ 00 แต่ควรเท่ากันเพื่อให้คำตอบเป็นชั่วโมงเต็ม
 
 ---
 
-## 4. Whole-hour practice
+# 3. แบบปานกลาง ชั่วโมงและนาที
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ระดับปานกลาง ให้คำตอบมีทั้งชั่วโมงและนาที
 
-> ป.3 เรื่องระยะเวลา 10 ข้อ ขอแบบง่าย คำตอบเป็นชั่วโมงเต็มทั้งหมด แต่เวลาเริ่มต้นไม่จำเป็นต้องเป็นนาที 00 เช่น 08:15 ถึง 10:15 ได้
-
-### Expected behavior
-
-Use equal minute components in start/end values where useful.
-
-Valid examples:
-
-```text
-08:15 → 10:15 = 2 ชั่วโมง
-09:30 → 11:30 = 2 ชั่วโมง
-06:45 → 07:45 = 1 ชั่วโมง
-```
-
-Do not generate unequal minute components that force hour-and-minute subtraction.
+ระบบควรเลือกช่วงนาทีที่เหมาะกับระดับชั้น เช่น 5, 10, 15 หรือ 30 นาที และตรวจคำตอบทุกข้อ
 
 ---
 
-## 5. Hours and minutes
+# 4. กำหนดธีมอวกาศ
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ธีมอวกาศ ขาวดำสำหรับระบายสี ไม่ต้องมีเฉลย
 
-> ทำให้ยากขึ้น ใช้คำตอบเป็นชั่วโมงและนาทีด้วย
-
-### Expected revision behavior
-
-Update:
-
-```text
-ALLOW_FULL_HOURS_ONLY = NO
-ALLOW_MINUTES = YES
-ANSWER_UNIT_MODE = HOURS_AND_MINUTES
-```
-
-Regenerate affected question data and rerun calculation, grade-level, layout, Thai, and prompt QA.
-
-Do not merely alter the wording of the final prompt while leaving the old blueprint unchanged.
+เนื้อหายังคงเป็นโจทย์เวลา แต่ภาพประกอบและกรอบใช้จรวด ดาว ดาวเคราะห์ หรือมนุษย์อวกาศแบบเด็ก
 
 ---
 
-## 6. Theme-only revision
+# 5. ธีมสวนสัตว์
 
-### User
+> ป.2 เรื่องเวลา 8 ข้อ ธีมสวนสัตว์ ขอภาพน่ารักและช่องตอบใหญ่
 
-> เปลี่ยนธีมเป็นอวกาศ แต่ห้ามเปลี่ยนเวลา กิจกรรม และคำตอบของทั้ง 10 ข้อ
-
-### Expected behavior
-
-Lock canonical content and change only visual parameters:
-
-```text
-VISUAL_THEME = FRIENDLY_SPACE
-VALUE_LOCK = ON
-CONTENT_LOCK = ON
-```
-
-Rerun layout and render-prompt QA. Do not regenerate academic data.
+ระบบควรลดความซับซ้อนให้เหมาะ ป.2 และให้พื้นที่เขียนมากกว่าการตกแต่ง
 
 ---
 
-## 7. Remove question numbers
+# 6. ธีมทะเล
 
-### User
+> ป.3 เรื่องหาระยะเวลา 12 ข้อ ธีมใต้ทะเล A4 แนวตั้ง ขาวดำ
 
-> ไม่เอาหมายเลขข้อ
-
-### Expected behavior
-
-Set:
-
-```text
-SHOW_QUESTION_NUMBER = NO
-```
-
-Rebalance row layout so the freed column becomes usable whitespace or answer space.
+ถ้า 12 ข้อแน่นเกินไป ระบบควรใช้ compact layout หรือแบ่งหน้าแทนการย่อตัวหนังสือจนอ่านยาก
 
 ---
 
-## 8. Landscape revision
+# 7. ไม่เอาตัวละคร
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ไม่เอาตัวละคร ใช้เฉพาะไอคอนกิจกรรมและกรอบเรียบ ๆ
 
-> เปลี่ยนเป็น A4 แนวนอน แต่คงโจทย์เดิม
-
-### Expected behavior
-
-Set:
-
-```text
-ORIENTATION = LANDSCAPE
-CONTENT_LOCK = ON
-```
-
-Recompile the layout. Do not alter verified source values or answers.
+ระบบควรปิดตัวละครตกแต่ง แต่ยังคง semantic icon ของแต่ละกิจกรรม
 
 ---
 
-## 9. High question count edge case
+# 8. ตกแต่งน้อย เน้นประหยัดหมึก
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ขาวดำ ตกแต่งน้อย เน้นถ่ายเอกสารง่ายและประหยัดหมึก
 
-> ขอ 25 ข้อใน A4 หน้าเดียว
-
-### Expected behavior
-
-Do not blindly force 25 detailed rows onto one portrait page.
-
-Explain or automatically apply the production-safe rule:
-
-- if readability would fail, paginate;
-- if the user insists on one page, explicitly warn that the requested density conflicts with primary-school readability and produce the safest compact layout possible without claiming it is optimal.
-
-Default preferred action:
-
-```text
-AUTO_PAGINATION = YES
-```
+ระบบควรใช้เส้นเรียบ พื้นขาว และไม่ใช้พื้นที่ดำทึบจำนวนมาก
 
 ---
 
-## 10. Answer key enabled
+# 9. มีวันที่และคะแนนในหัวกระดาษ
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ เพิ่มช่อง วันที่ และ คะแนน ด้วย
 
-> ขอหน้าเฉลยด้วย
-
-### Expected behavior
-
-Set:
-
-```text
-SHOW_ANSWER_KEY = YES
-```
-
-Generate a separate answer-key page or clearly separated answer-key output. Do not print answers inside the student worksheet unless explicitly requested.
+ระบบควรคง ชื่อ / ชั้น / เลขที่ และเพิ่มวันที่/คะแนนโดยตรวจพื้นที่หัวกระดาษใหม่
 
 ---
 
-## 11. Reference-image use case
+# 10. ไม่เอาหมายเลขข้อ
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ไม่ต้องมีหมายเลขข้อ
 
-> ใช้ภาพใบงานที่ส่งให้เป็นตัวอย่างโครงสร้าง แต่ทำธีมและภาพประกอบใหม่ทั้งหมด
-
-### Expected behavior
-
-Extract:
-
-- student header pattern;
-- title hierarchy;
-- instruction strip;
-- repeated question-row grammar;
-- icon + label + given data + blank response pattern;
-- border/decorative density.
-
-Do not copy:
-
-- creator name;
-- watermark;
-- exact characters;
-- exact decorative frame;
-- proprietary branding.
+ระบบควรเอาคอลัมน์เลขข้อออกและนำพื้นที่กลับมาใช้กับไอคอน ข้อความ หรือช่องคำตอบ
 
 ---
 
-## 12. User-supplied activities
+# 11. ขอหน้าเฉลยด้วย
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ขอใบงาน 1 ชุดและหน้าเฉลยแยกอีก 1 หน้า
 
-> ใช้กิจกรรม 5 อย่างนี้เท่านั้น: อ่านหนังสือ วาดรูป รดน้ำต้นไม้ เล่นฟุตบอล ทำการบ้าน และทำอย่างละ 2 ข้อ
-
-### Expected behavior
-
-Set:
-
-```text
-QUESTION_COUNT = 10
-ACTIVITY_NAMES = [อ่านหนังสือ, วาดรูป, รดน้ำต้นไม้, เล่นฟุตบอล, ทำการบ้าน]
-ACTIVITY_DISTRIBUTION = EXACTLY_2_EACH
-```
-
-Full question tuples must still be unique. Repetition of activity names is intentional and should not fail duplicate QA.
+ระบบต้องคงใบงานนักเรียนไว้แบบไม่เฉลย และสร้างเฉลยแยก ไม่เติมคำตอบลงในช่องของนักเรียน
 
 ---
 
-## 13. Invalid time prevention
+# 12. ใช้กิจกรรมที่ครูกำหนด
 
-The Gem must never release content like:
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ใช้กิจกรรมเหล่านี้เท่านั้น: อ่านหนังสือ วาดรูป รดน้ำต้นไม้ เล่นฟุตบอล ทำการบ้าน อย่างละ 2 ข้อ
 
-```text
-08:15 → 10:15 = 3 ชั่วโมง
-```
-
-or, when midnight crossing is disabled:
-
-```text
-20:00 → 08:00
-```
-
-Such content must be repaired before the final prompt is emitted.
+ระบบอนุญาตชื่อกิจกรรมซ้ำตามคำสั่ง แต่เวลาและโจทย์เต็มต้องไม่ซ้ำกันโดยไม่ตั้งใจ
 
 ---
 
-## 14. Thai text lock example
+# 13. กำหนดเวลาช่วงเช้าเท่านั้น
 
-Canonical strings:
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ใช้เวลาเฉพาะช่วง 06:00 ถึง 12:00
 
-```text
-ชื่อ ........................................................ ชั้น ............ เลขที่ ............
-เวลาเริ่มต้น
-เวลาสิ้นสุด
-ใช้เวลา
-ชั่วโมง
-นาที
-```
-
-The final image prompt must explicitly tell the rendering model to use these exact strings and not paraphrase them.
+ระบบควรสร้าง start/end time ภายในช่วงที่กำหนดและตรวจ duration ทุกข้อ
 
 ---
 
-## 15. Prompt-only output
+# 14. ไม่ให้ข้ามเที่ยง
 
-### User
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ ไม่ให้ข้อไหนข้าม 12:00 น.
 
-> ตรวจสอบทุกอย่างให้เสร็จ แล้วส่งเฉพาะ final prompt
+ระบบต้องถือเป็น constraint และ reject/repair ข้อที่ข้ามเที่ยง
 
-### Expected behavior
+---
 
-Perform the full internal pipeline and QA, but return only `FINAL_IMAGE_GENERATION_PROMPT` because the user explicitly selected `PROMPT_ONLY`.
+# 15. คำตอบไม่เกิน 3 ชั่วโมง
+
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ แต่ละกิจกรรมใช้เวลาไม่เกิน 3 ชั่วโมง
+
+ระบบต้องใช้ `MAX_DURATION` ภายในโดยครูไม่ต้องรู้ชื่อ Parameter
+
+---
+
+# 16. คำตอบเป็น 1–3 ชั่วโมงเท่านั้น
+
+> ป.3 เรื่องหาระยะเวลา 12 ข้อ ให้คำตอบมีเฉพาะ 1 ชั่วโมง 2 ชั่วโมง หรือ 3 ชั่วโมง และกระจายให้สมดุล
+
+ระบบควรใช้ target answer set และ balanced distribution
+
+---
+
+# 17. เปลี่ยนธีม แต่ห้ามเปลี่ยนโจทย์
+
+หลังจากได้ชุดแรก ครูสั่งต่อว่า:
+
+> เปลี่ยนธีมเป็นไดโนเสาร์ แต่ใช้เวลา กิจกรรม และโจทย์เดิมทั้งหมด
+
+ระบบต้องเปลี่ยนเฉพาะ design/render plan แล้วล็อก content เดิม
+
+---
+
+# 18. ทำให้ง่ายลง
+
+> ชุดนี้ยากไป ทำให้ง่ายลง แต่ยังใช้ 10 กิจกรรมเดิม
+
+ระบบควรปรับค่าทางเวลาให้เหมาะกับระดับง่าย แล้ว rerun calculation QA โดยคงกิจกรรมถ้าเป็นไปได้
+
+---
+
+# 19. ทำให้ยากขึ้น
+
+> ชุดนี้ง่ายไป เพิ่มโจทย์ที่ต้องคิดทั้งชั่วโมงและนาที แต่ไม่ข้ามเที่ยงคืน
+
+ระบบต้องปรับ difficulty/content และตรวจใหม่ ไม่ใช่แค่เปลี่ยนคำว่า “ยาก” ใน prompt
+
+---
+
+# 20. ลดจำนวนข้อและเพิ่มพื้นที่เขียน
+
+> ลดจาก 12 ข้อเหลือ 8 ข้อ แล้วทำช่องตอบให้ยาวขึ้น
+
+ระบบต้องปรับ question count และ layout พร้อม rerun count/layout QA
+
+---
+
+# 21. เพิ่มจำนวนข้อ
+
+> เพิ่มจาก 8 ข้อเป็น 16 ข้อ ถ้าหน้าเดียวแน่นให้แบ่งเป็น 2 หน้า
+
+ระบบควรเปิด auto-pagination และรักษาขนาดตัวอักษรที่เหมาะกับเด็ก
+
+---
+
+# 22. ครูยืนยันว่าต้องหน้าเดียว
+
+> ขอ 16 ข้อ A4 หน้าเดียวจริง ๆ
+
+ระบบควรพยายาม compact layout อย่างปลอดภัย แต่ต้องไม่อ้างว่าดีที่สุดถ้าความอ่านง่ายลดลงมาก
+
+---
+
+# 23. เปลี่ยนเป็นแนวนอน
+
+> เปลี่ยนเป็น A4 แนวนอน แต่ห้ามเปลี่ยนโจทย์เดิม
+
+ระบบต้อง re-layout โดยไม่ regenerate ตัวเลขหรือคำตอบ
+
+---
+
+# 24. ขอเฉพาะ Prompt สุดท้าย
+
+> ตรวจทุกอย่างภายในให้เรียบร้อย แล้วส่งเฉพาะ prompt สำหรับสร้างภาพ
+
+ระบบยังต้องทำ QA ครบ แต่ซ่อน intermediate output จากครู
+
+---
+
+# 25. ขอเห็น Blueprint ก่อน
+
+> ยังไม่ต้องทำ final prompt ขอผมดูรายการโจทย์และแผนหน้าใบงานก่อน
+
+ระบบควรใช้ `BLUEPRINT_ONLY` และไม่ต้องแสดงรายละเอียดเทคนิคที่ไม่จำเป็น
+
+---
+
+# 26. ใช้ภาพตัวอย่างเป็นแนวทาง
+
+> ใช้ภาพใบงานที่ผมส่งให้เป็นตัวอย่างรูปแบบ แต่สร้างภาพประกอบและกรอบใหม่ทั้งหมด
+
+ระบบควรนำแนวคิดเรื่อง header, title, instruction, repeated rows, answer area และ visual hierarchy มาใช้ แต่ไม่คัดลอกชื่อผู้สร้าง watermark โลโก้ หรือตัวละครต้นฉบับ
+
+---
+
+# 27. ขอให้เหมือนโครงสร้างเดิมแต่เปลี่ยนโจทย์
+
+> ใช้โครงสร้างคล้ายภาพตัวอย่าง แต่เปลี่ยนกิจกรรมและเวลาใหม่ทั้งหมด 10 ข้อ
+
+ระบบต้องสร้าง canonical content ใหม่และตรวจเวลาใหม่ ไม่ copy ตัวเลขจาก reference แบบอัตโนมัติ
+
+---
+
+# 28. ครูไม่ได้บอกวิชา
+
+> ป.3 เรื่องหาระยะเวลา 10 ข้อ
+
+ระบบควร infer ว่าเป็นคณิตศาสตร์ ไม่ควรถามซ้ำว่า “วิชาอะไร” เพราะหัวข้อชัดเจนอยู่แล้ว
+
+---
+
+# 29. ครูไม่ได้บอกจำนวนข้อ
+
+> ป.3 เรื่องหาระยะเวลา
+
+ระบบควรถามเพียงคำถามสั้น ๆ เช่น:
+
+> ต้องการประมาณกี่ข้อครับ เช่น 8, 10 หรือ 12 ข้อ?
+
+ไม่ควรถามรายการ parameter อื่น ๆ พร้อมกัน
+
+---
+
+# 30. ครูบอกเพียง “เรื่องเวลา”
+
+> ป.3 เรื่องเวลา 10 ข้อ
+
+ถ้าระบบไม่สามารถทราบได้ว่าครูต้องการอ่านนาฬิกา หรือหาระยะเวลา ควรถามแบบมีตัวเลือกง่าย ๆ:
+
+> ต้องการฝึกแบบไหนครับ: (1) อ่านเวลาจากนาฬิกา หรือ (2) หาเวลาที่ใช้จากเวลาเริ่มต้นและสิ้นสุด?
+
+---
+
+# 31. ครูใช้ภาษาธรรมดา ไม่ใช้คำเทคนิค
+
+> ขอแบบง่าย ๆ ให้เด็กคิดไม่ยาก นาทีสวย ๆ หน่อย
+
+ระบบควรตีความเป็น difficulty ต่ำและเลือก minute granularity ที่เหมาะ ไม่ควรให้ครูอธิบาย `MINUTE_INTERVAL`
+
+---
+
+# 32. ครูขอ “น่ารักแต่ไม่รก”
+
+> ทำให้น่ารักขึ้น แต่ไม่เอารูปเยอะจนบังโจทย์
+
+ระบบควรเพิ่ม visual appeal โดยรักษา academic content dominance และ answer space
+
+---
+
+# 33. ครูขอ “เหมือนใบงานร้านค้า”
+
+> ทำธีมร้านค้า แต่โจทย์ยังเป็นเรื่องเวลา เช่น เวลาเปิดร้าน เวลาเริ่มจัดของ เวลาเลิกกิจกรรม
+
+ระบบควรปรับ activity context ให้สัมพันธ์กับ theme โดยยังรักษาความเหมาะสมกับเด็ก
+
+---
+
+# 34. ครูขอหลายชุด
+
+> ทำ 3 ชุด ชุดละ 10 ข้อ ระดับเท่ากัน แต่ห้ามโจทย์ซ้ำกัน
+
+ระบบควรสร้าง 3 verified sets และทำ duplicate check ข้ามชุดด้วยถ้ารองรับ batch mode; ถ้ายังไม่รองรับอย่างเป็นทางการ ต้องระบุข้อจำกัดก่อนอ้าง validation แบบเต็ม
+
+---
+
+# 35. ครูขอเวอร์ชันนักเรียนสองระดับ
+
+> ทำชุด A แบบง่าย และชุด B แบบปานกลาง เรื่องเดียวกัน อย่างละ 10 ข้อ
+
+ระบบควรแยก normalized spec และ QA ของแต่ละชุด ไม่ใช้คำตอบชุดเดียวแล้วเปลี่ยนแค่ป้าย difficulty
+
+---
+
+# 36. ครูขอให้กิจกรรมไม่ซ้ำ
+
+> 10 ข้อ ขอ 10 กิจกรรมไม่ซ้ำกัน
+
+ระบบต้องใช้ duplicate activity check แบบเข้มงวด
+
+---
+
+# 37. ครูขอภาพไม่เยอะเพื่อถ่ายเอกสาร
+
+> ขอแบบโรงเรียน ใช้ภาพเล็ก ๆ แค่พอเข้าใจ ไม่ต้องมีตัวละครมุมกระดาษ
+
+ระบบควรลด decoration density และปิด decorative characters
+
+---
+
+# 38. ครูขอหน้าตาเป็นทางการขึ้น
+
+> ทำให้ดูเรียบร้อยแบบเอกสารโรงเรียน ไม่ต้องคิ้วท์มาก
+
+ระบบควรปรับ visual theme/border แต่ไม่เปลี่ยน academic content
+
+---
+
+# 39. ครูขอให้ตรวจภาษาไทยเป็นพิเศษ
+
+> ช่วยตรวจภาษาไทยทุกคำก่อนส่ง prompt เพราะจะใช้แจกนักเรียนจริง
+
+ระบบต้องทำ Thai QA ตามปกติอยู่แล้ว แต่คำสั่งนี้ควรเพิ่มความเข้มในการรายงาน/ตรวจ student-facing strings
+
+---
+
+# 40. ครูขอใช้เฉพาะหน่วย “ชั่วโมง”
+
+> ทุกข้อให้ตอบเป็นจำนวนชั่วโมงเท่านั้น ไม่ใช้ช่องนาที
+
+ระบบต้องสร้างโจทย์ที่ duration ลงตัวเป็นชั่วโมง และ render เฉพาะช่องคำตอบหน่วยชั่วโมง
+
+---
+
+# 41. ครูขอทั้งชั่วโมงและนาทีสองช่อง
+
+> ให้ช่องคำตอบเป็น ____ ชั่วโมง ____ นาที ทุกข้อ
+
+ระบบต้องตรวจ answer-space capacity และไม่ลดช่องจนเด็กเขียนไม่ได้
+
+---
+
+# 42. ตัวอย่างคำสั่งฉบับพร้อมใช้สำหรับภาพคล้ายตัวอย่าง
+
+> สร้างใบงานคณิตศาสตร์ ป.3 เรื่องการหาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด จำนวน 10 ข้อ ใช้กิจกรรมในชีวิตประจำวันของเด็ก แต่ละข้อมีไอคอนกิจกรรม ชื่อกิจกรรม เวลาเริ่มต้น เวลาสิ้นสุด และช่องตอบว่าใช้เวลากี่ชั่วโมงหรือกี่ชั่วโมงกี่นาที ใช้ A4 แนวตั้ง ขาวดำ มีช่องชื่อ ชั้น เลขที่ มีคำชี้แจง ภาพเส้นน่ารักแต่ไม่บังเนื้อหา ไม่ต้องมีเฉลย และตรวจโจทย์ทุกข้อก่อนสร้าง prompt
+
+นี่เป็นตัวอย่างที่ครูสามารถคัดลอกไปใช้ได้ทันที
+
+---
+
+# หลักสำคัญสำหรับทุกตัวอย่าง
+
+- ครูไม่ต้องใช้ชื่อ Parameter
+- ถ้าครูไม่ระบุค่าที่ไม่บังคับ ระบบต้องใช้ Default/Auto ที่บันทึกไว้
+- ถ้าข้อมูลจำเป็นขาด ให้ถามเฉพาะสิ่งที่ขาดจริง ๆ
+- อย่าถามคำถามเชิงเทคนิคหลายข้อพร้อมกัน
+- Explicit user request มีลำดับเหนือ default เมื่อไม่ขัดกับ correctness/safety
+- โจทย์ต้องผ่าน validation ก่อน Final Image Prompt
+- ถ้า `SHOW_ANSWER_KEY = NO` ห้าม hidden answer หลุดเข้าสู่ student render prompt
