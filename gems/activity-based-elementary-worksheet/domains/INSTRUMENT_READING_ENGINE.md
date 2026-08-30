@@ -1,6 +1,6 @@
 # INSTRUMENT_READING_ENGINE — Shared Geometry Rules
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Mandatory base engine for visual instrument-reading worksheets
 
 Applies to dial scales, analog clocks, rulers, thermometers, and graduated capacity instruments.
@@ -27,18 +27,7 @@ Never require the child to read a tiny decorative instrument if a separate enlar
 
 Within one worksheet, all instruments of the same type use one canonical template.
 
-Lock:
-
-- outer geometry
-- orientation
-- scale direction
-- labels
-- tick count and spacing
-- font sizing
-- stroke hierarchy
-- reserved bounding box
-
-Only the pedagogically intended variable changes, e.g. needle angle, clock-hand position, liquid level, mercury level, endpoint, or bar height.
+Lock outer geometry, orientation, scale direction, labels, tick count and spacing, font sizing, stroke hierarchy, and reserved bounding box. Only the pedagogically intended variable changes, e.g. needle angle, clock-hand position, liquid level, endpoint, or bar height.
 
 ## 4. Geometry invariants
 
@@ -59,16 +48,27 @@ For any graduated instrument:
 - minor divisions must be uniform;
 - stronger marks identify major intervals;
 - labels must align to their intended marks;
-- the target indicator must coincide with a valid mark/level when the exercise expects exact reading;
+- the target indicator must coincide with a valid mark/level when exact reading is expected;
 - no decorative strokes inside the scale band.
 
-## 6. Minimum readability
+## 6. Minimum readability + global page policy
 
-The domain engine must define a printed minimum size. If layout would reduce an instrument below that minimum:
+The subtype engine must define or derive a printed minimum size for the active reading task.
 
-`CHANGE LAYOUT OR PAGINATE`
+When layout pressure threatens that minimum, apply the global page policy in this order:
 
-Never solve density by shrinking or distorting the educational instrument.
+1. change to a more efficient valid layout;
+2. reduce/remove nonessential decoration;
+3. shorten nonessential instructions without changing meaning;
+4. reduce nonessential padding/whitespace within safe print limits;
+5. preserve instrument size, answer space, text legibility, and question count.
+
+If a valid one-page solution still does not fit:
+
+- when `ONE_PAGE_LOCK=OFF`: paginate;
+- when `ONE_PAGE_LOCK=ON`: do **not** paginate and do **not** shrink below the minimum. Return `ONE_PAGE_FEASIBILITY_QA=FAIL` and `LAYOUT_QA=FAIL`.
+
+Never solve density by shrinking, clipping, overlapping, or distorting the educational instrument.
 
 ## 7. Redundant render instruction
 
@@ -81,11 +81,15 @@ Compile target metadata redundantly, using value + relational geometry. Examples
 - ruler: `endpoint at 6.7 cm = 67 mm from zero`
 - thermometer: `level at 28°C = 8 minor marks above 20°C` when scale supports it
 
+Render-only target metadata must never become visible answer text.
+
 ## 8. Preferred rendering architecture
 
 When available:
 
-`AI CONTEXT ART/LAYOUT → VECTOR/SVG INSTRUMENT OVERLAY → TEXT OVERLAY → VISUAL QA`
+`AI CONTEXT ART/LAYOUT → VECTOR/SVG INSTRUMENT OVERLAY → DETERMINISTIC TEXT OVERLAY → COMPOSITE → VISUAL QA`
+
+For text-heavy worksheets with a small instrument component, prefer deterministic document/text layout first and overlay the instrument geometry into reserved zones.
 
 If deterministic overlay is unavailable, add hard geometry constraints and mark `VISUAL_QA_REQUIRED=YES`.
 
@@ -100,5 +104,6 @@ Every instrument-reading domain adds:
 - `MINIMUM_SIZE_QA`
 - `CLEARANCE_QA`
 - `VISUAL_AMBIGUITY_QA`
+- `ONE_PAGE_FEASIBILITY_QA`
 
-Inspect every individual instrument after rendering. One incorrect instrument blocks classroom release.
+Inspect every individual instrument after rendering. One incorrect instructional instrument blocks classroom release.
