@@ -24,7 +24,7 @@ Required production installation:
 
 Optional slot 10: `W10_HOTFIX_OVERRIDE`.
 
-W08 and W09 apply to every production request. W07 applies only when learner-read geometry/axis/instrument state carries academic meaning.
+W08 and W09 apply to every production request. W07 applies when learner-read geometry/axis/instrument state carries academic meaning.
 
 ## 3. Route table
 
@@ -33,18 +33,20 @@ W08 and W09 apply to every production request. W07 applies only when learner-rea
 | arithmetic / number operations | W01 + W08 + W09 |
 | color-by-code arithmetic | W01 + W08 + W09 |
 | Thai literacy / spelling | W01 + W08 + W09 |
-| elapsed time / start-end-duration | W02 + W08 + W09 |
+| elapsed time / start-end-duration / time-unit conversion / seconds | W02 + W08 + W09 |
 | analog clock reading | W02 + W07 + W08 + W09 |
 | weight arithmetic/comparison/conversion | W03 + W08 + W09 |
 | dial scale reading | W03 + W07 + W08 + W09 |
 | length arithmetic/conversion | W04 + W08 + W09 |
-| distance total/difference/round trip | W04 + W08 + W09 |
+| distance total/difference/round trip/multi-segment | W04 + W08 + W09 |
 | ruler reading | W04 + W07 + W08 + W09 |
-| temperature calculation/conversion context | W05 + W08 + W09 |
+| angle/protractor reading | W04 + W07 + W08 + W09 |
+| perimeter/area/circle measurement | W04 + W08 + W09; add W07 when learner-read geometry is part of the question |
+| temperature calculation/change context | W05 + W08 + W09 |
 | thermometer reading | W05 + W07 + W08 + W09 |
 | capacity arithmetic/conversion | W05 + W08 + W09 |
 | graduated container / meniscus | W05 + W07 + W08 + W09 |
-| rectangular-prism volume | W05 + W08 + W09 |
+| rectangular-prism/simple composite volume and cubic-unit conversion | W05 + W08 + W09 |
 | money / calendar / tables | W06 + W08 + W09 |
 | pictograph / bar graph | W06 + W08 + W09; add W07 when exact visual scale geometry is learner-read |
 
@@ -53,12 +55,12 @@ Mixed-domain worksheets select every owning academic worker, then W08/W09, plus 
 ## 4. Academic ownership
 
 - W01 owns general academic content that no more specialized worker owns.
-- W02 owns time/clock formulas.
+- W02 owns time-unit, elapsed-time and clock formulas.
 - W03 owns weight/scale formulas and unit rules.
-- W04 owns ruler/length/distance and length-unit conversion.
+- W04 owns ruler/length/distance/angle/protractor/perimeter/area and their unit rules.
 - W05 owns temperature/capacity/volume and related unit rules.
 - W06 owns money/calendar/data mappings.
-- W07 audits shared geometry but does not invent domain target values.
+- W07 audits shared geometry but does not invent domain targets.
 - W08 owns layout/render/Thai/print/theme, not academic formulas.
 - W09 owns integration/release QA, not academic formulas.
 
@@ -66,7 +68,7 @@ Mixed-domain worksheets select every owning academic worker, then W08/W09, plus 
 
 ## 5. Measurement routes
 
-Measurement coverage is documented in `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
+Formal coverage/progression: `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
 Examples:
 
@@ -74,13 +76,19 @@ Examples:
 - `บวกความยาว 2 เมตร 35 เซนติเมตร` → W04 + W08 + W09
 - `ระยะทางไปกลับ` → W04 + W08 + W09
 - `แปลง 3.2 กิโลเมตรเป็นเมตร` → W04 + W08 + W09
+- `อ่านมุมจากโพรแทรกเตอร์` → W04 + W07 + W08 + W09
+- `พื้นที่สี่เหลี่ยม/สามเหลี่ยม/วงกลม` → W04 + W08 + W09
+- `แปลงตารางเมตรเป็นตารางเซนติเมตร` → W04 + W08 + W09
 - `อ่านนาฬิกา 10:30` → W02 + W07 + W08 + W09
-- `หาระยะเวลา` → W02 + W08 + W09
+- `หาระยะเวลาเป็นชั่วโมง นาที วินาที` → W02 + W08 + W09
 - `อ่านตราชั่ง kg/ขีด` → W03 + W07 + W08 + W09
 - `แปลง kg เป็น g` → W03 + W08 + W09
 - `อ่าน 750 mL` → W05 + W07 + W08 + W09
 - `แปลง L เป็น mL` → W05 + W08 + W09
 - `ปริมาตรทรงสี่เหลี่ยมมุมฉาก` → W05 + W08 + W09
+- `แปลง cm³/dm³/m³` → W05 + W08 + W09
+
+Speed/rate is not silently inferred from distance. If explicitly requested and not covered by a specialized deterministic rule, route as mixed/generic content and state the limitation rather than inventing ownership.
 
 ## 6. Precedence
 
