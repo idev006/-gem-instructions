@@ -1,6 +1,6 @@
 # LENGTH_READING_ENGINE — Ruler / Length Reading
 
-Version: 1.1.0
+Version: 1.2.0
 Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 
@@ -29,6 +29,25 @@ Elementary metric defaults:
 - object start/end guides unambiguous
 - no decorative art covering endpoint, zero mark or labels
 - identical scale geometry for repeated questions unless the task explicitly changes scale
+
+## Deterministic graduation structure
+
+For active ruler range `SCALE_MIN_CM` to `SCALE_MAX_CM` with `d = MINOR_DIVISION_CM`:
+
+`EXPECTED_INTERVAL_COUNT = round((SCALE_MAX_CM - SCALE_MIN_CM) / d)`
+
+`EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
+
+Require exact representability within tolerance.
+
+For the canonical millimetre profile:
+
+- `1 cm = 10 mm`
+- between adjacent whole-centimetre values there are exactly **10 equal intervals**
+- including both endpoints, that 1 cm span contains **11 graduation positions**
+- whole-centimetre marks are major ticks; internal millimetre positions are minor ticks
+
+A ruler that visually shows 9, 11, or another number of intervals per centimetre is academically wrong even if spacing looks regular.
 
 ## Deterministic mapping
 
@@ -63,7 +82,8 @@ If an object is offset from zero in an advanced task, students must read both en
 The smallest active graduation must be distinguishable after printing/photocopying.
 
 - reserve a rectangular instrument zone with fixed aspect ratio
-- prefer fewer questions or pagination over compressing 1 mm ticks
+- preserve the exact graduation count before decoration
+- prefer fewer questions or pagination over compressing/merging 1 mm ticks
 - labels may not collide with ticks or object endpoints
 - object must not visually float above an ambiguous start/end location
 
@@ -71,12 +91,18 @@ The smallest active graduation must be distinguishable after printing/photocopyi
 
 For each item compile:
 
-`START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT`
+`START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT, EXPECTED_INTERVAL_COUNT, EXPECTED_TICK_POSITION_COUNT`
 
 These values control geometry but answers remain invisible when answer key is off.
 
+## Post-render QA
+
+Inspect every ruler individually. Count the active intervals and graduation positions rather than judging only visual regularity.
+
+Critical failures include missing/duplicated millimetre marks, wrong count per centimetre, a major mark not aligned to its value, start/end placed between intended ticks, or decorative marks that could be mistaken for graduations.
+
 ## QA
 
-`RULER_STRAIGHT_QA, SCALE_RANGE_QA, ZERO_ALIGNMENT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, START_ENDPOINT_QA, END_ENDPOINT_QA, VALUE_QA, UNIT_QA, MINIMUM_SIZE_QA`
+`RULER_STRAIGHT_QA, SCALE_RANGE_QA, ZERO_ALIGNMENT_QA, INTERVAL_COUNT_QA, TICK_POSITION_COUNT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, START_ENDPOINT_QA, END_ENDPOINT_QA, VALUE_QA, UNIT_QA, MINIMUM_SIZE_QA`
 
-Incorrect start reference, endpoint, spacing, or value is a critical blocker.
+Incorrect start reference, endpoint, interval count, tick count, spacing, or value is a critical blocker.
