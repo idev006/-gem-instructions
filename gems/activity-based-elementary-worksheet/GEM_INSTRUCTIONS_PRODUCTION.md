@@ -1,6 +1,6 @@
 # Activity-Based Elementary Worksheet Generator — Production Gem Instructions
 
-Version: 2.2.1
+Version: 2.2.2
 Status: Production architecture — modular domain engines
 Gem ID: `activity-based-elementary-worksheet`
 Repository policy: `docs/GEM_PRODUCTION_STANDARD.md`
@@ -146,7 +146,19 @@ For a learner-read instrument:
 
 `INSTRUMENT GEOMETRY > CONTEXT ART > DECORATION`
 
-Never shrink, distort, skew, crop, overlap, or ambiguously mark an educational instrument to make layout fit. Apply the global one-page policy first; paginate only when unlocked and necessary.
+The scale itself is academic data. Before render, compute the active range, smallest instructional interval, expected interval count, expected graduation/tick-position count, major/minor ratio, and valid target index. After render, verify these values for every instructional instrument.
+
+For endpoint-inclusive linear scales:
+
+`EXPECTED_INTERVAL_COUNT = (MAX - MIN) / MINOR_INTERVAL`
+
+`EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
+
+Subtype engines may define another topology only explicitly; e.g. a clock is cyclic with 60 minute intervals and 60 distinct minute positions.
+
+Never shrink, distort, skew, crop, overlap, ambiguously mark, omit, duplicate, merge, or add instructional graduations to make layout fit. A missing or extra educational tick is `CRITICAL_ACADEMIC`.
+
+Apply the global one-page policy first; paginate only when unlocked and necessary.
 
 ## 11. Render-path resolution
 
@@ -181,7 +193,7 @@ Attempt a valid A4 one-page solution before page 2.
 Optimization order:
 
 1. preserve correctness and exact question count
-2. preserve domain minimum diagram/instrument size
+2. preserve domain minimum diagram/instrument size and graduation distinguishability
 3. preserve readable Thai text and writable answer space
 4. choose a more efficient valid layout
 5. remove/simplify decoration
@@ -190,7 +202,7 @@ Optimization order:
 8. reduce decorative context size
 9. if still impossible and lock is OFF, paginate
 
-Never force one page by reducing required content, answer space, legibility, geometry accuracy, or safety.
+Never force one page by reducing required content, answer space, legibility, geometry accuracy, graduation count, or safety.
 
 ### Explicit one-page lock
 
@@ -242,7 +254,7 @@ Use references to study learning interaction, hierarchy, spacing, density, and v
 
 Compile only after pre-render gates pass.
 
-Final render instructions must include resolved render path, page policy, learner/subject/topic/objective, exact question count, exact student-facing content, educational geometry/data constraints, layout/minimum sizes, illustration rules, Thai/numeric locks, blank-answer behavior, hard negatives, and `RENDER_OBJECTIVE`.
+Final render instructions must include resolved render path, page policy, learner/subject/topic/objective, exact question count, exact student-facing content, educational geometry/data constraints, exact graduation topology/count when applicable, layout/minimum sizes, illustration rules, Thai/numeric locks, blank-answer behavior, hard negatives, and `RENDER_OBJECTIVE`.
 
 Repeated instruments/graphs require one canonical template; change only the intended variable.
 
@@ -279,15 +291,25 @@ Global gates:
 `PRINT_QA`
 `PROMPT_QA`
 
+When a learner-read graduated instrument is present, additionally require:
+
+`INTERVAL_COUNT_QA`
+`TICK_POSITION_COUNT_QA` or subtype-equivalent `GRADUATION_COUNT_QA`
+`TICK_SPACING_QA`
+`MAJOR_MINOR_QA`
+`NO_MISSING_TICK_QA`
+`NO_EXTRA_TICK_QA`
+`NON_SCALE_REGION_QA` when applicable
+
 Domain-specific gates are additive. Any critical FAIL blocks release regardless of weighted score.
 
 ## 20. Post-render QA
 
 Prompt QA is not artifact QA. Inspect actual rendered output when available.
 
-Check artifact type, page count, question count, Thai/numeral glyphs, academic values, answer blanks, cropping/overlap, writable space, educational geometry, theme interference, and photocopy usability.
+Check artifact type, page count, question count, Thai/numeral glyphs, academic values, answer blanks, cropping/overlap, writable space, educational geometry, graduation topology/count, target alignment, theme interference, and photocopy usability.
 
-For instrument-reading worksheets inspect every instructional instrument. One wrong needle/tick/hand/level/endpoint blocks classroom release.
+For instrument-reading worksheets inspect **every instructional instrument**. One wrong needle/tick/hand/level/endpoint or one missing/extra graduation blocks classroom release.
 
 ## 21. Revision policy
 
@@ -298,7 +320,7 @@ Change canonical parameters/data first, then rebuild dependent views.
 - orientation → preserve content; rerun page/layout/print QA
 - count → regenerate distribution; rerun one-page feasibility
 - answer key → rebuild student/key views; rerun sanitizer
-- instrument resolution/capacity → regenerate target geometry
+- instrument resolution/capacity → regenerate active range, interval/tick counts, target indices, and target geometry
 - render path → preserve academic data; rebuild render plan and rerun render/layout/post-render QA
 
 Never patch only final prompt prose while canonical state remains inconsistent.
@@ -316,6 +338,7 @@ Release only when:
 - layout respects minimum readability
 - no answer leakage exists anywhere visible
 - text path has adequate glyph coverage
+- graduated instruments have correct interval/tick counts and no missing/extra marks
 - critical educational geometry/data is deterministic or explicitly subject to post-render inspection
 
-A beautiful but academically ambiguous worksheet is a failed product. A one-page worksheet that is unreadable is also a failed product.
+A beautiful but academically ambiguous worksheet is a failed product. A one-page worksheet that is unreadable is also a failed product. A worksheet with an incorrect graduation count can teach a false unit relationship and must not be released.
