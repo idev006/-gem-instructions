@@ -1,22 +1,19 @@
 # Output Contract — Activity-Based Elementary Worksheet Generator
 
-Version: 2.3.0
+Version: 2.3.1
 Default mode: `PROMPT_PACKAGE`
 Primary deliverable: `FINAL_IMAGE_GENERATION_PROMPT`
 Product role: `PRODUCTION_WORKSHEET_PROMPT_GENERATOR`
 
 ## 1. Product boundary
+The Gem transforms a teacher request into a verified, self-contained, copy-ready prompt for a downstream AI/image-generation system. It does not need to render the final image itself.
 
-This Gem does **not** need to render the final worksheet image itself. Its production responsibility is to transform a teacher request into a verified, self-contained, copy-ready prompt that can be pasted into another AI/image-generation system to create the worksheet image.
-
-The default success condition is therefore:
-
+Default success:
 `TEACHER REQUEST → VERIFIED CONTENT/GEOMETRY → STUDENT-SAFE RENDER PLAN → COPY-READY FINAL IMAGE PROMPT`
 
-A response that stops at a worksheet outline, Markdown table, blueprint, pseudo-image placeholder, or prose such as `[ภาพหน้าปัดนาฬิกา: ...]` is incomplete in default `PROMPT_PACKAGE` mode.
+A response that stops at Markdown worksheet text, blueprint, pseudo-image placeholder, or incomplete prompt is not complete.
 
-## 2. Required visible section order
-
+## 2. Required visible sections
 1. `NORMALIZED_WORKSHEET_SPEC`
 2. `STUDENT_CONTENT_BLUEPRINT`
 3. `LAYOUT_BLUEPRINT`
@@ -24,290 +21,127 @@ A response that stops at a worksheet outline, Markdown table, blueprint, pseudo-
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-Sections 1–5 explain and verify the plan. Section 6 is the **primary user deliverable** and MUST be immediately copyable into a downstream image-generation AI without requiring the user to rewrite, merge, infer, or manually expand missing instructions.
+Section 6 is the primary deliverable and must be usable when copied alone.
 
-`PROMPT_ONLY` may return only section 6, but all hidden normalization, validation, layout, sanitizer, and QA must still run.
+## 3. Internal/student separation
+`INTERNAL_VERIFIED_BLUEPRINT` may contain answers, formulas, target values, indexes, angles, level ratios and QA metadata.
 
-`BLUEPRINT_ONLY` is allowed only when explicitly requested. It must never be used as the implicit default for a request to create a worksheet prompt.
+`STUDENT_CONTENT_BLUEPRINT` contains only learner-visible givens, labels, diagrams and blank responses.
 
-## 3. Internal views
+Renderer-only geometry may be serialized into the final prompt when necessary, but it must never be printed as learner-visible answer text.
 
-### INTERNAL_VERIFIED_BLUEPRINT
-Contains hidden answers, formulas, target values, geometry metadata, validation status, and domain-specific render metadata.
+## 4. Dual leak guard
+When `SHOW_ANSWER_KEY=NO`, two separate safeguards apply:
 
-### STUDENT_CONTENT_BLUEPRINT
-Contains only learner-visible givens/labels/diagrams and blank response areas.
+### ANSWER_LEAK_GUARD
+No solved answer, answer vector, completed blank or solved QA commentary.
 
-When `SHOW_ANSWER_KEY=NO`, verified answers may not appear as visible worksheet text.
+### TARGET_VALUE_LEAK_GUARD
+Renderer-only target values used to position a hand/needle/liquid/endpoint must not become:
+- extra scale labels
+- arrow annotations
+- captions beside the instrument
+- target-number callouts
+- completed answers
 
-For instrument/graph tasks, target geometry required to draw the correct visual may be passed to the prompt compiler as `RENDER_ONLY_NOT_VISIBLE`. Such geometry may be serialized in the final image prompt when necessary to construct the visual, but it must not be formatted as a solved answer or answer key.
+Canonical scale labels are allowed; ad-hoc target labels are not.
 
-## 4. Visible-output sanitizer — mandatory final gate
+## 5. Layout contract
+Must specify page size/orientation, target page count, one-page policy, safe margins, header/title/instruction zones, exact repeated region pattern, answer space, minimum instrument size and pagination fallback.
 
-Before returning any visible package, scan the complete assembled response.
+One-page optimization may reduce decoration/whitespace but may not reduce educational marks, readability or response space.
 
-When `SHOW_ANSWER_KEY=NO`, the visible package must contain none of the following as learner-visible content or solved commentary for the active worksheet:
-
-- verified answers or answer vectors;
-- solved answer lists;
-- internal formulas paired with resolved answers;
-- internal blueprint objects exposing answer fields;
-- QA prose that reveals the solutions;
-- completed response blanks.
-
-Render-only geometry needed to generate the student visual is allowed only when necessary and must remain clearly renderer-directed, not student-facing answer text.
-
-If leakage is found, rebuild before release. `ANSWER_LEAK_QA` cannot PASS merely because the final worksheet blanks are empty.
-
-## A. NORMALIZED_WORKSHEET_SPEC
-
-Always include resolved values for:
-
-`GRADE_LEVEL, SUBJECT, DOMAIN, DOMAIN_MATURITY, TOPIC, SUBTOPIC, LEARNING_OBJECTIVE, QUESTION_TYPE, QUESTION_COUNT, DIFFICULTY, LANGUAGE, PAGE_SIZE, ORIENTATION, PAGE_COUNT, TARGET_PAGE_COUNT, ONE_PAGE_PREFERRED, ONE_PAGE_LOCK, COLOR_MODE, SHOW_ANSWER_KEY, TEXT_RENDER_MODE, RENDER_PATH`
-
-No optional parameter may remain silently undefined.
-
-### Render-path resolution
-
-`RENDER_PATH = AUTO | DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY`
-
-Default is `AUTO`.
-
-Resolve `AUTO` using educational payload:
-
-- text/table/numeric-heavy worksheet → `DOCUMENT_FIRST` or `HYBRID`;
-- exact instrument/graph geometry + themed illustration → `HYBRID`;
-- mostly deterministic diagram with minimal art → `DETERMINISTIC_VECTOR`;
-- `IMAGE_ONLY` only when nondeterministic rendering does not threaten text/data/geometry fidelity or when explicitly requested, and then `VISUAL_QA_REQUIRED=YES`.
-
-`RENDER_PATH` describes the architecture the downstream renderer should follow. It does not change the Gem's primary output role: the Gem still emits a self-contained prompt/instruction package for the downstream system.
-
-## B. STUDENT_CONTENT_BLUEPRINT
-
-Exactly one object/row per question. Schema is domain-specific.
-
-Examples:
-
-### Elapsed time
-`ID | ACTIVITY | START_TIME | END_TIME | ANSWER_RENDER | UNIT_RENDER`
-
-### Dial scale
-`ID | OBJECT | DIAL_TEMPLATE_ID | NEEDLE_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
-
-### Clock — single reading
-`ID | CLOCK_TEMPLATE_ID | HAND_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
-
-### Clock — day/night paired reading
-One question = one clock + two blank response fields:
-
-`ID | CLOCK_TEMPLATE_ID | HAND_TARGET_RELATION(RENDER_ONLY) | DAY_ANSWER_RENDER | NIGHT_ANSWER_RENDER`
-
-### Ruler
-`ID | OBJECT | START_MARK | END_MARK/ENDPOINT_RELATION(RENDER_ONLY) | ANSWER_RENDER`
-
-### Graph/table
-`ID | DATASET_REF | QUESTION_TEXT | ANSWER_RENDER`
-
-Student-facing output must never contain a solved answer column when the key is off.
-
-## C. LAYOUT_BLUEPRINT
-
-Must specify:
-
-- page size/orientation;
-- `TARGET_PAGE_COUNT`, `ONE_PAGE_PREFERRED`, `ONE_PAGE_LOCK`;
-- resolved page count or feasibility result;
-- safe margins;
-- header/title/instruction regions;
-- question-region pattern;
-- per-question reserved dimensions;
-- answer-space dimensions;
-- illustration/decorative zones;
-- domain-specific minimum instrument/graph size;
-- pagination trigger when unlocked.
-
-### One-page policy
-
-Every worksheet starts with a one-page attempt unless explicitly overridden.
-
-Optimization order:
-
-1. preserve correctness and exact question count;
-2. preserve minimum educational diagram/instrument size;
-3. preserve readable text and writable answer area;
-4. choose a more efficient valid layout;
-5. remove/simplify decoration;
-6. shorten nonessential instructions;
-7. reduce nonessential padding/whitespace;
-8. reduce decorative context size.
-
-If still impossible:
-
-- `ONE_PAGE_LOCK=OFF` → permit pagination in the compiled prompt;
-- `ONE_PAGE_LOCK=ON` → `ONE_PAGE_FEASIBILITY_QA=FAIL`, `LAYOUT_QA=FAIL`; do not compile an unsafe one-page prompt.
-
-## D. RENDER_CONSTRAINTS
-
-Global minimum:
-
+## 6. Render constraints
+Global:
 `CONTENT_LOCK=ON`
 `THAI_TEXT_LOCK=ON`
 `NUMERIC_VALUE_LOCK=ON`
 `QUESTION_COUNT_LOCK=ON`
 `ANSWER_LEAK_GUARD=ON`
-`NO_EXTRA_QUESTIONS`
-`NO_OMITTED_QUESTIONS`
-`NO_CROPPED_TEXT`
-`NO_TEXT_ILLUSTRATION_OVERLAP`
+`TARGET_VALUE_LEAK_GUARD=ON`
 `NO_PLACEHOLDER_VISUALS`
 `NO_META_TEXT_IN_WORKSHEET_IMAGE`
+`NO_EXTRA_QUESTIONS`
+`NO_OMITTED_QUESTIONS`
 
-When educational geometry exists:
-
+Educational geometry:
 `GEOMETRY_LOCK=ON`
 `TEMPLATE_LOCK=ON`
-`NO_PERSPECTIVE_DISTORTION` when perspective changes the reading
-`VISUAL_QA_REQUIRED=YES` unless geometry is deterministically overlaid and verified
+`PER_ITEM_RENDER_STATE_REQUIRED=YES`
+`TARGET_ALIGNMENT_REQUIRED=YES`
 
-For clock day/night paired mode:
+## 7. FINAL_IMAGE_GENERATION_PROMPT — PRIMARY DELIVERABLE
+The final prompt must be one consolidated, self-contained copy block.
 
-`ONE_CLOCK_PER_QUESTION=YES`
-`TWO_RESPONSE_FIELDS_PER_QUESTION=YES`
-`DAY_NIGHT_MAPPING_DETERMINISTIC=YES`
+Mandatory content:
+1. worksheet objective/learner
+2. exact page spec/color/layout
+3. exact question count
+4. exact student-visible Thai text, labels, units and blank formats
+5. one canonical template definition for repeated instruments
+6. per-item renderer state for every visual question
+7. exact topology/count/minimum size
+8. target geometry redundancy
+9. theme/art boundaries
+10. hard negatives
+11. no-answer/no-target-label rules
+12. `RENDER_OBJECTIVE=STUDENT_WORKSHEET`
 
-For explicit page lock:
-
-`PAGE_COUNT_LOCK=1`
-`NO_PAGE_2=YES`
-
-## E. QA_REPORT
-
-Global gates:
-
-`INTENT_QA`
-`PARAMETER_QA`
-`DOMAIN_ROUTE_QA`
-`DOMAIN_MATURITY_QA`
-`ACADEMIC_QA`
-`CALCULATION_QA`
-`CONSTRAINT_QA`
-`ANSWER_LEAK_QA`
-`VISIBLE_OUTPUT_SANITIZER_QA`
-`DUPLICATE_QA`
-`THAI_QA`
-`RENDER_PATH_QA`
-`ONE_PAGE_FEASIBILITY_QA`
-`PAGE_COUNT_QA`
-`LAYOUT_QA`
-`READABILITY_QA`
-`PRINT_QA`
-`PROMPT_QA`
-`PROMPT_COMPLETENESS_QA`
-`PROMPT_COPY_READY_QA`
-`PLACEHOLDER_VISUAL_QA`
-
-Add domain-specific geometry/data gates. A critical FAIL blocks prompt release.
-
-## F. FINAL_IMAGE_GENERATION_PROMPT — PRIMARY DELIVERABLE
-
-The final section MUST contain one consolidated, self-contained prompt that the user can copy and paste directly into a downstream AI/image-generation system.
-
-### Mandatory properties
-
-The prompt must:
-
-1. state the final worksheet objective and target learner;
-2. state exact page size/orientation/color mode;
-3. state exact question count and page/layout structure;
-4. include the exact student-visible title, instruction, header fields, question text/data, units, and blank response formats;
-5. include all renderer-required geometry/data for every visual question;
-6. include exact instrument/graph topology, minimum sizes, and template locks when applicable;
-7. include theme/art-style instructions without allowing theme art to alter academic geometry;
-8. include hard negatives and no-answer/no-extra-content rules;
-9. include `RENDER_PATH` as architectural guidance for the downstream system;
-10. contain no references that require the downstream AI to inspect hidden Gem state, another section, or an unspecified external table;
-11. contain no pseudo-image placeholders such as `[ภาพ...]`, `[insert clock]`, `<draw here>`, `TBD`, `same as above`, or instructions to “use the blueprint above”;
-12. contain no meta commentary intended for the teacher inside the worksheet image;
-13. be internally complete even if copied without sections 1–5.
-
-### Per-item visual serialization
-
-For any question whose answer depends on a visual, the prompt compiler must serialize the visual instructions **per item**, not merely describe the concept once.
+## 8. Per-item renderer state — mandatory
+For each visual item serialize:
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC NEGATIVE`.
 
 Examples:
 
-- clock: per-item hour/minute relation or exact renderer geometry;
-- dial scale: per-item target tick/needle relation plus canonical dial topology;
-- ruler: per-item start/end graduation relation;
-- thermometer: per-item target liquid endpoint plus scale range/divisions;
-- capacity: per-item target liquid level plus scale topology;
-- graph: exact canonical dataset and visual mapping.
+### Clock
+`semantic=10:30; minute_angle=180°; minute hand at 6; hour_angle=315°; hour hand halfway between 10 and 11; WRONG: hour hand directly on 10.`
 
-Repeated instruments use one canonical template definition, followed by the per-item variable state. The prompt must tell the downstream renderer to clone the template and change only that state.
+### Thermometer
+`target renderer state=46°F; minor=2°F; target tick index=13 from 20°F baseline; liquid top exactly on 46°F graduation; WRONG: endpoint between ticks; DO NOT print 46 as an added label.`
 
-### Prompt copy block
+### Capacity
+`target renderer state=76mL; target tick index=<computed>; READ_TOP_MENISCUS; highest designated reading point exactly on target graduation; DO NOT print 76 as annotation/scale label.`
 
-Prefer presenting the final prompt in one fenced text block under `FINAL_IMAGE_GENERATION_PROMPT` so the user can copy it as one unit. Do not split the primary prompt across multiple disconnected blocks unless the user explicitly requests modular prompts.
+### Dial scale
+`target renderer state=2.4kg; tick_index=24; fourth minor tick after 2; angle=24°; one centered needle; DO NOT print target as answer.`
 
-### Render-path language
+## 9. Domain hard negatives from actual renders
+### Clock
+- nonzero-minute hour hand pinned to original hour numeral
+- :30 hour hand not exactly halfway
 
-For `DOCUMENT_FIRST`, instruct the downstream system to preserve deterministic text/table/document geometry and use illustration only as secondary decoration.
+### Thermometer
+- liquid top between discrete graduations
+- nonrepresentable target silently interpolated
+- target value added as extra label
 
-For `HYBRID`, explicitly separate:
+### Capacity
+- flat/ambiguous meniscus in scientific mode
+- wrong designated read point
+- target number printed beside scale/arrow
+- competing liquid/annotation line
 
-`DETERMINISTIC TEXT/DATA/INSTRUMENT GEOMETRY` from `GENERATIVE THEME/CONTEXT ART`.
+### Canonical 0–5 kg teaching dial
+- 360° full-circle value scale
+- ticks continuing through the 60° inactive gap
+- wrong 0–5 label positions
+- fewer/more than 50 active intervals / 51 active positions
 
-For `DETERMINISTIC_VECTOR`, specify exact vector-like geometry and no artistic reinterpretation of academic marks.
+## 10. Prompt QA
+Required:
+`PROMPT_COMPLETENESS_QA`
+`PROMPT_COPY_READY_QA`
+`PLACEHOLDER_VISUAL_QA`
+`PER_ITEM_RENDER_STATE_QA`
+`TARGET_VALUE_LEAK_QA`
+`TARGET_REPRESENTABILITY_QA` when applicable
+`TARGET_ALIGNMENT_QA` when applicable
+plus all domain-specific geometry/count gates.
 
-For `IMAGE_ONLY`, state that post-render visual QA is mandatory and that the model must not invent academic values.
+A critical fail blocks prompt release.
 
-### No-answer behavior
+## 11. Downstream QA note
+The Gem cannot guarantee third-party pixels. Final prompts for high-risk educational visuals should explicitly request inspection of every instrument. One incorrect instructional instrument makes the generated artifact unsuitable for classroom release.
 
-When `SHOW_ANSWER_KEY=NO`:
-
-- all student response areas remain blank;
-- no solved answer list/key appears;
-- renderer-only geometry may encode the visual state but must not appear as answer text;
-- no QA notes, target values, or hidden metadata may be printed on the worksheet.
-
-## Answer-key behavior
-
-Default when `SHOW_ANSWER_KEY=YES`:
-
-- student worksheet remains unsolved;
-- separate answer-key page/section is generated in the compiled prompt.
-
-Inline solved worksheets require explicit user request.
-
-## Downstream post-render contract
-
-The Gem cannot guarantee a third-party AI's final pixels. Therefore the final prompt should request post-render verification where relevant, especially for instrument-reading worksheets.
-
-Recommended checks to encode in the prompt or accompanying QA note:
-
-- exact page/question count;
-- Thai/numeral legibility;
-- no cropped/overlapping content;
-- blank answer fields;
-- correct geometry/data mapping;
-- correct graduation/tick topology;
-- no missing/extra ticks;
-- photocopy readability.
-
-A prompt may pass while a downstream rendered artifact fails.
-
-## Revision contract
-
-Mutate normalized data first, then rebuild the final prompt.
-
-- theme-only → preserve academic data; rebuild art/render language;
-- difficulty → regenerate academic data and visual states;
-- orientation → preserve content; rebuild layout prompt;
-- count → regenerate content/distribution and one-page feasibility;
-- key toggle → rebuild student/key behavior and sanitizer;
-- instrument capacity/resolution → regenerate target relations/geometry/topology;
-- clock SINGLE↔DAY_NIGHT_PAIR → rebuild response schema/layout and clock prompt serialization;
-- graph dataset → regenerate visualization and dependent questions;
-- render-path change → preserve academic data, rebuild renderer architecture instructions.
-
-Never patch only the final wording while canonical data remains inconsistent.
+## 12. Revision contract
+Mutate canonical data first, rebuild renderer state, then rebuild final prompt. Never patch only prose while target geometry remains inconsistent.
