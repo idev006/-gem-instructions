@@ -1,11 +1,11 @@
 # Domain Release Matrix
 
-Version: 1.1.0
+Version: 1.2.0
 
 | Domain | Deterministic academic rules | Geometry/data rules | Domain QA | Post-render evidence | Current status |
 |---|---:|---:|---:|---:|---|
 | TIME | YES | N/A | YES | YES/dry-run history | PRODUCTION_HARDENED |
-| MEASUREMENT_WEIGHT | YES | YES | YES | INSUFFICIENT after newly observed real-render defects; repaired engine awaiting ≥10 clean audited renders | PRODUCTION_CANDIDATE |
+| MEASUREMENT_WEIGHT | YES | YES | YES | 10/10 deterministic-overlay worksheets audited; 100/100 dials pass critical geometry; generative-only objective failure still open as fallback evidence | PRODUCTION_CANDIDATE |
 | TIME_CLOCK | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_LENGTH | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_TEMPERATURE | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
@@ -29,17 +29,32 @@ To promote a candidate domain to `PRODUCTION_HARDENED`:
 
 For instrument-reading domains, the 10 render audits must inspect every instructional instrument individually; one wrong instrument makes that worksheet a failed render case.
 
+For domains that use multiple rendering paths, hardened status should identify which path is hardened. A deterministic-overlay path may be production-ready even while a generative-only fallback remains candidate; do not imply equivalent reliability.
+
 ## Demotion rule
 
 A hardened domain is demoted if a newly discovered systemic defect can produce academically wrong worksheets without being caught by current QA.
 
-This rule was applied to `MEASUREMENT_WEIGHT` after actual examples exposed off-center needles, malformed scales, and layout-induced dial distortion. Documentation repairs do not automatically restore hardened status.
+This rule was applied to `MEASUREMENT_WEIGHT` after actual examples exposed off-center needles, malformed scales, and layout-induced dial distortion. Documentation repairs alone do not restore hardened status.
+
+## Current MEASUREMENT_WEIGHT evidence
+
+KAN-V2-01 (2026-08-30):
+
+- 10 deterministic rendered worksheets audited;
+- 100 instructional dials inspected through programmatic geometry checks plus visual contact-sheet review;
+- 100/100 pass circle, center pivot, tick count, label count, exact target tick, and minimum-size checks;
+- text glyph regression found and repaired;
+- one nondeterministic render produced an audit dashboard rather than student worksheets, creating a new `RENDER_OBJECTIVE_QA` blocker and regression test;
+- deterministic-overlay path evidence is strong; generative-only fallback remains unproven.
+
+See `qa/KAN_V2_01_SCALE_RENDER_AUDIT_2026-08-30.md`.
 
 ## Current priority backlog
 
-1. produce and audit ≥10 repaired scale-reading renders;
+1. KAN-V2-01E: full generative-context art + deterministic-dial composite audit;
 2. strengthen actual-render regression for analog clocks;
 3. validate ruler minimum printed tick spacing;
 4. validate thermometer/capacity scale rendering;
 5. test graph/table deterministic overlays;
-6. add automated SVG reference templates for all instrument domains.
+6. add reusable SVG reference templates for all instrument domains.
