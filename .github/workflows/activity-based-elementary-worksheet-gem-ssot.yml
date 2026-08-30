@@ -1,0 +1,40 @@
+name: activity-based-elementary-worksheet Gem SSOT
+
+on:
+  push:
+    paths:
+      - 'gems/activity-based-elementary-worksheet/**'
+      - '.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml'
+  pull_request:
+    paths:
+      - 'gems/activity-based-elementary-worksheet/**'
+      - '.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate Gem SSOT
+        run: python gems/activity-based-elementary-worksheet/tools/validate_ssot.py
+
+      - name: Build compact installation package
+        run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
+
+      - name: Verify ZIP
+        run: python -m zipfile -t gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT.zip
+
+      - name: Upload installation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT
+          path: gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT.zip
+          if-no-files-found: error
