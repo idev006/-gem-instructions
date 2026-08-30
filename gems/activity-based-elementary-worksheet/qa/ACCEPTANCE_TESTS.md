@@ -1,6 +1,6 @@
 # Acceptance Tests — Activity-Based Elementary Worksheet Generator
 
-Version: 2.2.0
+Version: 2.2.1
 Status: Critical QA / Regression Suite
 
 A production release passes only when all applicable critical tests pass. Weighted score never overrides a critical blocker.
@@ -14,7 +14,7 @@ A production release passes only when all applicable critical tests pass. Weight
 Every normalized parameter is explicit, defaulted, auto-derived, or NONE.
 
 ### Test 3 — Exact question count
-Internal blueprint, student blueprint, and prompt contain exactly requested count.
+Internal blueprint, student blueprint, and render instructions contain exactly requested count.
 
 ### Test 4 — Correct domain routing
 Scale→MEASUREMENT_WEIGHT; analog clock→TIME_CLOCK; ruler→MEASUREMENT_LENGTH; thermometer→MEASUREMENT_TEMPERATURE; capacity→MEASUREMENT_CAPACITY; money→MONEY; calendar→CALENDAR; graph/table→DATA_READING.
@@ -34,7 +34,7 @@ Internal verified blueprint stores answer and QA metadata.
 When key is off, student blueprint contains no visible answer value.
 
 ### Test 9 — Prompt answer-leak guard
-Verified answer is absent from visible worksheet text in final prompt.
+Verified answer is absent from visible worksheet text in final render instructions.
 
 ### Test 10 — Render-only geometry exception
 Target geometry needed to draw an instrument may exist as render-only metadata but is never rendered as answer text.
@@ -59,8 +59,8 @@ Student can physically write the expected response.
 ### Test 16 — Decoration priority
 Decorative art never covers instructional text/diagram/answer area.
 
-### Test 17 — Capacity repair
-If one page makes content too small, paginate rather than shrink below domain minimum.
+### Test 17 — Capacity repair when unlocked
+If one page cannot preserve minimum readability and `ONE_PAGE_LOCK=OFF`, optimize layout first, then paginate rather than shrink below minimum.
 
 ### Test 18 — Monochrome readability
 Black-and-white output does not rely on color coding.
@@ -271,7 +271,7 @@ Academic content remains unchanged when user requests only theme change.
 Affected academic values regenerate and revalidate.
 
 ### Test 80 — Orientation revision
-Content preserved; layout/print QA reruns.
+Content preserved; one-page/layout/print QA reruns.
 
 ### Test 81 — Instrument resolution change
 All target relations and geometry regenerate.
@@ -285,7 +285,7 @@ Changing SINGLE↔DAY_NIGHT_PAIR rebuilds response schema/layout and reruns cloc
 ## O. Post-render QA
 
 ### Test 84 — Prompt pass is not artifact pass
-A rendered image can fail even if prompt passes.
+A rendered artifact can fail even if prompt passes.
 
 ### Test 85 — Per-instrument inspection
 Every instructional instrument is inspected individually.
@@ -297,16 +297,45 @@ One incorrect needle/hand/endpoint/level causes FAIL.
 Educational marks remain distinguishable in monochrome print.
 
 ### Test 88 — Render-objective lock
-A request to render a student worksheet must produce a student worksheet, not an audit dashboard, QA poster, report, rubric, prompt summary, or meta-document.
+A student worksheet request must not produce an audit dashboard, QA poster, report, rubric, prompt summary, or meta-document.
 
 ### Test 89 — Thai + numeral glyph coverage
-When deterministic text overlay is used, the selected font/render path must visibly support required Thai text plus Arabic numerals, decimal point, punctuation, and unit symbols. Missing-glyph boxes/tofu fail release.
+When deterministic text overlay is used, selected font/render path visibly supports required Thai text, Arabic numerals, punctuation, decimal point, and unit symbols. Missing-glyph boxes/tofu fail release.
 
 ### Test 90 — Render recovery after artifact-type failure
-If a renderer returns the wrong artifact type, mark the attempt FAIL, strengthen/route the render path, and rerun. Never count the failed meta-artifact as worksheet evidence.
+If renderer returns wrong artifact type, mark FAIL, strengthen/route the render path, and rerun. Never count the failed meta-artifact as worksheet evidence.
 
 ### Test 91 — Paired clock post-render structure
 For DAY_NIGHT_PAIR, each rendered question visibly contains one readable clock and two clearly labelled blank response fields associated with that same clock.
+
+## P. v2.2.1 global page / render / governance regression
+
+### Test 92 — One-page preferred default
+A normal request with no page count resolves `TARGET_PAGE_COUNT=1`, `ONE_PAGE_PREFERRED=YES`, `ONE_PAGE_LOCK=OFF`.
+
+### Test 93 — One-page optimization before pagination
+When initial layout does not fit, system attempts a more efficient layout and removes nonessential decoration before creating page 2.
+
+### Test 94 — Explicit one-page lock
+`A4 หน้าเดียวเท่านั้น` resolves `ONE_PAGE_LOCK=ON`, `PAGE_COUNT=1`, and page 2 is prohibited.
+
+### Test 95 — Locked infeasibility fails safely
+If required content cannot fit one page above minimum readability, return `ONE_PAGE_FEASIBILITY_QA=FAIL` and `LAYOUT_QA=FAIL`; do not shrink below domain minimum, crop, reduce question count, or silently paginate.
+
+### Test 96 — Instrument policy obeys page lock
+An instrument worksheet cannot use the old unconditional “paginate” rule when `ONE_PAGE_LOCK=ON`; it must fail feasibility instead.
+
+### Test 97 — Text-heavy render-path selection
+A Thai 10-row elapsed-time table under `RENDER_PATH=AUTO` resolves to `DOCUMENT_FIRST` or `HYBRID`, not IMAGE_ONLY by default.
+
+### Test 98 — Exact-instrument render-path selection
+Scale/clock/ruler/thermometer/capacity tasks under AUTO resolve to HYBRID or DETERMINISTIC_VECTOR when exact geometry is required, unless another deterministic path is explicitly justified.
+
+### Test 99 — Registry maturity is authoritative
+If an engine header and `DOMAIN_REGISTRY.md` disagree, `DOMAIN_MATURITY_QA=FAIL`; teacher-visible output uses registry status and the repository must repair the mismatch before release.
+
+### Test 100 — Academic maturity is not overall maturity
+A deterministic academic calculation layer may be reported as mature, but overall `DOMAIN_MATURITY` remains the registry value until release-matrix evidence is satisfied.
 
 ## Release gates
 
@@ -316,6 +345,7 @@ Global required statuses:
 INTENT_QA
 PARAMETER_QA
 DOMAIN_ROUTE_QA
+DOMAIN_MATURITY_QA
 ACADEMIC_QA
 CALCULATION_QA
 CONSTRAINT_QA
@@ -324,6 +354,9 @@ VISIBLE_OUTPUT_SANITIZER_QA
 DUPLICATE_QA
 THAI_QA
 GLYPH_COVERAGE_QA when deterministic text is rendered
+RENDER_PATH_QA
+ONE_PAGE_FEASIBILITY_QA
+PAGE_COUNT_QA
 RENDER_OBJECTIVE_QA
 LAYOUT_QA
 READABILITY_QA
@@ -333,6 +366,6 @@ PROMPT_QA
 
 Plus all applicable domain-specific geometry/data gates.
 
-Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage anywhere in the visible package, wrong count, wrong artifact type, missing text glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
+Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage anywhere in visible output, wrong count, wrong artifact type, incorrect maturity claim, unsafe page-lock override, missing glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
 
 Dry-run score target: >=95/100 AND zero critical blockers. Actual classroom release additionally requires post-render inspection when nondeterministic rendering is used.
