@@ -12,20 +12,23 @@ Gem นี้มีหน้าที่หลักคือ **สร้าง 
 - `ป.3 อ่านนาฬิกาเข็ม 10 ข้อ`
 - `ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ`
 - `ป.4 คำนวณระยะทางไปกลับ 10 ข้อ`
+- `ป.4 อ่านมุมจากโพรแทรกเตอร์ 10 ข้อ`
+- `ป.5 แปลงหน่วยพื้นที่ 10 ข้อ`
 - `ป.3 อ่านตราชั่ง 0–5 กก. ขีดละ 0.1 กก. 10 ข้อ`
 - `ป.4 แปลงลิตรกับมิลลิลิตร 10 ข้อ`
+- `ป.6 แปลง cm³ dm³ และ m³ 10 ข้อ`
 
 Gem จะ normalize คำสั่ง, route ไปยัง Specialist Worker, ตรวจค่าภายใน, วาง layout และสร้าง `FINAL_IMAGE_GENERATION_PROMPT` ที่ copy ไปใช้ได้ทันที
 
-## สถาปัตยกรรมแบบใหม่
+## สถาปัตยกรรม
 
 Main Instructions ทำหน้าที่เป็น **Orchestrator** ส่วน Knowledge 9 ไฟล์เป็น Specialist Workers:
 
 1. W01 — คณิตศาสตร์ทั่วไป / color-by-code / ภาษาไทย
-2. W02 — เวลาและนาฬิกา
+2. W02 — เวลา หน่วยเวลา และนาฬิกา
 3. W03 — น้ำหนักและตราชั่ง
-4. W04 — ไม้บรรทัด ความยาว ระยะทาง และการแปลงหน่วย
-5. W05 — อุณหภูมิ ความจุ ปริมาตร และเมนิสคัส
+4. W04 — ไม้บรรทัด ความยาว ระยะทาง มุม/โพรแทรกเตอร์ รอบรูป และพื้นที่
+5. W05 — อุณหภูมิ ความจุ เมนิสคัส และปริมาตร
 6. W06 — เงิน ปฏิทิน ตาราง/กราฟ
 7. W07 — ตรวจ geometry/topology ของมาตรวัด
 8. W08 — layout/render/ภาษาไทย/งานพิมพ์
@@ -38,11 +41,14 @@ Main Instructions ทำหน้าที่เป็น **Orchestrator** ส�
 ### เวลา
 - อ่านนาฬิกาเข็ม
 - ชั่วโมงเต็ม/ครึ่งชั่วโมง/ช่วง 15, 5, 1 นาทีตามระดับ
+- ชั่วโมง นาที วินาที และการแปลงหน่วยเวลาเมื่อเหมาะกับจุดประสงค์
 - กลางวัน/กลางคืน
 - เวลาเริ่มต้น + ระยะเวลา → เวลาสิ้นสุด
 - เวลาสิ้นสุด − ระยะเวลา → เวลาเริ่มต้น
 - เวลาเริ่ม/สิ้นสุด → ระยะเวลา
 - ตารางเวลาและการเปรียบเทียบเวลา
+
+Gem จะไม่ใส่เข็มวินาทีในนาฬิกาเพียงเพราะโจทย์มีการแปลงวินาที ถ้าไม่ได้สอนการอ่านเข็มวินาทีโดยตรง
 
 ### ความยาวและไม้บรรทัด
 - อ่านไม้บรรทัดจาก 0
@@ -60,12 +66,42 @@ Main Instructions ทำหน้าที่เป็น **Orchestrator** ส�
 
 Gem จะไม่แอบเปลี่ยนโจทย์ระยะทางให้เป็นเรื่องความเร็ว ถ้าไม่ได้ขอ
 
+### มุมและโพรแทรกเตอร์
+- อ่านมุมจากโพรแทรกเตอร์
+- acute/right/obtuse/straight classification
+- vertex ต้องอยู่ตรง origin
+- baseline ray ต้องตรง 0° ที่เลือก
+- dual scale ต้องระบุ inner/outer direction ให้ชัด
+- target ray ต้องตรง graduation ที่กำหนด
+
+### รอบรูปและพื้นที่
+รองรับสูตรตามระดับ/จุดประสงค์ เช่น:
+
+- rectangle/square perimeter
+- rectangle/square area
+- triangle area
+- parallelogram area
+- trapezoid area
+- circle area/circumference เมื่อสั่ง
+
+การแปลงหน่วยพื้นที่ต้องใช้ตัวคูณแบบยกกำลังสอง เช่น:
+
+`1 m² = 10,000 cm²`
+
+โจทย์วงกลมต้องใช้ `PI_POLICY` เดียวกันทั้งใบงาน เช่น `3.14` หรือ `22/7`
+
 ### น้ำหนัก
 - อ่านตราชั่ง
 - kg / g / kg+g / kg+ขีด
 - บวก ลบ เปรียบเทียบ แปลงหน่วย
 - `1000 g = 1 kg`
 - บริบทไทยที่เกี่ยวข้อง: `1 ขีด = 100 g = 0.1 kg`
+
+### อุณหภูมิ
+- อ่านเทอร์โมมิเตอร์
+- °C / °F เมื่อระบุ
+- เปรียบเทียบและการเปลี่ยนแปลงอุณหภูมิ
+- target ของแบบ discrete ต้องตรงขีดที่แทนค่าได้จริง
 
 ### ปริมาตร/ความจุ
 - อ่านภาชนะตวง
@@ -74,6 +110,21 @@ Gem จะไม่แอบเปลี่ยนโจทย์ระยะท�
 - meniscus เมื่อระบุ
 - ปริมาตรทรงสี่เหลี่ยมมุมฉาก
 - รูปทรงประกอบจากทรงสี่เหลี่ยมมุมฉากแบบง่ายเมื่อเหมาะกับระดับ
+- cm³ / dm³ / m³ conversion
+
+ความสัมพันธ์สำคัญ:
+
+`1000 cm³ = 1 dm³`
+`1000 dm³ = 1 m³`
+`1 m³ = 1,000,000 cm³`
+
+เมื่อจุดประสงค์สอนความสัมพันธ์ capacity-volume โดยตรง:
+
+`1 cm³ = 1 mL`
+`1 dm³ = 1 L`
+`1 m³ = 1000 L`
+
+Gem จะไม่ฉีดความสัมพันธ์เหล่านี้เข้าโจทย์เด็กเล็กโดยอัตโนมัติ
 
 ## Grade progression ป.1–ป.6
 
@@ -83,10 +134,10 @@ Gem มี `CURRICULUM_PROFILE=AUTO` ซึ่งใช้ progression แบบ
 
 - ป.1: เปรียบเทียบ/อ่านหน่วยง่าย ไม่เน้น conversion ซับซ้อน
 - ป.2: อ่านมาตรวัดพื้นฐานและคำนวณหนึ่งขั้น
-- ป.3: cm/mm, kg/ขีด, mL/L, duration และระยะทางพื้นฐาน
-- ป.4: mixed units, nonzero ruler start, multi-segment distance, conversion แบบจำนวนเต็ม
-- ป.5: mixed/decimal units เมื่อเหมาะสม, rectangular-prism volume
-- ป.6: multi-step measurement reasoning และ composite rectangular-prism volume แบบง่าย
+- ป.3: cm/mm, kg/ขีด, mL/L, duration, ระยะทางพื้นฐาน และรอบรูปง่าย ๆ
+- ป.4: mixed units, nonzero ruler start, multi-segment distance, protractor, rectangle/square area/perimeter, seconds เมื่อสอน
+- ป.5: mixed/decimal units, triangle/parallelogram/trapezoid area, rectangular-prism volume, cm³/dm³ เมื่อเหมาะ
+- ป.6: multi-step measurement reasoning, polygon/circle measurement, composite rectangular-prism volume และ cm³/dm³/m³
 
 ครูสามารถกำหนดความยาก/หน่วย/ชนิดโจทย์เองได้เสมอ
 
@@ -103,9 +154,9 @@ Gem มี `CURRICULUM_PROFILE=AUTO` ซึ่งใช้ progression แบบ
 
 ## Student Blueprint กับข้อมูล renderer ต่างกัน
 
-Student Blueprint ต้องมีเฉพาะสิ่งที่เด็กเห็นจริง จึงไม่ควรมี target time, target weight, angle, tick index หรือ liquid level
+Student Blueprint ต้องมีเฉพาะสิ่งที่เด็กเห็นจริง จึงไม่ควรมี target time, target weight, target length/angle, tick index, ray angle หรือ liquid level
 
-แต่ Final Prompt สามารถมีข้อมูลเหล่านี้เพื่อสั่ง AI วาดภาพให้ถูก โดยจะถูกทำเครื่องหมาย:
+แต่ Final Prompt สามารถมีข้อมูลเหล่านี้เพื่อสั่ง AI วาดภาพให้ถูก โดยทำเครื่องหมาย:
 
 `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT`
 
@@ -120,6 +171,7 @@ Student Blueprint ต้องมีเฉพาะสิ่งที่เด�
 ตัวอย่างสำคัญ:
 
 - ไม้บรรทัด 1 cm @1 mm = 10 intervals / 11 positions
+- โพรแทรกเตอร์ 0–180° @1° = 180 intervals / 181 positions
 - นาฬิกา 10:30 → เข็มนาที 180°, เข็มชั่วโมง 315°, กึ่งกลาง 10–11
 - ตราชั่ง 0–5 kg canonical → 300° active + 60° inactive gap
 - thermometer แบบ discrete → endpoint ต้องตรงขีดที่แทนค่าได้จริง
@@ -145,7 +197,7 @@ Gem จะพยายามหนึ่งหน้าก่อน แต่ไ
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-ภาพปลายทาง โดยเฉพาะนาฬิกา ตราชั่ง ไม้บรรทัด เทอร์โมมิเตอร์ และภาชนะตวง ต้องตรวจ visual artifact ก่อนใช้กับเด็ก
+ภาพปลายทาง โดยเฉพาะนาฬิกา ตราชั่ง ไม้บรรทัด โพรแทรกเตอร์ เทอร์โมมิเตอร์ และภาชนะตวง ต้องตรวจ visual artifact ก่อนใช้กับเด็ก
 
 ## ตรวจสุขภาพ Gem
 
@@ -153,7 +205,13 @@ Gem จะพยายามหนึ่งหน้าก่อน แต่ไ
 
 `ตรวจสุขภาพ Gem`
 
-Gem จะตรวจ baseline, W01–W09, schema, route, visibility model, render-path rule และสถานะ hotfix โดยไม่ต้องสร้างใบงาน
+Gem จะตรวจ baseline, W01–W09, schema, route, measurement capability family, visibility model, render-path rule และสถานะ hotfix โดยไม่ต้องสร้างใบงาน
+
+## Command Catalog
+
+ตัวอย่างคำสั่ง ป.1–ป.6 อยู่ใน:
+
+`examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 
 ## จำง่าย ๆ
 
