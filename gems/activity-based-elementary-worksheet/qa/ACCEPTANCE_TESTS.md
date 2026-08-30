@@ -1,6 +1,6 @@
 # Acceptance Tests — Activity-Based Elementary Worksheet Generator
 
-Version: 2.0.0
+Version: 2.1.0
 Status: Critical QA / Regression Suite
 
 A production release passes only when all applicable critical tests pass. Weighted score never overrides a critical blocker.
@@ -166,7 +166,7 @@ Beginner object begins at zero graduation, not merely ruler edge.
 1 cm and 1 mm spacing are consistent.
 
 ### Test 49 — Endpoint mapping
-6.7 cm endpoint maps to 67 mm from zero.
+6.7 cm endpoint maps to 67 mm from zero under the 1 mm profile.
 
 ### Test 50 — Nonzero-start arithmetic
 Length = end mark - start mark.
@@ -269,6 +269,15 @@ One incorrect needle/hand/endpoint/level causes FAIL.
 ### Test 78 — Photocopy test
 Educational marks remain distinguishable in monochrome print.
 
+### Test 79 — Render-objective lock
+A request to render a student worksheet must produce a student worksheet, not an audit dashboard, QA poster, report, rubric, prompt summary, or meta-document.
+
+### Test 80 — Thai + numeral glyph coverage
+When deterministic text overlay is used, the selected font/render path must visibly support required Thai text plus Arabic numerals, decimal point, punctuation, and unit symbols. Missing-glyph boxes/tofu fail release.
+
+### Test 81 — Render recovery after artifact-type failure
+If a renderer returns the wrong artifact type, mark the attempt FAIL, strengthen/route the render path, and rerun. Never count the failed meta-artifact as worksheet evidence.
+
 ## Release gates
 
 Global required statuses:
@@ -283,6 +292,8 @@ CONSTRAINT_QA
 ANSWER_LEAK_QA
 DUPLICATE_QA
 THAI_QA
+GLYPH_COVERAGE_QA when deterministic text is rendered
+RENDER_OBJECTIVE_QA
 LAYOUT_QA
 READABILITY_QA
 PRINT_QA
@@ -291,6 +302,6 @@ PROMPT_QA
 
 Plus all applicable domain-specific geometry/data gates.
 
-Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage, wrong count, unreadable/cropped layout, or malformed canonical text.
+Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage, wrong count, wrong artifact type, missing text glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
 
 Dry-run score target: >=95/100 AND zero critical blockers. Actual classroom release additionally requires post-render inspection when nondeterministic rendering is used.
