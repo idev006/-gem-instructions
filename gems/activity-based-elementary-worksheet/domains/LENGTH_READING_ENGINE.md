@@ -1,55 +1,82 @@
 # LENGTH_READING_ENGINE — Ruler / Length Reading
 
-Version: 1.0.0
+Version: 1.1.0
 Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 
 ## Learning goal
 
-Student reads an object's length from a ruler or number-line style measuring scale.
+Student reads an object's length from a ruler or number-line style measuring scale without confusing the ruler edge with the zero graduation.
 
 ## Core parameters
 
-`MAX_LENGTH_CM, MAJOR_DIVISION_CM, MINOR_DIVISION_CM, UNIT_MODE=CM|MM|CM_AND_MM, START_POSITION_MODE=ZERO|NONZERO_ADVANCED, TARGET_LENGTHS, ANSWER_FORMAT`
+`SCALE_MIN_CM, MAX_LENGTH_CM, MAJOR_DIVISION_CM, MINOR_DIVISION_CM, UNIT_MODE=CM|MM|CM_AND_MM, START_POSITION_MODE=ZERO|NONZERO_ADVANCED, TARGET_LENGTHS, ANSWER_FORMAT`
 
-Default elementary metric profile:
+Elementary metric defaults:
 
-- major mark = 1 cm
-- minor mark = 1 mm = 0.1 cm when millimetre reading is intended
-- object normally starts exactly at zero for beginner worksheets
+- `SCALE_MIN_CM = 0`
+- major division = `1 cm`
+- minor division = `0.1 cm = 1 mm` when millimetre reading is intended
+- beginner object start = exact zero graduation
 
 ## Geometry invariants
 
-- ruler baseline straight and horizontal/vertical as specified
-- no perspective or skew
-- evenly spaced graduations
-- zero mark explicit and aligned to measurement start
-- centimetre marks stronger than millimetre marks
-- object endpoints unambiguous
-- no decorative art covering endpoints or tick labels
+- ruler baseline straight and front-facing
+- no perspective, skew, stretch or non-uniform scale
+- graduation spacing uniform
+- zero graduation explicit and visually distinct from physical ruler edge
+- centimetre marks stronger/longer than millimetre marks
+- object start/end guides unambiguous
+- no decorative art covering endpoint, zero mark or labels
+- identical scale geometry for repeated questions unless the task explicitly changes scale
 
 ## Deterministic mapping
 
-`length_mm = round(length_cm * 10)`
+For any active minor division `d = MINOR_DIVISION_CM`:
 
-For zero-start tasks, endpoint tick index = `length_mm` when minor division is 1 mm.
+`tick_index(value) = round((value - SCALE_MIN_CM) / d)`
+
+Require exact representability:
+
+`abs(value - (SCALE_MIN_CM + tick_index*d)) < tolerance`
+
+For zero-start tasks:
+
+`length = end_value - 0`
 
 For nonzero-start tasks:
 
 `length = end_value - start_value`
 
-Generate and validate both endpoints before rendering.
+and both start/end must be valid graduations.
+
+Never assume `tick_index = length_mm` unless `d = 0.1 cm` and `SCALE_MIN_CM = 0`.
 
 ## Critical misconception guard
 
-Do not measure from the physical edge of the drawn ruler unless the zero mark is exactly at that edge. The academic start point is the zero graduation.
+The academic measurement begins at the selected start graduation, normally zero, not automatically at the physical edge of the ruler.
+
+If an object is offset from zero in an advanced task, students must read both endpoints or the start marker must be explicit.
 
 ## Layout/readability
 
-Minor marks must remain distinguishable in print. If 1 mm divisions become too dense, enlarge the ruler or reduce question density.
+The smallest active graduation must be distinguishable after printing/photocopying.
+
+- reserve a rectangular instrument zone with fixed aspect ratio
+- prefer fewer questions or pagination over compressing 1 mm ticks
+- labels may not collide with ticks or object endpoints
+- object must not visually float above an ambiguous start/end location
+
+## Render-only target metadata
+
+For each item compile:
+
+`START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT`
+
+These values control geometry but answers remain invisible when answer key is off.
 
 ## QA
 
-`RULER_STRAIGHT_QA, ZERO_ALIGNMENT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, ENDPOINT_QA, VALUE_QA, UNIT_QA, MINIMUM_SIZE_QA`
+`RULER_STRAIGHT_QA, SCALE_RANGE_QA, ZERO_ALIGNMENT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, START_ENDPOINT_QA, END_ENDPOINT_QA, VALUE_QA, UNIT_QA, MINIMUM_SIZE_QA`
 
-Incorrect zero alignment or endpoint is a critical blocker.
+Incorrect start reference, endpoint, spacing, or value is a critical blocker.
