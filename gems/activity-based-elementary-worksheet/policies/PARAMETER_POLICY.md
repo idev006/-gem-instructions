@@ -1,6 +1,6 @@
 # Parameter Policy — Activity-Based Elementary Worksheet Generator
 
-Version: 2.2.1
+Version: 2.3.2
 Status: Canonical supporting policy
 Audience: teachers, Gem maintainers, automation builders
 
@@ -120,13 +120,17 @@ Ask only when a missing value materially changes correctness and cannot be safel
 | DECORATION_DENSITY | OPTIONAL_DEFAULT | LOW_TO_MEDIUM for data-heavy worksheets |
 | LINE_WEIGHT | OPTIONAL_DEFAULT | CONSISTENT |
 
-### Render path
+### Render / prompt
 
 | Parameter | Class | Default/Auto |
 |---|---|---|
 | RENDER_PATH | OPTIONAL_AUTO | AUTO |
 | RENDER_OBJECTIVE | OPTIONAL_DEFAULT | STUDENT_WORKSHEET |
 | VISUAL_QA_REQUIRED | OPTIONAL_AUTO | YES when nondeterministic rendering carries academic risk |
+| OUTPUT_MODE | OPTIONAL_DEFAULT | PROMPT_PACKAGE |
+| PRIMARY_DELIVERABLE | OPTIONAL_DEFAULT | FINAL_IMAGE_GENERATION_PROMPT |
+| PER_ITEM_RENDER_STATE_REQUIRED | OPTIONAL_AUTO | YES for visual questions |
+| TARGET_ALIGNMENT_REQUIRED | OPTIONAL_AUTO | YES for learner-read instruments |
 
 `RENDER_PATH` values:
 
@@ -156,8 +160,11 @@ Teachers normally do not set these.
 | NUMERIC_VALUE_LOCK | ON |
 | QUESTION_COUNT_LOCK | ON |
 | ANSWER_LEAK_GUARD | ON |
+| TARGET_VALUE_LEAK_GUARD | ON when renderer-only targets exist |
 | GEOMETRY_LOCK | ON when geometry carries educational meaning |
 | TEMPLATE_LOCK | ON for repeated instruments/graphs |
+| PER_ITEM_RENDER_STATE_REQUIRED | YES for visual questions |
+| TARGET_ALIGNMENT_REQUIRED | YES for learner-read instruments |
 
 ## 6. Global one-page policy — applies to EVERY worksheet family
 
@@ -180,7 +187,7 @@ Optimization order:
 8. reduce decorative context size;
 9. only then paginate when `ONE_PAGE_LOCK=OFF`.
 
-Never achieve one page by shrinking instruments below minimum size, distorting diagrams, making text unreadable, removing required data/answer fields, clipping, overlapping, reducing question count, leaking answers, or changing the objective.
+Never achieve one page by shrinking instruments below minimum size, distorting diagrams, making text unreadable, removing required data/answer fields, clipping, overlapping, reducing question count, leaking answers/targets, or changing the objective.
 
 ### 6.1 ONE_PAGE_LOCK
 
@@ -230,6 +237,7 @@ For Thai Grade 3 unless explicitly changed:
 - CENTER_PIVOT_LOCK = ON
 - SINGLE_NEEDLE_ONLY = YES
 - NEEDLE_TARGET_MODE = EXACT_TICK
+- canonical 5kg teaching dial = 300° active sweep + 60° inactive gap, not 360°
 - default 10-question A4 portrait layout = 2 columns × 5 rows if minimum dial size is preserved
 - preferred render path = HYBRID or DETERMINISTIC_VECTOR
 
@@ -238,10 +246,10 @@ For Thai Grade 3 unless explicitly changed:
 - standard 12/3/6/9 orientation
 - two hands only unless seconds requested
 - minute granularity derived from grade/difficulty
+- HOUR_HAND_MODE = CONTINUOUS_INTERPOLATION
 - TEMPLATE_LOCK = ON
 - `CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`
 - day/night pair uses one clock + two answer fields
-- visual clock tasks must respect domain minimum size even under one-page optimization
 - preferred render path = HYBRID or DETERMINISTIC_VECTOR
 
 ### MEASUREMENT_LENGTH / ruler
@@ -254,12 +262,15 @@ For Thai Grade 3 unless explicitly changed:
 ### MEASUREMENT_TEMPERATURE
 - UNIT = Celsius for Thai primary default
 - vertical scale
-- min/max/interval derived from objective or safe grade-appropriate range
+- target must be exactly representable by MINOR_INTERVAL unless interpolation is explicitly taught
+- liquid endpoint must align exactly to target graduation
 - preferred render path = HYBRID or DETERMINISTIC_VECTOR
 
 ### MEASUREMENT_CAPACITY
 - UNIT = L or mL derived from topic
 - MENISCUS_MODE = SIMPLE_FLAT for early primary unless science-specific meniscus reading is requested
+- scientific mode must explicitly lock READ_BOTTOM_MENISCUS or READ_TOP_MENISCUS
+- renderer-only target numbers must not be printed as labels/annotations
 - preferred render path = HYBRID or DETERMINISTIC_VECTOR
 
 ### MONEY
@@ -278,7 +289,18 @@ For Thai Grade 3 unless explicitly changed:
 - 3D/perspective graph distortion prohibited
 - preferred render path = DOCUMENT_FIRST, HYBRID, or DETERMINISTIC_VECTOR depending visualization
 
-## 8. Default resolution algorithm
+## 8. Prompt-generation defaults
+
+Unless explicitly overridden:
+
+`OUTPUT_MODE=PROMPT_PACKAGE`
+`PRIMARY_DELIVERABLE=FINAL_IMAGE_GENERATION_PROMPT`
+
+A visual question is production-complete only when its final prompt has one canonical template plus an explicit renderer state for every item. High-risk instrument states use:
+
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`.
+
+## 9. Default resolution algorithm
 
 For every field:
 
@@ -286,11 +308,12 @@ For every field:
 2. else apply domain-specific default;
 3. else apply core default/auto rule;
 4. record resolved value;
-5. resolve `RENDER_PATH`;
-6. run one-page feasibility planning;
-7. if no safe rule exists and correctness changes, ask one concise clarification.
+5. resolve KB route/compatibility;
+6. resolve `RENDER_PATH`;
+7. run one-page feasibility planning;
+8. if no safe rule exists and correctness changes, ask one concise clarification.
 
-## 9. Teacher-friendly rule
+## 10. Teacher-friendly rule
 
 Bad interaction:
 
@@ -298,10 +321,10 @@ Bad interaction:
 
 Good interaction:
 
-> ได้ครับ ป.3 การอ่านตราชั่ง 10 ข้อ ผมจะใช้ตราชั่ง 5 กก. ขีดย่อย 0.1 กก. A4 แนวตั้ง ขาวดำ ไม่ใส่เฉลย จัดให้จบใน 1 หน้าเป็นอันดับแรก และใช้เส้นทาง render ที่รักษาหน้าปัดกับภาษาไทยให้แม่นยำโดยอัตโนมัติ
+> ได้ครับ ป.3 การอ่านตราชั่ง 10 ข้อ ผมจะใช้ตราชั่ง 5 กก. ขีดย่อย 0.1 กก. A4 แนวตั้ง ขาวดำ ไม่ใส่เฉลย จัดให้จบใน 1 หน้าเป็นอันดับแรก และสร้าง Final Image Generation Prompt ที่ล็อกหน้าปัดกับตำแหน่งเข็มให้ครบทุกข้อ
 
 The teacher may override visible educational choices in ordinary language.
 
-## 10. Advanced users
+## 11. Advanced users
 
-Automation builders may provide structured parameters directly. The same normalization and QA still apply. Technical input never bypasses validation.
+Automation builders may provide structured parameters directly. The same normalization, KB routing, and QA still apply. Technical input never bypasses validation.
