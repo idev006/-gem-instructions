@@ -16,10 +16,10 @@ The main Gem Instructions field uses `GEM_INSTRUCTIONS_PRODUCTION.md` and is not
 | Worker ID | Repository SSOT | Installation role |
 |---|---|---|
 | W01_ACADEMIC_CONTENT | `workers/W01_ACADEMIC_CONTENT.md` | arithmetic/color-by-code/Thai literacy/generic content |
-| W02_TIME_CLOCK | `workers/W02_TIME_CLOCK.md` | time + analog clock |
+| W02_TIME_CLOCK | `workers/W02_TIME_CLOCK.md` | time units/calculation + analog clock |
 | W03_WEIGHT_SCALE | `workers/W03_WEIGHT_SCALE.md` | weight + dial scale |
-| W04_LENGTH_DISTANCE | `workers/W04_LENGTH_DISTANCE.md` | ruler + length + distance + conversion |
-| W05_TEMPERATURE_CAPACITY_VOLUME | `workers/W05_TEMPERATURE_CAPACITY_VOLUME.md` | thermometer + capacity + volume |
+| W04_LENGTH_DISTANCE | `workers/W04_LENGTH_DISTANCE.md` | ruler + length + distance + angle/protractor + perimeter/area |
+| W05_TEMPERATURE_CAPACITY_VOLUME | `workers/W05_TEMPERATURE_CAPACITY_VOLUME.md` | thermometer + capacity + meniscus + solid volume |
 | W06_MONEY_CALENDAR_DATA | `workers/W06_MONEY_CALENDAR_DATA.md` | money + calendar + data reading |
 | W07_INSTRUMENT_AUDITOR | `workers/W07_INSTRUMENT_AUDITOR.md` | shared geometry/topology audit |
 | W08_LAYOUT_RENDER_THAI | `workers/W08_LAYOUT_RENDER_THAI.md` | layout/render/Thai/print/theme |
@@ -47,7 +47,7 @@ Do not use slot 10 for a second full worker set or broad architecture override.
 
 ## 4. Repository support files
 
-The following files are SSOT/supporting references and are merged/translated into the installable worker package where appropriate:
+SSOT/supporting references merged/translated into the installable worker package where appropriate:
 
 - `GEM_INSTRUCTIONS_PRODUCTION.md`
 - `OUTPUT_CONTRACT.md`
@@ -59,6 +59,7 @@ The following files are SSOT/supporting references and are merged/translated int
 - `domains/MEASUREMENT_COVERAGE_P1_P6.md`
 - domain engines
 - QA/regression files
+- `examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 
 These repository files do not need to be uploaded separately when using the compact 9-worker installation package.
 
@@ -73,30 +74,54 @@ These repository files do not need to be uploaded separately when using the comp
 5. W08/W09 are available for every production request;
 6. W07 is available whenever learner-read visual geometry is selected;
 7. no incompatible W10 override is active;
-8. route/ownership rules match `KB_ROUTER.md`.
+8. route/ownership rules match `KB_ROUTER.md`;
+9. baseline-critical QA/regression files are coherent with the same capability set.
 
 ## 6. Measurement expansion requirements
 
-Baseline 2.6.x installation must support:
+Baseline 2.6.x must support, when grade/objective appropriate:
 
-- clock reading and elapsed-time calculation
-- ruler reading
+### Time
+- analog clock reading
+- elapsed/start/end/duration calculation
+- `60 s=1 min`, `60 min=1 h`, `24 h=1 day`
+- second precision only when explicitly requested/warranted
+
+### Length / distance / measurement geometry
+- ruler zero/nonzero reading
 - length arithmetic/comparison
 - mm/cm/m/km conversion
-- distance total/difference/round trip/multi-segment problems
-- weight dial reading and g/kg/ขีด arithmetic/conversion
+- distance total/difference/round trip/multi-segment/route comparison
+- angle reading with a protractor
+- perimeter
+- supported elementary area formulas
+- squared-unit conversion
+- one consistent `PI_POLICY` for circle tasks
+
+### Weight
+- dial reading
+- g/kg/ขีด arithmetic/conversion
+- optional metric tonne only when explicitly requested
+
+### Temperature / capacity / volume
 - thermometer reading
 - mL/L capacity reading/arithmetic/conversion
-- meniscus convention when requested
-- rectangular-prism volume and simple composite rectangular-prism volume when grade-appropriate
+- meniscus convention when explicitly requested
+- rectangular-prism/simple composite rectangular-prism volume
+- cm³/dm³/m³ conversion
+- capacity-volume relations only when explicitly taught
 
 See `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
 ## 7. Known hardening requirements
 
 - clock continuous hour-hand interpolation; 10:30 = 315° midpoint 10–11
+- seconds hand only when the lesson explicitly includes seconds
 - canonical 0–5 kg dial = 300° active + 60° inactive gap; no 360° substitution
 - ruler 1 cm @1 mm = 10 intervals / 11 positions
+- nonzero ruler measurement = end-start
+- protractor vertex at exact origin, baseline on selected 0°, active scale direction explicit
+- area conversion uses squared linear factors; cubic conversion uses cubed linear factors
 - thermometer discrete target must be representable and align to a graduation
 - scientific meniscus read point explicit and unambiguous
 - renderer-only target data must not appear in Student Blueprint or learner-visible worksheet
@@ -122,9 +147,9 @@ The distributed ZIP should contain:
 
 - `01_MAIN_INSTRUCTIONS/GEM_ORCHESTRATOR_INSTRUCTIONS.txt`
 - `02_UPLOAD_9_WORKER_KNOWLEDGE_TXT/` with exactly nine `.txt` workers
-- installation guide
+- installation/health-check guide
 - smoke tests
 - static lint report
 - manifest/checksums
 
-The package is generated from the GitHub SSOT rules, not maintained as a separate competing specification.
+The package is generated from GitHub SSOT, not maintained as a separate competing specification.
