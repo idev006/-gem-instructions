@@ -7,7 +7,7 @@ This file is the single source of truth for domain routing and **overall domain 
 
 | Domain | Question family | Engine | Maturity |
 |---|---|---|---|
-| TIME | elapsed time / start-end-duration transformations | `TIME_ENGINE.md` | PRODUCTION_HARDENED |
+| TIME | elapsed time / start-end-duration transformations | `TIME_ENGINE.md` | PRODUCTION_CANDIDATE |
 | MEASUREMENT_WEIGHT | dial scale reading | `SCALE_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md` | PRODUCTION_CANDIDATE |
 | TIME_CLOCK | analog clock reading, including one-clock day/night paired reading | `CLOCK_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md` | PRODUCTION_CANDIDATE |
 | MEASUREMENT_LENGTH | ruler/length reading | `LENGTH_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md` | PRODUCTION_CANDIDATE |
@@ -35,15 +35,23 @@ This file is the single source of truth for domain routing and **overall domain 
 
 `PRODUCTION_HARDENED` requires deterministic generation/validation, domain-specific QA, regression evidence, and the evidence threshold in `qa/DOMAIN_RELEASE_MATRIX.md`.
 
-`PRODUCTION_CANDIDATE` has deterministic rules and QA design but still requires broader actual-render regression before promotion.
+`PRODUCTION_CANDIDATE` has deterministic rules and QA design but still requires one or more release-evidence requirements before promotion.
 
 `SUPPORTED_GENERIC` may use the core pipeline but must not claim domain-specific deterministic guarantees that do not exist.
 
 The Gem MUST include the maturity status in QA whenever the domain is not hardened.
 
+## Academic maturity vs overall maturity
+
+A domain can have a mature deterministic academic core while its **overall domain status remains candidate** because render/layout evidence is incomplete. QA may report this distinction, e.g. `ACADEMIC_RULES=DETERMINISTIC_MATURE`, but must use the overall registry status for `DOMAIN_MATURITY`.
+
 ## Path-specific evidence rule
 
 Overall maturity is not the same as render-path evidence. A candidate domain may have a strong deterministic-vector/overlay path while a generative-only path remains weak. The QA report may state path-specific evidence, but MUST NOT upgrade the overall maturity unless the promotion rule is satisfied.
+
+## TIME note
+
+TIME arithmetic/validation rules are deterministic and mature, but the release matrix does not yet document the required ≥10 actual rendered worksheet audits. Therefore the overall TIME domain is conservatively `PRODUCTION_CANDIDATE` until that evidence is recorded.
 
 ## Scale-reading note
 
