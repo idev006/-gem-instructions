@@ -1,6 +1,6 @@
 # Output Contract — Activity-Based Elementary Worksheet Generator
 
-Version: 2.0.0
+Version: 2.1.0
 Default mode: `PROMPT_PACKAGE`
 
 ## Required visible section order
@@ -28,6 +28,26 @@ When `SHOW_ANSWER_KEY=NO`, verified answers may not appear as visible worksheet 
 
 For instrument/graph tasks, hidden target metadata may be passed to the render compiler only to construct the correct diagram. It must be clearly marked `RENDER_ONLY_NOT_VISIBLE`.
 
+## Visible-output sanitizer — mandatory final gate
+
+Before returning any visible package to the user, scan the complete assembled output, not only the student blueprint.
+
+When `SHOW_ANSWER_KEY=NO`, the visible package must contain none of the following for the active worksheet:
+
+- verified answers
+- answer vectors/lists
+- solved values in parenthetical notes
+- internal formulas paired with resolved active answers
+- internal blueprint objects containing answer fields
+- QA prose that reveals answers while claiming they are hidden
+
+Allowed exceptions:
+
+- generic examples that are clearly unrelated to the active generated questions
+- non-visible render metadata that never appears in user-visible output
+
+If the sanitizer detects active answers, redact/rebuild before release. `ANSWER_LEAK_QA` cannot PASS merely because the final image prompt is blank; the **entire visible response** must be clean.
+
 ## A. NORMALIZED_WORKSHEET_SPEC
 
 Always include resolved values for:
@@ -39,7 +59,7 @@ Also include active domain parameters that affect correctness.
 Examples:
 
 - scale: max capacity, major/minor division, answer format
-- clock: minute granularity, number/mark mode
+- clock: minute granularity, number/mark mode, clock-reading mode, answer time format
 - ruler: major/minor division, unit mode, zero-start mode
 - thermometer: min/max/interval/unit
 - capacity: max/minor division/unit
@@ -61,8 +81,15 @@ Examples:
 ### Dial scale
 `ID | OBJECT | DIAL_TEMPLATE_ID | NEEDLE_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
 
-### Clock
+### Clock — single reading
 `ID | CLOCK_TEMPLATE_ID | HAND_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
+
+### Clock — day/night paired reading
+One question = one clock + two blank response fields.
+
+`ID | CLOCK_TEMPLATE_ID | HAND_TARGET_RELATION(RENDER_ONLY) | DAY_ANSWER_RENDER | NIGHT_ANSWER_RENDER`
+
+The day/night verified values remain internal. Do not duplicate the clock face merely to produce the second answer field.
 
 ### Ruler
 `ID | OBJECT | START_MARK | END_MARK/ENDPOINT_RELATION(RENDER_ONLY) | ANSWER_RENDER`
@@ -85,6 +112,8 @@ Must specify:
 - illustration/decorative zones
 - domain-specific minimum instrument/graph size
 - pagination trigger
+
+For paired-response questions, reserve all required response lines inside each question region before decoration is placed.
 
 If domain minimum readability cannot fit, layout must paginate rather than shrink/distort.
 
@@ -109,6 +138,12 @@ When educational geometry exists:
 `NO_PERSPECTIVE_DISTORTION` when perspective changes the reading
 `VISUAL_QA_REQUIRED=YES` unless geometry is deterministically overlaid and verified
 
+For clock day/night pairing:
+
+`ONE_CLOCK_PER_QUESTION=YES`
+`TWO_RESPONSE_FIELDS_PER_QUESTION=YES`
+`DAY_NIGHT_MAPPING_DETERMINISTIC=YES`
+
 ## E. QA_REPORT
 
 Global gates:
@@ -120,6 +155,7 @@ Global gates:
 `CALCULATION_QA`
 `CONSTRAINT_QA`
 `ANSWER_LEAK_QA`
+`VISIBLE_OUTPUT_SANITIZER_QA`
 `DUPLICATE_QA`
 `THAI_QA`
 `LAYOUT_QA`
@@ -133,7 +169,7 @@ Example:
 
 ```text
 DOMAIN = MEASUREMENT_WEIGHT
-DOMAIN_MATURITY = PRODUCTION_HARDENED
+DOMAIN_MATURITY = PRODUCTION_CANDIDATE
 CENTER_PIVOT_QA = PASS
 TICK_SPACING_QA = PASS
 NEEDLE_TARGET_QA = PASS
@@ -159,6 +195,8 @@ Must be self-contained and include:
 
 When `SHOW_ANSWER_KEY=NO`, answers must not be visible anywhere.
 
+For clock day/night paired mode, the final prompt must explicitly state that each question has one analog clock face and two blank answer fields labelled day/night; do not create two clocks unless explicitly requested.
+
 ## Answer-key behavior
 
 Default when `SHOW_ANSWER_KEY=YES`:
@@ -180,6 +218,12 @@ If an actual image/PDF is rendered, append a `POST_RENDER_QA` result when possib
 - cropping/overlap
 - photocopy usability
 
+For clock day/night paired mode also verify:
+
+- exactly one instructional clock per question
+- exactly two response fields per question
+- day/night labels are clearly associated with the same clock
+
 A prompt may pass while a rendered image fails. Classroom release requires the rendered artifact to pass applicable post-render checks.
 
 ## Revision contract
@@ -192,6 +236,7 @@ Mutate normalized data first, then rebuild affected views.
 - count → regenerate content/distribution/pagination
 - key toggle → rebuild student/key views
 - instrument capacity/resolution → regenerate all target relations and geometry
+- clock reading mode SINGLE↔DAY_NIGHT_PAIR → preserve/validate clock targets as appropriate, rebuild answer schema and layout, rerun clock/answer-leak QA
 - graph dataset → regenerate visualization and dependent questions
 
 Never patch only final prompt prose while canonical data remains inconsistent.
