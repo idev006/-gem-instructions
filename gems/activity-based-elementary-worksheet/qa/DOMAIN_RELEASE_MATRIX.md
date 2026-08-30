@@ -1,6 +1,6 @@
 # Domain Release Matrix
 
-Version: 1.4.0
+Version: 1.5.0
 Compatible Gem baseline: 2.6.x
 Status: Release-evidence SSOT
 
@@ -12,6 +12,8 @@ Status: Release-evidence SSOT
 | MEASUREMENT_WEIGHT | YES | YES | YES | 10 deterministic-overlay worksheets; 100/100 dials pass; full hybrid/generative evidence incomplete | PRODUCTION_CANDIDATE |
 | MEASUREMENT_LENGTH | YES | YES | YES | LIMITED; 2.6 nonzero-start/conversion expansion not yet fully audited | PRODUCTION_CANDIDATE |
 | MEASUREMENT_DISTANCE | YES | contextual geometry optional | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
+| MEASUREMENT_ANGLE | YES | YES for protractor | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
+| MEASUREMENT_PERIMETER_AREA | YES for supported figure grammar | diagram/data rules | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
 | MEASUREMENT_TEMPERATURE | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_CAPACITY | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_VOLUME | YES for rectangular-prism/simple composite grammar | diagram/data rules | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
@@ -82,23 +84,29 @@ See `qa/KAN_V2_01_SCALE_RENDER_AUDIT_2026-08-30.md`.
 
 The following 2.6 capabilities have deterministic prompt rules/regressions but **must not be promoted solely from documentation changes**:
 
+- hours/minutes/seconds conversion and second-precision time tasks
 - mixed-unit length conversion/arithmetic
 - nonzero ruler starts
 - multi-segment/round-trip/route-comparison distance
+- angle/protractor reading
+- perimeter/area/circle measurement and squared-unit conversion
 - weight arithmetic/conversion
 - capacity arithmetic/conversion
 - rectangular-prism/simple composite rectangular-prism volume
+- cm³/dm³/m³ conversion and capacity-volume relations
 
 They remain `PRODUCTION_CANDIDATE` until the promotion evidence above is recorded.
 
 ## Current priority backlog
 
-1. TIME: audit ≥10 actual DOCUMENT_FIRST/HYBRID worksheets under 2.6.x.
+1. TIME: audit ≥10 actual DOCUMENT_FIRST/HYBRID worksheets including second-unit tasks.
 2. CLOCK: actual-render audit including half-hour, 5-minute and DAY_NIGHT_PAIR cases.
 3. SCALE: full hybrid generative-context + deterministic-dial audit.
-4. LENGTH: print/audit ruler 1 mm spacing, zero/nonzero starts and mixed-unit prompt outputs.
-5. DISTANCE: audit 10 text/document worksheets including asymmetric round trips and route comparison.
-6. TEMPERATURE/CAPACITY: actual graduation/level/meniscus audits.
-7. VOLUME: audit diagrams, dimension-label fidelity and composite decomposition prompts/artifacts.
-8. DATA_READING: deterministic graph/table overlay audits.
-9. reusable deterministic reference templates for learner-read instruments.
+4. LENGTH: ruler 1 mm spacing, zero/nonzero starts and mixed-unit outputs.
+5. DISTANCE: 10 text/document worksheets including asymmetric round trips and route comparison.
+6. ANGLE: 10 protractor worksheets covering left/right zero baselines and inner/outer scale ambiguity.
+7. PERIMETER/AREA: 10 worksheets covering formula/diagram fidelity, squared units and circle π policy.
+8. TEMPERATURE/CAPACITY: actual graduation/level/meniscus audits.
+9. VOLUME: diagrams, dimension-label fidelity, cubic-unit conversion and composite decomposition.
+10. DATA_READING: deterministic graph/table overlay audits.
+11. reusable deterministic reference templates for learner-read instruments.
