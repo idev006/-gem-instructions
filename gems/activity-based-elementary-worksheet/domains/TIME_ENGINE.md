@@ -1,7 +1,9 @@
 # TIME_ENGINE — Elapsed-Time Worksheet Rules
 
-Version: 1.0.0
-Status: PRODUCTION_HARDENED
+Version: 1.0.1
+Status: PRODUCTION_CANDIDATE
+Registry authority: `domains/DOMAIN_REGISTRY.md`
+Academic rules status: DETERMINISTIC_MATURE
 
 Applies to elapsed time from start/end times and closely related duration tasks.
 
@@ -36,6 +38,16 @@ Derive:
 `hours = duration // 60`
 `minutes = duration % 60`
 
+For forward transformation:
+
+`end_minutes = start_minutes + duration_minutes`
+
+For reverse transformation:
+
+`start_minutes = end_minutes - duration_minutes`
+
+Normalize into the active day/clock rules and reject forbidden crossings.
+
 ## Invariants
 
 - valid hour/minute syntax
@@ -45,8 +57,9 @@ Derive:
 - duration within min/max
 - no forbidden midnight crossing
 - whole-hour mode requires `duration % 60 == 0`
-- active minute granularity must be respected
+- active minute granularity respected
 - rendered unit matches expected response
+- forward/reverse transformation recomputes to the original relation
 
 ## Difficulty defaults
 
@@ -60,12 +73,30 @@ HARD: mixed minutes/regrouping/cross-hour or cross-noon while remaining age appr
 
 Choose valid duration first, then start time, derive end time, independently recompute, then attach an age-appropriate activity.
 
+For reverse question types, still generate from a canonical verified time relation first, then expose only the requested givens.
+
 ## Student rendering
 
-When answer key is off, show only activity, start/end values, blank response field, and required units. Hidden verified duration remains internal.
+When answer key is off, show only required activity/givens and blank response fields. Hidden verified values remain internal and must not appear in notes, QA prose, or parentheticals in the visible package.
+
+## Render-path guidance
+
+Elapsed-time worksheets are normally text/table/numeric-heavy. Preferred path:
+
+`DOCUMENT_FIRST` or `HYBRID`
+
+Do not default to generative image-only rendering for Thai text-heavy tables. Illustrations are optional secondary decoration.
+
+## One-page guidance
+
+Apply the global `ONE_PAGE_PREFERRED=YES` policy. For typical 10-question A4 tasks, first try a compact deterministic table or efficient row layout. Preserve readable text and writable answer cells. If `ONE_PAGE_LOCK=ON` and a valid one-page layout is impossible, fail feasibility rather than shrinking below readability.
 
 ## QA
 
-`TIME_PARSE_QA, DURATION_QA, BOUNDS_QA, INTERVAL_QA, CROSSING_QA, UNIT_QA, ANSWER_LEAK_QA`
+`TIME_PARSE_QA, DURATION_QA, BOUNDS_QA, INTERVAL_QA, CROSSING_QA, UNIT_QA, FORWARD_REVERSE_QA, ANSWER_LEAK_QA, ONE_PAGE_FEASIBILITY_QA, RENDER_PATH_QA`
 
-Any incorrect duration blocks release.
+Any incorrect time relation blocks release.
+
+## Maturity note
+
+The academic calculation layer is deterministic and mature. Overall domain maturity remains `PRODUCTION_CANDIDATE` until the actual-render evidence threshold in `qa/DOMAIN_RELEASE_MATRIX.md` is documented.
