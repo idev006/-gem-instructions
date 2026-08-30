@@ -1,108 +1,176 @@
-# LENGTH_READING_ENGINE — Ruler / Length Reading
+# LENGTH_READING_ENGINE — Ruler / Length / Distance Rules
 
-Version: 1.2.0
+Version: 1.3.0
 Status: PRODUCTION_CANDIDATE
-Requires: `INSTRUMENT_READING_ENGINE.md`
+Owning worker: `W04_LENGTH_DISTANCE`
+Requires `INSTRUMENT_READING_ENGINE.md` only when a learner reads a ruler/scale.
 
-## Learning goal
+## 1. Learning scope
 
-Student reads an object's length from a ruler or number-line style measuring scale without confusing the ruler edge with the zero graduation.
+Supports:
 
-## Core parameters
+- ruler reading
+- zero-start and nonzero-start measurement
+- length addition/subtraction/difference/comparison
+- mm/cm/m/km conversion
+- distance total/difference/round trip/multi-segment/route comparison
+- grade-appropriate measurement word problems
 
-`SCALE_MIN_CM, MAX_LENGTH_CM, MAJOR_DIVISION_CM, MINOR_DIVISION_CM, UNIT_MODE=CM|MM|CM_AND_MM, START_POSITION_MODE=ZERO|NONZERO_ADVANCED, TARGET_LENGTHS, ANSWER_FORMAT`
+Speed/rate is outside this engine unless explicitly requested through another rule set.
 
-Elementary metric defaults:
+## 2. Core parameters
 
-- `SCALE_MIN_CM = 0`
-- major division = `1 cm`
-- minor division = `0.1 cm = 1 mm` when millimetre reading is intended
+`LENGTH_SUBDOMAIN, SCALE_MIN_CM, SCALE_MAX_CM, MAJOR_DIVISION_CM, MINOR_DIVISION_CM, UNIT_SET, START_POSITION_MODE, TARGET_LENGTHS, LENGTH_TASK_TYPE, DISTANCE_TASK_TYPE, DISTANCE_CONTEXT, ANSWER_FORMAT`
+
+## 3. Exact metric relations
+
+`10 mm = 1 cm`
+`100 cm = 1 m`
+`1000 m = 1 km`
+
+Canonical arithmetic base unit: **millimetres** for exact integer metric length calculations unless a decimal-safe representation is explicitly used.
+
+Before adding/subtracting/comparing mixed units:
+
+1. convert every quantity to one base unit;
+2. perform exact arithmetic;
+3. independently verify;
+4. convert result to requested display format.
+
+Never add `m + cm` or `km + m` as raw numerals without unit conversion.
+
+## 4. Ruler geometry
+
+Elementary defaults when ruler reading is intended:
+
+- `SCALE_MIN_CM=0`
+- major division `1 cm`
+- minor division `0.1 cm = 1 mm` when mm reading is taught
 - beginner object start = exact zero graduation
 
-## Geometry invariants
+Geometry invariants:
 
-- ruler baseline straight and front-facing
-- no perspective, skew, stretch or non-uniform scale
-- graduation spacing uniform
-- zero graduation explicit and visually distinct from physical ruler edge
-- centimetre marks stronger/longer than millimetre marks
+- straight front-facing baseline
+- no perspective/skew/stretch
+- uniform graduation spacing
+- zero graduation visually distinct from physical ruler edge
+- cm marks stronger/longer than mm marks
 - object start/end guides unambiguous
-- no decorative art covering endpoint, zero mark or labels
-- identical scale geometry for repeated questions unless the task explicitly changes scale
+- no decoration that resembles graduations
+- repeated rulers share one template unless task explicitly changes scale
 
-## Deterministic graduation structure
+## 5. Linear graduation topology
 
-For active ruler range `SCALE_MIN_CM` to `SCALE_MAX_CM` with `d = MINOR_DIVISION_CM`:
+For scale min/max and minor interval `d`:
 
-`EXPECTED_INTERVAL_COUNT = round((SCALE_MAX_CM - SCALE_MIN_CM) / d)`
-
+`EXPECTED_INTERVAL_COUNT = round((SCALE_MAX-SCALE_MIN)/d)`
 `EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
 
-Require exact representability within tolerance.
+Require exact representability.
 
-For the canonical millimetre profile:
+Canonical mm profile:
 
-- `1 cm = 10 mm`
-- between adjacent whole-centimetre values there are exactly **10 equal intervals**
-- including both endpoints, that 1 cm span contains **11 graduation positions**
-- whole-centimetre marks are major ticks; internal millimetre positions are minor ticks
+- 1 cm = 10 equal intervals
+- 1 cm endpoint-inclusive span = 11 graduation positions
 
-A ruler that visually shows 9, 11, or another number of intervals per centimetre is academically wrong even if spacing looks regular.
+A ruler showing 9, 11, or another number of **intervals** per cm is academically wrong.
 
-## Deterministic mapping
+## 6. Ruler target mapping
 
-For any active minor division `d = MINOR_DIVISION_CM`:
+`tick_index(value)=round((value-SCALE_MIN)/d)`
 
-`tick_index(value) = round((value - SCALE_MIN_CM) / d)`
+Require:
 
-Require exact representability:
+`abs(value-(SCALE_MIN+tick_index*d)) < tolerance`
 
-`abs(value - (SCALE_MIN_CM + tick_index*d)) < tolerance`
+Zero-start:
 
-For zero-start tasks:
+`length=end_value`
 
-`length = end_value - 0`
+Nonzero-start:
 
-For nonzero-start tasks:
+`length=end_value-start_value`
 
-`length = end_value - start_value`
+Both endpoints must be valid graduations in exact-reading mode.
 
-and both start/end must be valid graduations.
+Do not confuse measurement start with the physical ruler edge.
 
-Never assume `tick_index = length_mm` unless `d = 0.1 cm` and `SCALE_MIN_CM = 0`.
+## 7. Length calculation
 
-## Critical misconception guard
+Task types:
 
-The academic measurement begins at the selected start graduation, normally zero, not automatically at the physical edge of the ruler.
+`ADD | SUBTRACT | DIFFERENCE | COMPARE | CONVERT`
 
-If an object is offset from zero in an advanced task, students must read both endpoints or the start marker must be explicit.
+For subtraction in nonnegative elementary mode, generate values that produce a valid nonnegative result unless negatives are explicitly taught.
 
-## Layout/readability
+Mixed-unit answer formats may be generated after exact base-unit computation, e.g. `2 m 35 cm`.
 
-The smallest active graduation must be distinguishable after printing/photocopying.
+## 8. Distance calculation
 
-- reserve a rectangular instrument zone with fixed aspect ratio
-- preserve the exact graduation count before decoration
-- prefer fewer questions or pagination over compressing/merging 1 mm ticks
-- labels may not collide with ticks or object endpoints
-- object must not visually float above an ambiguous start/end location
+Task types:
 
-## Render-only target metadata
+`TOTAL | DIFFERENCE | ROUND_TRIP | MULTI_SEGMENT | ROUTE_COMPARE | CONVERT`
 
-For each item compile:
+Rules:
+
+- total = sum verified segment distances after unit normalization
+- difference = absolute or directed difference according to wording; default elementary comparison uses nonnegative absolute difference
+- same-route round trip = `2×one_way_distance` only when the same route is stated/implied clearly
+- asymmetric outbound/return = `outbound + return`; do not assume equality
+- multi-segment = sum each segment exactly once
+- route compare = independently total each route, then compare/difference
+
+Map-style illustrations are contextual unless scale-map mathematics is explicitly requested; do not invent a map scale.
+
+## 9. Grade progression
+
+Follow `MEASUREMENT_COVERAGE_P1_P6.md`.
+
+Conservative defaults:
+
+- P1: whole-unit/direct comparison; no complex conversion
+- P2: clear cm/simple m contexts
+- P3: cm/mm ruler and basic distance arithmetic
+- P4: integer mm/cm/m/km conversion, nonzero starts, multi-segment distance
+- P5: mixed-unit/decimal conversion where appropriate, multi-step distance
+- P6: multi-step conversion + route reasoning
+
+## 10. Renderer-only ruler metadata
+
+For each ruler item compile internally:
 
 `START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT, EXPECTED_INTERVAL_COUNT, EXPECTED_TICK_POSITION_COUNT`
 
-These values control geometry but answers remain invisible when answer key is off.
+Put exact geometry only in teacher-visible renderer metadata marked `RENDER_ONLY_NOT_FOR_WORKSHEET`. Do not expose target values/indices in Student Blueprint.
 
-## Post-render QA
+## 11. Canonical labels
 
-Inspect every ruler individually. Count the active intervals and graduation positions rather than judging only visual regularity.
+Ruler labels/graduations required by the configured scale are legitimate instructional data and must remain visible. Leak guards prohibit target-answer callouts, not canonical ruler labels.
 
-Critical failures include missing/duplicated millimetre marks, wrong count per centimetre, a major mark not aligned to its value, start/end placed between intended ticks, or decorative marks that could be mistaken for graduations.
+## 12. Layout/readability
 
-## QA
+The smallest active graduation must remain distinguishable after print/photocopy.
 
-`RULER_STRAIGHT_QA, SCALE_RANGE_QA, ZERO_ALIGNMENT_QA, INTERVAL_COUNT_QA, TICK_POSITION_COUNT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, START_ENDPOINT_QA, END_ENDPOINT_QA, VALUE_QA, UNIT_QA, MINIMUM_SIZE_QA`
+- reserve fixed-aspect instrument zone
+- preserve exact graduation count before decoration
+- reduce decoration before ruler size
+- if one-page lock cannot preserve the scale, fail feasibility rather than merge/omit ticks
 
-Incorrect start reference, endpoint, interval count, tick count, spacing, or value is a critical blocker.
+## 13. QA
+
+Prompt-phase gates:
+
+`PROMPT_LENGTH_UNIT_COMPATIBILITY_QA`
+`PROMPT_LENGTH_CONVERSION_QA`
+`PROMPT_LENGTH_CALCULATION_QA`
+`PROMPT_DISTANCE_RELATION_QA`
+`PROMPT_RULER_TOPOLOGY_QA`
+`PROMPT_RULER_ZERO_REFERENCE_QA`
+`PROMPT_RULER_ENDPOINT_QA`
+`PROMPT_RULER_TARGET_REPRESENTABILITY_QA`
+`PROMPT_RULER_LABEL_PRESERVATION_QA`
+`PROMPT_MEASUREMENT_GRADE_APPROPRIATENESS_QA`
+
+Artifact checks run only after render and inspect every ruler individually.
+
+Critical blockers include wrong conversion/arithmetic, wrong start reference, wrong interval/position count, missing/extra graduation, between-tick target in exact mode, or misleading distance relation.
