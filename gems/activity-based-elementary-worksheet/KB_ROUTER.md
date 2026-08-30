@@ -1,113 +1,140 @@
 # KB Router — Activity-Based Elementary Worksheet Generator
 
-Version: 1.0.0
-Compatible Gem baseline: 2.3.2
-Status: Canonical knowledge-routing policy
+Version: 2.6.0-LTS
+Compatible Gem baseline: 2.6.x
+Status: Canonical worker-routing policy
 
 ## 1. Purpose
 
-This file tells the Gem which uploaded Knowledge files are authoritative for each request. Do not treat every KB file as equally relevant. Select the smallest complete dependency set that preserves correctness.
+Route each request to the smallest complete Specialist Worker set. Do not blend every Knowledge file indiscriminately.
 
-## 2. Always-required KB
+## 2. Base worker set
 
-Every production request uses:
+Required production installation:
 
-1. `GEM_INSTRUCTIONS_PRODUCTION.md` — core mission, pipeline, global release rules
-2. `OUTPUT_CONTRACT.md` — visible package/final-prompt contract
-3. `KB_ROUTER.md` — dependency routing and precedence
-4. `KB_MANIFEST.md` — compatibility/version inventory
-5. `policies/PARAMETER_POLICY.md` — normalization/default policy
-6. `domains/DOMAIN_REGISTRY.md` — domain routing + overall maturity SSOT
+- `W01_ACADEMIC_CONTENT`
+- `W02_TIME_CLOCK`
+- `W03_WEIGHT_SCALE`
+- `W04_LENGTH_DISTANCE`
+- `W05_TEMPERATURE_CAPACITY_VOLUME`
+- `W06_MONEY_CALENDAR_DATA`
+- `W07_INSTRUMENT_AUDITOR`
+- `W08_LAYOUT_RENDER_THAI`
+- `W09_QA_RELEASE`
 
-If any required file is missing or known incompatible, set `KB_COMPATIBILITY_QA=FAIL` and do not claim production-ready prompt release.
+Optional slot 10: `W10_HOTFIX_OVERRIDE`.
 
-## 3. Domain route table
+W08 and W09 apply to every production request. W07 applies only when learner-read geometry/axis/instrument state carries academic meaning.
 
-| Detected domain | Load/apply |
+## 3. Route table
+
+| Request family | Worker route |
 |---|---|
-| TIME | `domains/TIME_ENGINE.md` |
-| TIME_CLOCK | `domains/CLOCK_READING_ENGINE.md` + `domains/INSTRUMENT_READING_ENGINE.md` |
-| MEASUREMENT_WEIGHT | `domains/SCALE_READING_ENGINE.md` + `domains/INSTRUMENT_READING_ENGINE.md` |
-| MEASUREMENT_LENGTH | `domains/LENGTH_READING_ENGINE.md` + `domains/INSTRUMENT_READING_ENGINE.md` |
-| MEASUREMENT_TEMPERATURE | `domains/TEMPERATURE_READING_ENGINE.md` + `domains/INSTRUMENT_READING_ENGINE.md` |
-| MEASUREMENT_CAPACITY | `domains/CAPACITY_READING_ENGINE.md` + `domains/INSTRUMENT_READING_ENGINE.md` |
-| MONEY | `domains/MONEY_ENGINE.md` |
-| CALENDAR | `domains/CALENDAR_ENGINE.md` |
-| DATA_READING | `domains/TABLE_GRAPH_READING_ENGINE.md` |
-| WORD_PROBLEM_GENERIC | core files only unless another domain is actually present |
+| arithmetic / number operations | W01 + W08 + W09 |
+| color-by-code arithmetic | W01 + W08 + W09 |
+| Thai literacy / spelling | W01 + W08 + W09 |
+| elapsed time / start-end-duration | W02 + W08 + W09 |
+| analog clock reading | W02 + W07 + W08 + W09 |
+| weight arithmetic/comparison/conversion | W03 + W08 + W09 |
+| dial scale reading | W03 + W07 + W08 + W09 |
+| length arithmetic/conversion | W04 + W08 + W09 |
+| distance total/difference/round trip | W04 + W08 + W09 |
+| ruler reading | W04 + W07 + W08 + W09 |
+| temperature calculation/conversion context | W05 + W08 + W09 |
+| thermometer reading | W05 + W07 + W08 + W09 |
+| capacity arithmetic/conversion | W05 + W08 + W09 |
+| graduated container / meniscus | W05 + W07 + W08 + W09 |
+| rectangular-prism volume | W05 + W08 + W09 |
+| money / calendar / tables | W06 + W08 + W09 |
+| pictograph / bar graph | W06 + W08 + W09; add W07 when exact visual scale geometry is learner-read |
 
-## 4. Conditional QA KB
+Mixed-domain worksheets select every owning academic worker, then W08/W09, plus W07 if any selected item contains learner-read academic geometry.
 
-Always apply:
+## 4. Academic ownership
 
-- `qa/ACCEPTANCE_TESTS.md`
-- `qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md`
+- W01 owns general academic content that no more specialized worker owns.
+- W02 owns time/clock formulas.
+- W03 owns weight/scale formulas and unit rules.
+- W04 owns ruler/length/distance and length-unit conversion.
+- W05 owns temperature/capacity/volume and related unit rules.
+- W06 owns money/calendar/data mappings.
+- W07 audits shared geometry but does not invent domain target values.
+- W08 owns layout/render/Thai/print/theme, not academic formulas.
+- W09 owns integration/release QA, not academic formulas.
 
-Apply `qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md` whenever the request contains a learner-read visual instrument or any failure family covered by that suite.
+`WORKER_OWNERSHIP_QA=FAIL` if a worker overrides another worker's owned academic rule without an explicit compatible hotfix.
 
-Apply domain-specific render/regression files when they exist and match the selected domain, e.g. scale-reading render tests for `MEASUREMENT_WEIGHT`.
+## 5. Measurement routes
 
-`qa/DOMAIN_RELEASE_MATRIX.md` is required whenever maturity/release-readiness is reported.
+Measurement coverage is documented in `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
-## 5. Routing sequence
+Examples:
 
-Use this order:
+- `อ่านไม้บรรทัด` → W04 + W07 + W08 + W09
+- `บวกความยาว 2 เมตร 35 เซนติเมตร` → W04 + W08 + W09
+- `ระยะทางไปกลับ` → W04 + W08 + W09
+- `แปลง 3.2 กิโลเมตรเป็นเมตร` → W04 + W08 + W09
+- `อ่านนาฬิกา 10:30` → W02 + W07 + W08 + W09
+- `หาระยะเวลา` → W02 + W08 + W09
+- `อ่านตราชั่ง kg/ขีด` → W03 + W07 + W08 + W09
+- `แปลง kg เป็น g` → W03 + W08 + W09
+- `อ่าน 750 mL` → W05 + W07 + W08 + W09
+- `แปลง L เป็น mL` → W05 + W08 + W09
+- `ปริมาตรทรงสี่เหลี่ยมมุมฉาก` → W05 + W08 + W09
 
-`REQUEST → CORE/PARAMETER POLICY → DOMAIN_REGISTRY → SELECT DOMAIN ENGINE(S) → INSTRUMENT ENGINE IF REQUIRED → SELECT QA/REGRESSION KB → COMPILE/QA`
+## 6. Precedence
 
-Do not ask the teacher to choose technical engine filenames when the domain is unambiguous.
+When rules conflict:
 
-## 6. Precedence rules
+1. explicit valid user requirement, unless academically unsafe/contradictory
+2. `GEM_INSTRUCTIONS_PRODUCTION.md` for product/global architecture
+3. `domains/DOMAIN_REGISTRY.md` for domain and maturity
+4. owning Specialist Worker for academic rules
+5. W07 for cross-instrument geometry invariants
+6. `policies/PARAMETER_POLICY.md` for defaults
+7. W08 for layout/render/Thai/print
+8. `OUTPUT_CONTRACT.md` for packaging
+9. W09/QA suites for release gating
+10. user guide/README for explanation only
 
-When rules conflict, use this precedence:
+QA may make release stricter but may not redefine an owning worker's formula.
 
-1. explicit valid user requirement, unless academically unsafe or contradictory
-2. `GEM_INSTRUCTIONS_PRODUCTION.md` for product mission/global safety
-3. `domains/DOMAIN_REGISTRY.md` for domain route and overall maturity
-4. selected domain engine for domain-specific academic rules
-5. `domains/INSTRUMENT_READING_ENGINE.md` for cross-instrument geometry rules
-6. `policies/PARAMETER_POLICY.md` for defaults/normalization
-7. `OUTPUT_CONTRACT.md` for visible packaging/final-prompt serialization
-8. applicable QA/regression suites for release gating
-9. `USER_GUIDE.md` / README for explanatory guidance only
+## 7. High-risk visual route
 
-Special rule: if a domain engine and `DOMAIN_REGISTRY.md` disagree on overall maturity, the registry wins.
-
-Special rule: QA/regression files may make a release condition stricter; they do not redefine academic formulas owned by the domain engine.
-
-## 7. Mixed-domain requests
-
-If a worksheet genuinely combines multiple domains:
-
-- select every necessary domain engine;
-- include `INSTRUMENT_READING_ENGINE.md` if any selected domain is a visual instrument;
-- keep one canonical normalized spec;
-- validate each item against its owning domain;
-- run all applicable QA suites;
-- do not let one domain's defaults silently overwrite another's units/geometry.
-
-If mixed-domain complexity threatens readability or one-page feasibility, correctness/readability outrank one-page density.
-
-## 8. High-risk visual route
-
-For clocks, dial scales, rulers, thermometers, capacity vessels, and educational graphs whose visual state encodes the question:
+Learner-read visual items require:
 
 `PER_ITEM_RENDER_STATE_REQUIRED=YES`
 `TARGET_ALIGNMENT_REQUIRED=YES`
 
-Each item state must serialize:
+Each item state:
 
-`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`.
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
 
-## 9. KB routing QA
+Mark renderer-only data `RENDER_ONLY_NOT_FOR_WORKSHEET`.
+
+## 8. Hotfix route
+
+W10 may override one narrow rule only when it declares:
+
+`HOTFIX_ID`
+`APPLIES_TO_BASELINE=2.6.x`
+`SCOPE`
+`TARGET_WORKER`
+`REPLACED_RULE`
+`NEW_RULE`
+`REGRESSION_TEST`
+
+Reject broad hotfixes that alter architecture, visibility model, worker schema, or multiple unrelated domains.
+
+## 9. Routing QA
 
 `KB_ROUTE_QA=PASS` only if:
 
-- primary domain is correctly selected;
-- all required engines are available;
-- visual instrument tasks include the instrument engine;
-- applicable QA/regression KB is selected;
-- no irrelevant engine overrides the selected domain;
+- primary/mixed domains are correctly detected;
+- all owning workers are selected;
+- W07 is present for learner-read geometry;
+- W08/W09 are present;
+- no unrelated worker overrides the route;
 - precedence is respected.
 
-`KB_COMPATIBILITY_QA=PASS` only if the installed file set is compatible according to `KB_MANIFEST.md`.
+`KB_COMPATIBILITY_QA=PASS` only if installed worker IDs/schema/baseline match `KB_MANIFEST.md`.
