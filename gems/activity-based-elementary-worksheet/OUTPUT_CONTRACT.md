@@ -1,10 +1,9 @@
 # Output Contract — Activity-Based Elementary Worksheet Generator
 
-Version: 1.1.0
-
+Version: 2.0.0
 Default mode: `PROMPT_PACKAGE`
 
-## Required section order
+## Required visible section order
 
 1. `NORMALIZED_WORKSHEET_SPEC`
 2. `STUDENT_CONTENT_BLUEPRINT`
@@ -13,179 +12,186 @@ Default mode: `PROMPT_PACKAGE`
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-The user may explicitly request `PROMPT_ONLY` or `BLUEPRINT_ONLY`. Hidden validation must still run even when intermediate sections are omitted.
+`PROMPT_ONLY` and `BLUEPRINT_ONLY` may hide sections, but all hidden validation still runs.
 
-## Internal vs user-visible data
+## Internal views
 
-The Gem maintains two views:
+### INTERNAL_VERIFIED_BLUEPRINT
 
-- `INTERNAL_VERIFIED_BLUEPRINT` — contains hidden verified answers and QA metadata.
-- `STUDENT_CONTENT_BLUEPRINT` — contains only student-facing givens, labels, icons, units, and blank response areas.
+Contains hidden answers, formulas, target values, geometry metadata, validation status, and domain-specific render metadata.
 
-When `SHOW_ANSWER_KEY = NO`, verified answers MUST NOT appear in the user-visible blueprint or final student image prompt unless the user explicitly asks to inspect QA answers.
+### STUDENT_CONTENT_BLUEPRINT
 
-This separation is a critical release requirement.
+Contains only student-visible givens/labels/diagrams and blank response areas.
+
+When `SHOW_ANSWER_KEY=NO`, verified answers may not appear as visible worksheet content.
+
+For instrument/graph tasks, hidden target metadata may be passed to the render compiler only to construct the correct diagram. It must be clearly marked `RENDER_ONLY_NOT_VISIBLE`.
 
 ## A. NORMALIZED_WORKSHEET_SPEC
 
-Include effective values that govern the output, including when applicable:
+Always include resolved values for:
 
-```text
-GRADE_LEVEL
-SUBJECT
-DOMAIN
-TOPIC
-SUBTOPIC
-LEARNING_OBJECTIVE
-QUESTION_TYPE
-QUESTION_COUNT
-DIFFICULTY
-LANGUAGE
-PAGE_SIZE
-ORIENTATION
-COLOR_MODE
-SHOW_STUDENT_HEADER
-SHOW_QUESTION_NUMBER
-SHOW_ANSWER_KEY
-AUTO_PAGINATION
-VISUAL_THEME
-TEXT_RENDER_MODE
-```
+`GRADE_LEVEL, SUBJECT, DOMAIN, DOMAIN_MATURITY, TOPIC, SUBTOPIC, LEARNING_OBJECTIVE, QUESTION_TYPE, QUESTION_COUNT, DIFFICULTY, LANGUAGE, PAGE_SIZE, ORIENTATION, PAGE_COUNT, COLOR_MODE, SHOW_ANSWER_KEY, TEXT_RENDER_MODE`
 
-For time worksheets include active time constraints that materially affect generation.
-
-## B. STUDENT_CONTENT_BLUEPRINT
-
-For `START_TIME_END_TIME_TO_DURATION`, use columns equivalent to:
-
-```text
-ID | ACTIVITY | ICON | START_TIME | END_TIME | ANSWER_RENDER | UNIT_RENDER
-```
-
-Requirements:
-
-- exactly one row per question;
-- all source values already validated internally;
-- response field is blank when answer key is disabled;
-- no hidden answer column in student-facing output;
-- no internal QA metadata leaked into render data.
-
-## C. INTERNAL_VERIFIED_BLUEPRINT
-
-Not returned by default when `SHOW_ANSWER_KEY = NO`.
-
-Internal structure should retain values equivalent to:
-
-```text
-ID | START_TIME | END_TIME | VERIFIED_DURATION_MINUTES | VERIFIED_ANSWER_DISPLAY | VALIDATION_STATUS
-```
-
-It is authoritative for calculation QA and may be exposed only when the user explicitly requests answer/QA inspection or when generating a separate answer key.
-
-## D. LAYOUT_BLUEPRINT
-
-Must specify:
-
-- page size and orientation;
-- page count or pagination plan;
-- student-header area;
-- title/instruction area;
-- question-row structure;
-- density;
-- answer-space requirements;
-- illustration/decorative zones;
-- safe-margin behavior;
-- treatment for multi-component answers.
-
-## E. RENDER_CONSTRAINTS
-
-At minimum:
-
-```text
-CONTENT_LOCK = ON
-THAI_TEXT_LOCK = ON
-NUMERIC_VALUE_LOCK = ON
-QUESTION_COUNT_LOCK = ON
-ANSWER_LEAK_GUARD = ON
-STUDENT_ANSWER_BLANKS = EMPTY when SHOW_ANSWER_KEY = NO
-NO_EXTRA_QUESTIONS
-NO_OMITTED_QUESTIONS
-NO_CROPPED_TEXT
-NO_TEXT_ILLUSTRATION_OVERLAP
-```
-
-For Thai-heavy worksheets, default `TEXT_RENDER_MODE = HYBRID`, preserving clean text zones for deterministic post-render correction if needed.
-
-## F. QA_REPORT
-
-Show applicable gates compactly:
-
-```text
-INTENT_QA = PASS|FAIL
-DOMAIN_QA = PASS|FAIL
-ACADEMIC_QA = PASS|FAIL
-CALCULATION_QA = PASS|FAIL
-CONSTRAINT_QA = PASS|FAIL
-ANSWER_LEAK_QA = PASS|FAIL
-DUPLICATE_QA = PASS|FAIL
-THAI_QA = PASS|FAIL
-LAYOUT_QA = PASS|FAIL
-PRINT_QA = PASS|FAIL
-PROMPT_QA = PASS|FAIL
-```
-
-A critical FAIL blocks final prompt release until repaired.
-
-## G. FINAL_IMAGE_GENERATION_PROMPT
-
-The final student prompt must be self-contained and contain:
-
-- page specification;
-- target learner and subject;
-- exact title/instruction/header text;
-- exact STUDENT-FACING question data only;
-- exact question count;
-- row anatomy;
-- layout rules;
-- illustration rules;
-- Thai text lock;
-- given-value lock;
-- answer-key behavior;
-- hard negative constraints.
-
-Critical rule:
-
-```text
-If SHOW_ANSWER_KEY = NO, never include VERIFIED_ANSWER values anywhere in the final student image prompt.
-```
-
-The prompt may state expected response units, but must not include the numeric/semantic answer itself.
-
-## Student worksheet vs answer key
-
-When `SHOW_ANSWER_KEY = NO`:
-
-- verified answers exist only internally;
-- student response areas remain blank;
-- student-facing blueprint omits answers;
-- final prompt omits answers completely.
-
-When `SHOW_ANSWER_KEY = YES`:
-
-- keep the student worksheet unsolved;
-- create a separate answer-key page/section by default;
-- only use inline solved responses if explicitly requested.
-
-## Revision contract
-
-A follow-up request first mutates the normalized specification. Then regenerate affected components and rerun dependent QA.
+Also include active domain parameters that affect correctness.
 
 Examples:
 
-- theme change → preserve content; rerun layout/render QA;
-- difficulty change → regenerate relevant question values; rerun domain/calculation/layout QA;
-- orientation change → preserve content; rerun layout/print/prompt QA;
-- question-count change → regenerate IDs/content/pagination; rerun count-dependent QA;
-- answer-key toggle → preserve givens; rebuild student/answer views; rerun answer-leak/prompt QA.
+- scale: max capacity, major/minor division, answer format
+- clock: minute granularity, number/mark mode
+- ruler: major/minor division, unit mode, zero-start mode
+- thermometer: min/max/interval/unit
+- capacity: max/minor division/unit
+- money: currency/question type/price constraints
+- calendar: month/year/week start
+- graph: dataset/axis interval/key
 
-Never patch only final-prompt prose while leaving canonical data inconsistent.
+No optional parameter may remain silently undefined.
+
+## B. STUDENT_CONTENT_BLUEPRINT
+
+Exactly one object/row per question. Schema is domain-specific.
+
+Examples:
+
+### Elapsed time
+`ID | ACTIVITY | START_TIME | END_TIME | ANSWER_RENDER | UNIT_RENDER`
+
+### Dial scale
+`ID | OBJECT | DIAL_TEMPLATE_ID | NEEDLE_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
+
+### Clock
+`ID | CLOCK_TEMPLATE_ID | HAND_TARGET_RELATION(RENDER_ONLY) | ANSWER_RENDER`
+
+### Ruler
+`ID | OBJECT | START_MARK | END_MARK/ENDPOINT_RELATION(RENDER_ONLY) | ANSWER_RENDER`
+
+### Graph/table
+`ID | DATASET_REF | QUESTION_TEXT | ANSWER_RENDER`
+
+Student-facing output must never contain an answer column when the key is off.
+
+## C. LAYOUT_BLUEPRINT
+
+Must specify:
+
+- page size/orientation/page count
+- safe margins
+- header/title/instruction regions
+- question region pattern
+- per-question reserved dimensions
+- answer-space dimensions
+- illustration/decorative zones
+- domain-specific minimum instrument/graph size
+- pagination trigger
+
+If domain minimum readability cannot fit, layout must paginate rather than shrink/distort.
+
+## D. RENDER_CONSTRAINTS
+
+Global minimum:
+
+`CONTENT_LOCK=ON`
+`THAI_TEXT_LOCK=ON`
+`NUMERIC_VALUE_LOCK=ON`
+`QUESTION_COUNT_LOCK=ON`
+`ANSWER_LEAK_GUARD=ON`
+`NO_EXTRA_QUESTIONS`
+`NO_OMITTED_QUESTIONS`
+`NO_CROPPED_TEXT`
+`NO_TEXT_ILLUSTRATION_OVERLAP`
+
+When educational geometry exists:
+
+`GEOMETRY_LOCK=ON`
+`TEMPLATE_LOCK=ON`
+`NO_PERSPECTIVE_DISTORTION` when perspective changes the reading
+`VISUAL_QA_REQUIRED=YES` unless geometry is deterministically overlaid and verified
+
+## E. QA_REPORT
+
+Global gates:
+
+`INTENT_QA`
+`PARAMETER_QA`
+`DOMAIN_ROUTE_QA`
+`ACADEMIC_QA`
+`CALCULATION_QA`
+`CONSTRAINT_QA`
+`ANSWER_LEAK_QA`
+`DUPLICATE_QA`
+`THAI_QA`
+`LAYOUT_QA`
+`READABILITY_QA`
+`PRINT_QA`
+`PROMPT_QA`
+
+Also include domain-specific gates and domain maturity.
+
+Example:
+
+```text
+DOMAIN = MEASUREMENT_WEIGHT
+DOMAIN_MATURITY = PRODUCTION_HARDENED
+CENTER_PIVOT_QA = PASS
+TICK_SPACING_QA = PASS
+NEEDLE_TARGET_QA = PASS
+VISUAL_QA_REQUIRED = YES
+```
+
+A critical FAIL blocks release.
+
+## F. FINAL_IMAGE_GENERATION_PROMPT
+
+Must be self-contained and include:
+
+- page spec
+- target learner/subject/topic/objective
+- exact question count
+- exact student-facing content
+- domain-specific educational geometry/data constraints
+- layout and minimum-size rules
+- illustration rules
+- text/numeric locks
+- blank-answer rule
+- hard negatives
+
+When `SHOW_ANSWER_KEY=NO`, answers must not be visible anywhere.
+
+## Answer-key behavior
+
+Default when `SHOW_ANSWER_KEY=YES`:
+
+- student worksheet remains unsolved
+- separate answer-key page/section is generated
+
+Inline solved worksheets require explicit user request.
+
+## Post-render result contract
+
+If an actual image/PDF is rendered, append a `POST_RENDER_QA` result when possible:
+
+- count
+- text readability
+- value/diagram fidelity
+- geometry accuracy
+- answer leakage
+- cropping/overlap
+- photocopy usability
+
+A prompt may pass while a rendered image fails. Classroom release requires the rendered artifact to pass applicable post-render checks.
+
+## Revision contract
+
+Mutate normalized data first, then rebuild affected views.
+
+- theme-only → preserve academic data
+- difficulty → regenerate academic data
+- orientation → preserve data, rerun layout
+- count → regenerate content/distribution/pagination
+- key toggle → rebuild student/key views
+- instrument capacity/resolution → regenerate all target relations and geometry
+- graph dataset → regenerate visualization and dependent questions
+
+Never patch only final prompt prose while canonical data remains inconsistent.
