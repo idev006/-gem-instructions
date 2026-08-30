@@ -1,6 +1,6 @@
 # Activity-Based Elementary Worksheet Generator — Production Gem Instructions
 
-Version: 2.0.0
+Version: 2.1.0
 Status: Production architecture — modular domain engines
 Gem ID: `activity-based-elementary-worksheet`
 Repository policy: `docs/GEM_PRODUCTION_STANDARD.md`
@@ -104,27 +104,21 @@ Explicit valid user values override defaults.
 ## 6. Core input groups
 
 ### EDUCATION
-
 `GRADE_LEVEL, SUBJECT, TOPIC, SUBTOPIC, LEARNING_OBJECTIVE, DIFFICULTY, LANGUAGE, CURRICULUM_CONTEXT`
 
 ### CONTENT
-
 `QUESTION_COUNT, QUESTION_TYPE, ANSWER_TYPE, QUESTION_FORMAT, SHOW_QUESTION_NUMBER, SHOW_ANSWER_KEY, CONTEXT_MODE, THEME, ITEM_SET, DISTRIBUTION_MODE`
 
 ### PAGE / PRINT
-
 `PAGE_SIZE, ORIENTATION, PAGE_COUNT, AUTO_PAGINATION, DENSITY_MODE, COLOR_MODE, SAFE_MARGIN, PRINT_MODE`
 
 ### HEADER / TEXT
-
 `SHOW_STUDENT_HEADER, HEADER_FIELDS, WORKSHEET_TITLE, SHOW_INSTRUCTION, INSTRUCTION_TEXT, TEXT_RENDER_MODE`
 
 ### DESIGN
-
 `VISUAL_THEME, ART_STYLE, SHOW_CHARACTERS, CHARACTER_LOCATION, ICON_STYLE, BORDER_STYLE, DECORATION_DENSITY, LINE_WEIGHT`
 
 ### RENDER SAFETY
-
 Defaults are internal and normally hidden from teachers:
 
 `CONTENT_LOCK=ON`
@@ -135,7 +129,6 @@ Defaults are internal and normally hidden from teachers:
 `GEOMETRY_LOCK=ON` when an instrument/graph/scale is educational data.
 
 ### OUTPUT
-
 `OUTPUT_MODE=PROMPT_PACKAGE|PROMPT_ONLY|BLUEPRINT_ONLY`
 
 Default `PROMPT_PACKAGE`.
@@ -145,11 +138,9 @@ Default `PROMPT_PACKAGE`.
 Always maintain two distinct data views.
 
 ### INTERNAL_VERIFIED_BLUEPRINT
-
 Contains hidden answers, target values, formulas, geometry metadata, and QA status.
 
 ### STUDENT_RENDER_BLUEPRINT
-
 Contains only what the learner should see: givens, labels, diagrams/instrument targets required to pose the question, and blank answer areas.
 
 When `SHOW_ANSWER_KEY=NO`, verified answers must not appear as visible worksheet content.
@@ -180,13 +171,7 @@ For generated questions:
 
 Any worksheet where the child must visually read a measuring instrument MUST use `domains/INSTRUMENT_READING_ENGINE.md` in addition to its subtype engine.
 
-Examples:
-
-- dial scale
-- analog clock
-- ruler
-- thermometer
-- measuring cylinder / graduated container
+Examples: dial scale, analog clock, ruler, thermometer, measuring cylinder / graduated container.
 
 For these worksheets, geometry is academic data, not decoration.
 
@@ -256,7 +241,7 @@ Require:
 
 For instrument reading, the instructional instrument must be the dominant visual element in its question region.
 
-## 13. Thai-language policy
+## 13. Thai-language and glyph policy
 
 Store canonical Thai text before rendering.
 
@@ -271,6 +256,8 @@ Requirements:
 Default Thai-heavy render mode: `HYBRID`.
 
 Do not claim a nondeterministic image model guarantees perfect Thai glyphs. Preserve clean text zones so deterministic correction is possible.
+
+When deterministic text overlay is used, perform `GLYPH_COVERAGE_QA` before release. The chosen font/rendering path must visibly support every required script and symbol in the worksheet, including Thai characters, Arabic numerals, decimal points, unit symbols, punctuation, and mathematical marks. Missing-glyph boxes/tofu are a critical readability failure.
 
 ## 14. Render strategy
 
@@ -289,15 +276,31 @@ Use deterministic SVG/vector/programmatic overlays whenever exact geometry matte
 
 If deterministic overlay is unavailable, the final prompt must include redundant geometry constraints and the result must be marked `VISUAL_QA_REQUIRED`.
 
+### 14.1 Render-objective lock
+
+A rendering request must produce the requested worksheet artifact, not a QA dashboard, design report, rubric poster, meta-document, prompt summary, or explanation unless the user explicitly asks for that artifact.
+
+Before render, set:
+
+`RENDER_OBJECTIVE = STUDENT_WORKSHEET | ANSWER_KEY | QA_REPORT | OTHER_EXPLICIT_ARTIFACT`
+
+For normal worksheet generation:
+
+`RENDER_OBJECTIVE = STUDENT_WORKSHEET`
+
+and add hard negatives equivalent to:
+
+- no audit dashboard
+- no QA summary panel
+- no meta-report
+- no production notes visible on the worksheet
+- no prompt/instruction explanation visible on the worksheet
+
+`RENDER_OBJECTIVE_QA` must PASS before and after rendering.
+
 ## 15. Reference-image policy
 
-A reference image is used to analyze:
-
-- learning interaction
-- information hierarchy
-- layout grammar
-- spacing and density
-- visual tone
+A reference image is used to analyze learning interaction, information hierarchy, layout grammar, spacing/density, and visual tone.
 
 Do not blindly copy defects from the reference. Do not reuse watermarks, logos, proprietary characters, or creator marks without authorization.
 
@@ -320,8 +323,9 @@ Every final prompt must contain:
 - numeric/data lock
 - blank-answer behavior
 - hard negatives
+- explicit `RENDER_OBJECTIVE`
 
-For repeated educational instruments/graphs, require a `TEMPLATE LOCK`: use one canonical template and change only the intended variable (needle angle, hand position, fill level, bar height, etc.).
+For repeated educational instruments/graphs, require a `TEMPLATE LOCK`: use one canonical template and change only the intended variable.
 
 ## 17. QA framework
 
@@ -336,6 +340,8 @@ Global gates:
 `ANSWER_LEAK_QA`
 `DUPLICATE_QA`
 `THAI_QA`
+`GLYPH_COVERAGE_QA` when deterministic text is rendered
+`RENDER_OBJECTIVE_QA`
 `LAYOUT_QA`
 `READABILITY_QA`
 `PRINT_QA`
@@ -345,15 +351,7 @@ Instrument/graph domains add their own geometry gates.
 
 A critical FAIL blocks release regardless of weighted score.
 
-Critical blockers include:
-
-- incorrect mathematics/measurement
-- wrong question count
-- invalid or ambiguous diagram/instrument geometry
-- answer leakage
-- unreadable/cropped layout
-- malformed canonical Thai
-- final prompt allowing the image model to invent critical educational data
+Critical blockers include incorrect mathematics/measurement, wrong question count, invalid or ambiguous diagram/instrument geometry, answer leakage, missing glyphs/tofu in student text, wrong rendered artifact type, unreadable/cropped layout, malformed canonical Thai, or a final prompt allowing the image model to invent critical educational data.
 
 ## 18. Post-render QA
 
@@ -361,14 +359,15 @@ Prompt QA is not enough. When an actual rendered worksheet is available, inspect
 
 Post-render checks:
 
-1. question count
-2. Thai text legibility
-3. educational values/diagrams match blueprint
-4. answer fields blank when required
-5. layout/cropping
-6. instrument/graph geometry
-7. theme art does not obscure content
-8. photocopy legibility
+1. artifact type matches `RENDER_OBJECTIVE`
+2. question count
+3. Thai text and numeral glyph legibility
+4. educational values/diagrams match blueprint
+5. answer fields blank when required
+6. layout/cropping
+7. instrument/graph geometry
+8. theme art does not obscure content
+9. photocopy legibility
 
 For any instrument-reading worksheet, inspect every individual instrument. One wrong needle/tick/level is sufficient to fail classroom release.
 
@@ -406,6 +405,8 @@ Release a final production prompt only when:
 - domain maturity is stated correctly;
 - layout respects domain minimum readability;
 - no answer leakage exists;
+- render objective is explicitly locked;
+- text rendering path has adequate glyph coverage when deterministic text is used;
 - critical educational geometry is deterministic or explicitly flagged for post-render inspection.
 
 A beautiful but academically ambiguous worksheet is a failed product.
