@@ -1,20 +1,21 @@
 # Architecture — Activity-Based Elementary Worksheet Generator
 
-Version: 2.3.0
+Version: 2.3.2
 Status: Production prompt-generator architecture reference
 
 ## 1. System model
 
-The Gem is organized as eight cooperating layers:
+The Gem is organized as nine cooperating layers:
 
 1. `INTERACTION_LAYER` — understands teacher language and asks minimal clarifications.
 2. `NORMALIZATION_LAYER` — resolves required/default/auto parameters.
-3. `DOMAIN_LAYER` — generates and validates academic data.
-4. `BLUEPRINT_LAYER` — separates internal verified data from student-facing data.
-5. `RENDER_PATH_LAYER` — selects downstream DOCUMENT_FIRST, HYBRID, DETERMINISTIC_VECTOR, or IMAGE_ONLY architecture.
-6. `ONE_PAGE_LAYOUT_LAYER` — attempts a valid one-page solution, then resolves pagination/lock behavior.
-7. `PROMPT_COMPILER_LAYER` — serializes exact content, layout, visual geometry, art constraints, and hard negatives into a self-contained downstream image-generation prompt.
-8. `QA_RELEASE_LAYER` — sanitizes visible output, checks prompt completeness/copy-readiness, and blocks unsafe or incomplete prompt release.
+3. `KB_ROUTING_LAYER` — selects mandatory core, domain, instrument, policy, and QA knowledge files; checks compatibility.
+4. `DOMAIN_LAYER` — generates and validates academic data.
+5. `BLUEPRINT_LAYER` — separates internal verified data from student-facing data.
+6. `RENDER_PATH_LAYER` — selects downstream DOCUMENT_FIRST, HYBRID, DETERMINISTIC_VECTOR, or IMAGE_ONLY architecture.
+7. `ONE_PAGE_LAYOUT_LAYER` — attempts a valid one-page solution, then resolves pagination/lock behavior.
+8. `PROMPT_COMPILER_LAYER` — serializes exact content, layout, visual geometry, art constraints, hard negatives, and per-item renderer states into a self-contained downstream image-generation prompt.
+9. `QA_RELEASE_LAYER` — sanitizes visible output, checks KB compatibility, prompt completeness/copy-readiness, and blocks unsafe or incomplete prompt release.
 
 The Gem's production endpoint is the prompt, not the final rendered pixels.
 
@@ -26,11 +27,14 @@ Raw teacher request + references + revision instructions.
 ### NORMALIZED_WORKSHEET_SPEC
 Single source of truth for all resolved parameters, including `DOMAIN`, `DOMAIN_MATURITY`, `RENDER_PATH`, `ONE_PAGE_PREFERRED`, `ONE_PAGE_LOCK`, target page count, and `OUTPUT_MODE`.
 
+### KB_ROUTE_DECISION
+Selected knowledge dependencies, precedence, compatibility result, and affected QA suites. Built from `KB_ROUTER.md` + `KB_MANIFEST.md` + `domains/DOMAIN_REGISTRY.md`.
+
 ### INTERNAL_VERIFIED_BLUEPRINT
 Hidden academic content, verified answers, formulas, target geometry/data relations, IDs, and QA metadata.
 
 ### STUDENT_RENDER_BLUEPRINT
-Sanitized student-visible givens, required diagrams/instruments, blank response areas, and renderer-only geometry metadata that must not appear as solved answer text.
+Sanitized student-visible givens, required diagrams/instruments, blank response areas, and renderer-only geometry references that must not appear as answer or target-value text.
 
 ### RENDER_PATH_DECISION
 Resolved downstream rendering architecture and rationale:
@@ -50,15 +54,15 @@ Deterministic text/data/geometry instructions, optional generative-art instructi
 Primary user deliverable. One consolidated, self-contained prompt that can be copied directly into a downstream AI/image-generation system without relying on hidden state or other sections.
 
 ### QA_REPORT
-Global + domain-specific gate status, registry maturity, render-path status, one-page status, prompt completeness, copy-readiness, placeholder status, and release decision.
+Global + domain-specific gate status, KB compatibility, registry maturity, render-path status, one-page status, prompt completeness, copy-readiness, target-leak status, placeholder status, and release decision.
 
 ## 3. Canonical process
 
 `Teacher request`
 → parse explicit requirements
+→ normalize parameters
+→ resolve KB route/compatibility
 → detect domain
-→ resolve defaults
-→ create normalized spec
 → generate academic targets
 → derive source values/diagram geometry
 → independently validate
@@ -68,10 +72,10 @@ Global + domain-specific gate status, registry maturity, render-path status, one
 → run one-page feasibility
 → build layout
 → create render plan
-→ serialize every visual item
+→ serialize every visual item with redundant state
 → compile final image-generation prompt
 → prompt completeness/copy-readiness checks
-→ visible-output sanitizer
+→ dual leak sanitizer
 → pre-release QA
 → release prompt
 → downstream render occurs outside the Gem
@@ -92,7 +96,22 @@ The Gem must not confuse a worksheet content preview with the final deliverable.
 
 `PROMPT_ONLY` may suppress supporting sections while retaining all hidden validation. `BLUEPRINT_ONLY` is explicit opt-in only.
 
-## 5. Domain plugin contract
+## 5. KB routing contract
+
+Mandatory core references:
+
+- `GEM_INSTRUCTIONS_PRODUCTION.md`
+- `OUTPUT_CONTRACT.md`
+- `KB_ROUTER.md`
+- `KB_MANIFEST.md`
+- `policies/PARAMETER_POLICY.md`
+- `domains/DOMAIN_REGISTRY.md`
+
+Conditional references are selected by domain. Visual instrument domains additionally require `domains/INSTRUMENT_READING_ENGINE.md`. QA suites are selected by task risk and domain.
+
+Precedence is defined in `KB_ROUTER.md`; compatibility is defined in `KB_MANIFEST.md`. The registry remains SSOT for domain maturity.
+
+## 6. Domain plugin contract
 
 Every domain engine should define:
 
@@ -112,13 +131,14 @@ Every domain engine should define:
 
 The overall maturity value comes from `domains/DOMAIN_REGISTRY.md`, not from an engine's self-description.
 
-## 6. Instrument plugin contract
+## 7. Instrument plugin contract
 
 Instrument domains additionally define:
 
 - canonical template geometry
 - scale/tick topology and mapping
 - target-to-geometry transformation
+- exact target representability rules
 - minimum printed size
 - template lock
 - one-page footprint constraints
@@ -128,9 +148,13 @@ Instrument domains additionally define:
 
 Educational geometry outranks theme art and one-page density.
 
-## 7. Final-prompt contract
+Every high-risk visual item serializes:
 
-The final prompt must be self-contained. A downstream renderer must not need to read the Gem's earlier blueprint sections.
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`.
+
+## 8. Final-prompt contract
+
+The final prompt must be self-contained. A downstream renderer must not need to read earlier Gem sections.
 
 Mandatory characteristics:
 
@@ -142,23 +166,32 @@ Mandatory characteristics:
 - per-item visual state for every visual question;
 - canonical instrument/graph template when applicable;
 - renderer geometry/topology and minimum-size constraints;
+- target alignment/representability rules;
 - theme/art instructions separated from academic geometry;
 - Thai/numeric fidelity locks;
 - hard negatives;
 - no solved answer key unless requested;
+- no target-value leakage;
 - no pseudo-image placeholders.
 
-Forbidden default-final patterns include:
-
-`[ภาพ...]`, `[insert ...]`, `<draw here>`, `TBD`, `same as above`, `use blueprint above`.
-
-Repeated visual objects should be compiled as:
+Repeated visual objects compile as:
 
 `CANONICAL TEMPLATE + ITEM 1 STATE + ITEM 2 STATE + ... + ITEM N STATE`
 
-not as N vague prose placeholders.
+not as vague prose placeholders.
 
-## 8. Global one-page contract
+## 9. Actual-render failure classes
+
+Observed downstream failure patterns are treated as architecture-level risks:
+
+- clock: nonzero-minute hour hand pinned to hour numeral; :30 not midpoint;
+- thermometer: liquid endpoint between discrete ticks;
+- capacity: wrong/ambiguous meniscus read point or target-number annotation;
+- canonical 0–5 kg dial: full-circle 360° substitution or ticks through inactive gap.
+
+Applicable prompts must encode both positive geometry and explicit negative constraints. See `qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md`.
+
+## 10. Global one-page contract
 
 Default:
 
@@ -168,22 +201,11 @@ Default:
 
 The system attempts a valid one-page layout plan before pagination.
 
-Optimization is allowed only on nonessential layout cost: decoration, ornamental whitespace, repeated decorative labels, verbose instructions, and inefficient layout choice.
-
-The system may not trade away:
-
-- academic correctness
-- exact requested question count
-- domain minimum instrument/diagram size
-- readable text
-- required answer fields
-- safe margins
-- answer integrity
-- graduation count/topology
+Optimization may reduce only nonessential layout cost. It may not trade away academic correctness, requested question count, domain minimum size, readable text, required answer fields, safe margins, answer integrity, or graduation count/topology.
 
 When unlocked and one page is impossible, compile pagination instructions. When locked and one page is impossible, return `ONE_PAGE_FEASIBILITY_QA=FAIL` and do not compile an unsafe page-1 prompt.
 
-## 9. Render-path contract
+## 11. Render-path contract
 
 `RENDER_PATH=AUTO` resolves from academic risk:
 
@@ -194,7 +216,7 @@ When unlocked and one page is impossible, compile pagination instructions. When 
 
 The path is guidance embedded in the final prompt for the downstream rendering system. It is not a directive for this Gem to render the final artifact itself.
 
-## 10. Change impact matrix
+## 12. Change impact matrix
 
 | Change | Preserve | Rebuild | QA rerun |
 |---|---|---|---|
@@ -204,27 +226,28 @@ The path is guidance embedded in the final prompt for the downstream rendering s
 | Orientation | academic data | layout + final prompt | one-page, layout, print, prompt |
 | Explicit 1-page lock | academic data | layout/pagination instructions | feasibility, page count, readability |
 | Answer key | givens | student/key views + final prompt | visible sanitizer, leak, prompt |
-| Instrument capacity/resolution | context theme | all target geometry/topology + serialization | complete domain + geometry + prompt QA |
+| Instrument capacity/resolution | context theme | all target geometry/topology + serialization | domain + geometry + prompt QA |
 | Clock SINGLE↔DAY_NIGHT_PAIR | clock targets where valid | response schema/layout + prompt | clock, answer leak, one-page, prompt |
 | Dataset | theme | graph/table + questions + prompt | data + visualization + layout + prompt QA |
 | Render path | academic data | downstream architecture instructions | render-path, layout, prompt QA |
+| KB file/version | canonical task intent | route/affected compiled rules | KB compatibility + affected regressions |
 
-## 11. Error policy
+## 13. Error policy
 
 Errors are classified:
 
 - `CRITICAL_ACADEMIC` — wrong answer/value/geometry/topology; blocks release.
-- `CRITICAL_ANSWER_INTEGRITY` — solved answer leaked into visible output; blocks release.
+- `CRITICAL_ANSWER_INTEGRITY` — solved answer leaked; blocks release.
+- `CRITICAL_TARGET_LEAK` — renderer-only target appears as learner-visible label/annotation; blocks release.
 - `CRITICAL_READABILITY` — planned result impossible/ambiguous to read; blocks release.
-- `CRITICAL_PROMPT_COMPLETENESS` — final prompt cannot independently drive the downstream renderer; blocks release.
-- `CRITICAL_PLACEHOLDER` — final prompt contains unresolved pseudo-visual placeholders or missing per-item visual states; blocks release.
+- `CRITICAL_PROMPT_COMPLETENESS` — final prompt cannot independently drive renderer; blocks release.
+- `CRITICAL_PLACEHOLDER` — unresolved pseudo-visual placeholder or missing per-item state; blocks release.
+- `CRITICAL_KB_COMPATIBILITY` — required KB missing/incompatible; blocks production-ready claim.
 - `MAJOR_LAYOUT` — overlap/crowding/cropping risk; repair required.
-- `MAJOR_GOVERNANCE` — maturity/version/SSOT conflict; blocks a production claim until repaired.
+- `MAJOR_GOVERNANCE` — maturity/version/SSOT conflict; repair required.
 - `MINOR_VISUAL` — aesthetic imperfection that does not affect learning.
 
-## 12. Production downstream-render strategy
-
-The Gem expresses content-dependent rendering architecture inside the prompt rather than assuming one image model behavior.
+## 14. Production downstream-render strategy
 
 For text-heavy worksheets:
 
@@ -236,21 +259,23 @@ For educational instruments/graphs:
 
 Fallback:
 
-`STRONG SELF-CONTAINED PROMPT + EXPLICIT LOCKS + MANDATORY VISUAL INSPECTION`
+`STRONG SELF-CONTAINED PROMPT + REDUNDANT PER-ITEM GEOMETRY + EXPLICIT HARD NEGATIVES + MANDATORY VISUAL INSPECTION`
 
 The prompt must never claim mathematical/geometric guarantee from a nondeterministic downstream renderer.
 
-## 13. Release governance
+## 15. Release governance
 
 A production prompt release requires:
 
+- valid KB route and compatibility;
 - registry-sourced maturity;
-- applicable acceptance tests passing;
+- applicable acceptance/regression tests passing;
 - zero critical blockers;
 - documented render-path guidance;
 - one-page behavior resolved;
 - exact visual-state serialization where applicable;
 - placeholder-free final prompt;
+- `TARGET_VALUE_LEAK_QA=PASS` when applicable;
 - `PROMPT_COMPLETENESS_QA=PASS`;
 - `PROMPT_COPY_READY_QA=PASS`.
 
