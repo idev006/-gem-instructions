@@ -1,22 +1,16 @@
 # Parameter Policy — Activity-Based Elementary Worksheet Generator
 
-Version: 2.3.2
+Version: 2.6.0-LTS
 Status: Canonical supporting policy
 Audience: teachers, Gem maintainers, automation builders
 
 ## 1. Principle
 
-Teachers use natural language. Parameter names are an internal normalization contract.
+Teachers use natural language. Parameter names are an internal normalization contract. No released specification may contain silent `UNDEFINED` production values.
 
-Every parameter belongs to exactly one class:
+Parameter classes:
 
-1. `REQUIRED`
-2. `CONDITIONALLY_REQUIRED`
-3. `OPTIONAL_DEFAULT`
-4. `OPTIONAL_AUTO`
-5. `OPTIONAL_NONE`
-
-No released spec may contain silent `UNDEFINED` values.
+`REQUIRED | CONDITIONALLY_REQUIRED | OPTIONAL_DEFAULT | OPTIONAL_AUTO | OPTIONAL_NONE`
 
 ## 2. Minimum teacher-facing input
 
@@ -26,305 +20,238 @@ Normally require only:
 - `TOPIC_OR_SKILL`
 - `QUESTION_COUNT`
 
-If a topic is clearly mathematical, infer `SUBJECT=คณิตศาสตร์`.
+Infer subject/language/domain when unambiguous. Ask only when a missing value materially changes academic correctness and cannot be safely derived.
 
-## 3. Required parameters
+## 3. Global defaults
 
-### `GRADE_LEVEL` — REQUIRED
-Affects difficulty, wording, diagram density, and answer space.
+`PAGE_SIZE=A4`
+`ORIENTATION=PORTRAIT`
+`TARGET_PAGE_COUNT=1`
+`ONE_PAGE_PREFERRED=YES`
+`ONE_PAGE_LOCK=OFF`
+`SHOW_ANSWER_KEY=NO`
+`SHOW_STUDENT_HEADER=YES`
+`HEADER_FIELDS=ชื่อ-นามสกุล / ชั้น / เลขที่`
+`LANGUAGE=THAI` for Thai request
+`COLOR_MODE=BLACK_AND_WHITE`
+`RENDER_PATH=AUTO`
+`RENDER_OBJECTIVE=STUDENT_WORKSHEET`
+`OUTPUT_MODE=PROMPT_PACKAGE`
+`PRIMARY_DELIVERABLE=FINAL_IMAGE_GENERATION_PROMPT`
+`CURRICULUM_PROFILE=AUTO`
 
-### `TOPIC_OR_SKILL` — REQUIRED
-Used to route to a domain engine and derive objective/question type.
+## 4. Curriculum profile
 
-### `QUESTION_COUNT` — REQUIRED
-Affects content generation and layout capacity. If omitted, ask one short question rather than inventing a production count.
+Allowed:
 
-## 4. Conditionally required
+`AUTO | TH_PRIMARY_2568_P1_P3 | TH_CORE_2551_REV2560 | CUSTOM`
 
-### `SUBJECT`
-Infer when unambiguous.
+`AUTO` uses the conservative grade progression in `domains/MEASUREMENT_COVERAGE_P1_P6.md`; it is a pedagogical default, not a claim that every school uses one identical curriculum sequence.
 
-### `QUESTION_TYPE`
-Derive from the stated skill. Ask only if multiple task types materially change the objective.
+Explicit teacher requirements override AUTO when academically valid.
 
-### `LANGUAGE`
-Default THAI for Thai requests.
+## 5. Core education/content parameters
 
-### Domain values with no safe default
-Ask only when a missing value materially changes correctness and cannot be safely inferred.
+`GRADE_LEVEL, SUBJECT, TOPIC, SUBTOPIC, LEARNING_OBJECTIVE, DIFFICULTY, LANGUAGE, CURRICULUM_PROFILE, QUESTION_COUNT, QUESTION_TYPE, ANSWER_TYPE, ANSWER_FORMAT, SHOW_QUESTION_NUMBER, SHOW_ANSWER_KEY, THEME, DISTRIBUTION_MODE`
 
-## 5. Core optional parameters
+Defaults:
 
-### Education
+- `DIFFICULTY=AUTO`
+- `SHOW_QUESTION_NUMBER=YES` unless user/workflow prohibits it
+- `SHOW_ANSWER_KEY=NO`
+- `DISTRIBUTION_MODE=BALANCED`
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| SUBJECT | CONDITIONALLY_REQUIRED | derive from topic |
-| SUBTOPIC | OPTIONAL_AUTO | derive |
-| LEARNING_OBJECTIVE | OPTIONAL_AUTO | derive from grade + skill |
-| DIFFICULTY | OPTIONAL_AUTO | AUTO |
-| LANGUAGE | OPTIONAL_DEFAULT | THAI for Thai request |
-| CURRICULUM_CONTEXT | OPTIONAL_NONE | no binding unless requested |
+## 6. Page/render parameters
 
-### Content
+`PAGE_SIZE, ORIENTATION, PAGE_COUNT, TARGET_PAGE_COUNT, ONE_PAGE_PREFERRED, ONE_PAGE_LOCK, AUTO_PAGINATION, DENSITY_MODE, COLOR_MODE, SAFE_MARGIN, PRINT_MODE, RENDER_PATH, RENDER_OBJECTIVE, VISUAL_QA_REQUIRED, OUTPUT_MODE, PRIMARY_DELIVERABLE`
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| QUESTION_TYPE | CONDITIONALLY_REQUIRED | domain route |
-| ANSWER_TYPE | OPTIONAL_AUTO | derive |
-| QUESTION_FORMAT | OPTIONAL_AUTO | derive |
-| SHOW_QUESTION_NUMBER | OPTIONAL_DEFAULT | YES |
-| SHOW_ANSWER_KEY | OPTIONAL_DEFAULT | NO |
-| CONTEXT_MODE | OPTIONAL_DEFAULT | child-appropriate real-life context |
-| THEME | OPTIONAL_DEFAULT | CUTE_SCHOOL / domain-appropriate |
-| ITEM_SET | OPTIONAL_NONE | engine chooses if absent |
-| DISTRIBUTION_MODE | OPTIONAL_DEFAULT | BALANCED |
+Final `RENDER_PATH` must resolve to exactly one:
 
-### Page / Print
+`DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY`
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| PAGE_SIZE | OPTIONAL_DEFAULT | A4 |
-| ORIENTATION | OPTIONAL_DEFAULT | PORTRAIT |
-| PAGE_COUNT | OPTIONAL_AUTO | target 1 page first |
-| TARGET_PAGE_COUNT | OPTIONAL_DEFAULT | 1 |
-| ONE_PAGE_PREFERRED | OPTIONAL_DEFAULT | YES |
-| ONE_PAGE_LOCK | OPTIONAL_DEFAULT | OFF |
-| AUTO_PAGINATION | OPTIONAL_DEFAULT | YES_AFTER_ONE_PAGE_OPTIMIZATION when lock is OFF |
-| DENSITY_MODE | OPTIONAL_AUTO | derive from payload |
-| COLOR_MODE | OPTIONAL_DEFAULT | BLACK_AND_WHITE |
-| SAFE_MARGIN | OPTIONAL_DEFAULT | YES |
-| PRINT_MODE | OPTIONAL_DEFAULT | PRINTABLE |
+`AUTO` is input-only.
 
-### Header/Text
+Default resolution:
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| SHOW_STUDENT_HEADER | OPTIONAL_DEFAULT | YES |
-| HEADER_FIELDS | OPTIONAL_DEFAULT | ชื่อ / ชั้น / เลขที่ |
-| WORKSHEET_TITLE | OPTIONAL_AUTO | derive |
-| SHOW_INSTRUCTION | OPTIONAL_DEFAULT | YES |
-| INSTRUCTION_TEXT | OPTIONAL_AUTO | short grade-appropriate instruction |
-| TEXT_RENDER_MODE | OPTIONAL_DEFAULT | HYBRID for Thai-heavy pages |
+- Thai/text/table/numeric-heavy → DOCUMENT_FIRST
+- exact learner-read geometry + theme/context art → HYBRID
+- geometry-dominant/minimal art → DETERMINISTIC_VECTOR
+- IMAGE_ONLY only when nondeterminism cannot threaten required correctness or explicitly requested
 
-### Design
+## 7. Render safety parameters
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| VISUAL_THEME | OPTIONAL_DEFAULT | CUTE_SCHOOL |
-| ART_STYLE | OPTIONAL_DEFAULT | clean child-friendly line art |
-| SHOW_CHARACTERS | OPTIONAL_DEFAULT | YES, decorative only |
-| CHARACTER_LOCATION | OPTIONAL_DEFAULT | corners/header/footer |
-| ICON_STYLE | OPTIONAL_DEFAULT | simple outlined semantic icon |
-| BORDER_STYLE | OPTIONAL_DEFAULT | rounded/simple |
-| DECORATION_DENSITY | OPTIONAL_DEFAULT | LOW_TO_MEDIUM for data-heavy worksheets |
-| LINE_WEIGHT | OPTIONAL_DEFAULT | CONSISTENT |
+Defaults when applicable:
 
-### Render / prompt
+`CONTENT_LOCK=ON`
+`THAI_TEXT_LOCK=ON`
+`NUMERIC_VALUE_LOCK=ON`
+`QUESTION_COUNT_LOCK=ON`
+`STUDENT_VISIBLE_ANSWER_LEAK_GUARD=ON`
+`STUDENT_VISIBLE_TARGET_TEXT_LEAK_GUARD=ON`
+`CANONICAL_LABEL_PRESERVATION=ON`
+`GEOMETRY_LOCK=ON` when visual geometry is academic
+`TEMPLATE_LOCK=ON` for repeated instruments/graphs
+`PER_ITEM_RENDER_STATE_REQUIRED=YES` for learner-read visuals
+`TARGET_ALIGNMENT_REQUIRED=YES` for exact-reading instruments
 
-| Parameter | Class | Default/Auto |
-|---|---|---|
-| RENDER_PATH | OPTIONAL_AUTO | AUTO |
-| RENDER_OBJECTIVE | OPTIONAL_DEFAULT | STUDENT_WORKSHEET |
-| VISUAL_QA_REQUIRED | OPTIONAL_AUTO | YES when nondeterministic rendering carries academic risk |
-| OUTPUT_MODE | OPTIONAL_DEFAULT | PROMPT_PACKAGE |
-| PRIMARY_DELIVERABLE | OPTIONAL_DEFAULT | FINAL_IMAGE_GENERATION_PROMPT |
-| PER_ITEM_RENDER_STATE_REQUIRED | OPTIONAL_AUTO | YES for visual questions |
-| TARGET_ALIGNMENT_REQUIRED | OPTIONAL_AUTO | YES for learner-read instruments |
-
-`RENDER_PATH` values:
-
-- `AUTO`
-- `DOCUMENT_FIRST`
-- `HYBRID`
-- `DETERMINISTIC_VECTOR`
-- `IMAGE_ONLY`
-
-AUTO resolution guidance:
-
-- text/table/numeric-heavy → `DOCUMENT_FIRST` or `HYBRID`;
-- exact instrument/graph + theme art → `HYBRID`;
-- mostly deterministic educational diagram → `DETERMINISTIC_VECTOR`;
-- `IMAGE_ONLY` only when text/data/geometry fidelity is not threatened or explicitly requested.
-
-Thai text-heavy worksheets and exact measuring-instrument worksheets must not default to generative image-only rendering.
-
-### Render safety
-
-Teachers normally do not set these.
-
-| Parameter | Default |
-|---|---|
-| CONTENT_LOCK | ON |
-| THAI_TEXT_LOCK | ON |
-| NUMERIC_VALUE_LOCK | ON |
-| QUESTION_COUNT_LOCK | ON |
-| ANSWER_LEAK_GUARD | ON |
-| TARGET_VALUE_LEAK_GUARD | ON when renderer-only targets exist |
-| GEOMETRY_LOCK | ON when geometry carries educational meaning |
-| TEMPLATE_LOCK | ON for repeated instruments/graphs |
-| PER_ITEM_RENDER_STATE_REQUIRED | YES for visual questions |
-| TARGET_ALIGNMENT_REQUIRED | YES for learner-read instruments |
-
-## 6. Global one-page policy — applies to EVERY worksheet family
+## 8. One-page-first policy
 
 Default:
 
-`ONE_PAGE_PREFERRED = YES`
-`TARGET_PAGE_COUNT = 1`
-
-The layout engine MUST attempt a valid one-page A4 solution before page 2.
+`ONE_PAGE_PREFERRED=YES`
+`TARGET_PAGE_COUNT=1`
 
 Optimization order:
 
-1. preserve academic correctness and exact question count;
-2. preserve domain minimum diagram/instrument size;
-3. preserve readable Thai text and writable answer space;
-4. choose a more efficient valid layout;
-5. remove/simplify decoration;
-6. shorten nonessential instructions;
-7. reduce nonessential whitespace/padding within safe limits;
-8. reduce decorative context size;
-9. only then paginate when `ONE_PAGE_LOCK=OFF`.
+1. preserve academic correctness and exact question count
+2. preserve domain minimum diagram/instrument size
+3. preserve readable Thai/numerals and writable answer space
+4. choose efficient valid layout
+5. remove/simplify decoration
+6. shorten nonessential instruction
+7. reduce nonessential padding
+8. reduce decorative context
+9. paginate only when unlocked
 
-Never achieve one page by shrinking instruments below minimum size, distorting diagrams, making text unreadable, removing required data/answer fields, clipping, overlapping, reducing question count, leaking answers/targets, or changing the objective.
+Explicit `A4 หน้าเดียว` / `1 หน้าเท่านั้น` → `ONE_PAGE_LOCK=ON`, `PAGE_COUNT=1`.
 
-### 6.1 ONE_PAGE_LOCK
+If safe fit is impossible under lock:
 
-`ONE_PAGE_LOCK = OFF` by default.
+`PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`
+`PROMPT_RELEASE=BLOCKED`
 
-Explicit requests such as `1 หน้าเท่านั้น` or `A4 หน้าเดียว` normalize to:
+Never reduce question count, crop, merge ticks, or shrink below minimum to force one page.
 
-`ONE_PAGE_LOCK = ON`
-`PAGE_COUNT = 1`
+## 9. Time/clock parameters
 
-If a valid one-page layout is impossible after optimization:
+`TIME_SUBDOMAIN=CLOCK_READING|TIME_CALCULATION`
+`TIME_FORMAT=12_HOUR|24_HOUR`
+`MINUTE_GRANULARITY=60|30|15|5|1`
+`TIME_TASK_TYPE=READ_CLOCK|START_PLUS_DURATION|START_END_TO_DURATION|END_MINUS_DURATION|COMPARE_TIME|SCHEDULE`
+`CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`
+`DAY_NIGHT_MODE=OFF|ON`
+`TIME_CROSS_MIDNIGHT_ALLOWED=NO|YES`
+`START_TIME_RANGE`
+`MIN_DURATION`
+`MAX_DURATION`
+`TARGET_TIMES`
+`ANSWER_TIME_FORMAT`
 
-`ONE_PAGE_FEASIBILITY_QA = FAIL`
-`LAYOUT_QA = FAIL`
+Default Thai elapsed-time mode: 24-hour, no midnight crossing unless requested.
 
-Do not create page 2 and do not silently violate readability. A safe alternative may be proposed but requires user approval.
+## 10. Length/ruler/distance parameters
 
-### 6.2 Feasibility planning
+`LENGTH_SUBDOMAIN=RULER_READING|LENGTH_CALCULATION|DISTANCE_CALCULATION|UNIT_CONVERSION`
+`UNIT_SET=MM|CM|M|KM|CM_MM|M_CM|KM_M|MIXED_METRIC`
+`RULER_SCALE_MIN`
+`RULER_SCALE_MAX`
+`MAJOR_DIVISION`
+`MINOR_DIVISION`
+`START_POSITION_MODE=ZERO_ONLY|NONZERO_ALLOWED|MIXED`
+`TARGET_LENGTHS`
+`LENGTH_TASK_TYPE=READ|ADD|SUBTRACT|COMPARE|DIFFERENCE|CONVERT`
+`DISTANCE_TASK_TYPE=TOTAL|DIFFERENCE|ROUND_TRIP|MULTI_SEGMENT|ROUTE_COMPARE|CONVERT`
+`DISTANCE_CONTEXT=DAILY_LIFE|ROUTE|MAP_STYLE|WORD_PROBLEM`
 
-Estimate capacity from:
+Exact metric relations:
 
-`usable_page_area ÷ per_question_minimum_footprint`
+`10 mm=1 cm`
+`100 cm=1 m`
+`1000 m=1 km`
 
-The footprint includes required text, answer area, and domain minimum educational diagram size.
+Normalize to a canonical base unit before arithmetic.
 
-Test plausible structures such as 1-column rows, 2-column cards, 3-column compact cards, tables for text/numeric tasks, and grids for visual/instrument tasks. Select the most readable valid one-page solution, not merely the densest.
+## 11. Weight parameters
 
-## 7. Domain-specific defaults
+`WEIGHT_SUBDOMAIN=DIAL_READING|WEIGHT_CALCULATION|UNIT_CONVERSION`
+`UNIT_SET=G|KG|KG_AND_G|KG_AND_TICK`
+`DIAL_MAX_KG`
+`MAJOR_DIVISION_KG`
+`MINOR_DIVISION_KG`
+`TARGET_WEIGHTS`
+`WEIGHT_TASK_TYPE=READ|ADD|SUBTRACT|COMPARE|DIFFERENCE|CONVERT`
 
-### TIME / elapsed time
-- TIME_FORMAT = 24_HOUR
-- TIME_CROSS_MIDNIGHT_ALLOWED = NO
-- ANSWER_DISTRIBUTION = BALANCED
-- difficulty controls minute granularity
-- preferred render path for text/table-heavy sheets = DOCUMENT_FIRST or HYBRID
+Thai Grade 3 dial default when appropriate:
 
-### MEASUREMENT_WEIGHT / dial scale
-For Thai Grade 3 unless explicitly changed:
-- DIAL_MAX_KG = 5
-- MAJOR_DIVISION_KG = 1
-- MINOR_DIVISION_KG = 0.1
-- MINOR_DIVISIONS_PER_KG = 10
-- TICK_MEANING = 1 ขีด = 0.1 กก. = 100 กรัม
-- ANSWER_FORMAT = `........ กิโลกรัม ........ ขีด`
-- DIAL_SHAPE = TRUE_CIRCLE
-- VIEW = FRONT_ORTHOGRAPHIC
-- CENTER_PIVOT_LOCK = ON
-- SINGLE_NEEDLE_ONLY = YES
-- NEEDLE_TARGET_MODE = EXACT_TICK
-- canonical 5kg teaching dial = 300° active sweep + 60° inactive gap, not 360°
-- default 10-question A4 portrait layout = 2 columns × 5 rows if minimum dial size is preserved
-- preferred render path = HYBRID or DETERMINISTIC_VECTOR
+`DIAL_MAX_KG=5`
+`MAJOR_DIVISION_KG=1`
+`MINOR_DIVISION_KG=0.1`
+`1 ขีด=0.1 kg=100 g`
+`ANSWER_FORMAT=........ กิโลกรัม ........ ขีด`
 
-### TIME_CLOCK / analog clock
-- CLOCK_FORMAT = 12_HOUR
-- standard 12/3/6/9 orientation
-- two hands only unless seconds requested
-- minute granularity derived from grade/difficulty
-- HOUR_HAND_MODE = CONTINUOUS_INTERPOLATION
-- TEMPLATE_LOCK = ON
-- `CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`
-- day/night pair uses one clock + two answer fields
-- preferred render path = HYBRID or DETERMINISTIC_VECTOR
+Exact conversion:
 
-### MEASUREMENT_LENGTH / ruler
-- metric system
-- MAJOR_DIVISION = 1 cm
-- MINOR_DIVISION = 1 mm when mm reading is taught
-- START_POSITION_MODE = ZERO for beginner worksheets
-- preferred render path = HYBRID or DETERMINISTIC_VECTOR
+`1000 g=1 kg`
 
-### MEASUREMENT_TEMPERATURE
-- UNIT = Celsius for Thai primary default
-- vertical scale
-- target must be exactly representable by MINOR_INTERVAL unless interpolation is explicitly taught
-- liquid endpoint must align exactly to target graduation
-- preferred render path = HYBRID or DETERMINISTIC_VECTOR
+## 12. Temperature parameters
 
-### MEASUREMENT_CAPACITY
-- UNIT = L or mL derived from topic
-- MENISCUS_MODE = SIMPLE_FLAT for early primary unless science-specific meniscus reading is requested
-- scientific mode must explicitly lock READ_BOTTOM_MENISCUS or READ_TOP_MENISCUS
-- renderer-only target numbers must not be printed as labels/annotations
-- preferred render path = HYBRID or DETERMINISTIC_VECTOR
+`TEMPERATURE_SUBDOMAIN=THERMOMETER_READING|COMPARE|CHANGE`
+`MIN_TEMP`
+`MAX_TEMP`
+`MAJOR_INTERVAL`
+`MINOR_INTERVAL`
+`UNIT=C|F`
+`ORIENTATION=VERTICAL|HORIZONTAL`
+`TARGET_TEMPERATURES`
 
-### MONEY
-- CURRENCY = THB for Thai context
-- arithmetic performed in smallest currency unit when decimals are active
-- SHOW_ANSWER_KEY = NO
+Discrete reading targets must be exactly representable by the minor interval unless interpolation is explicitly taught.
 
-### CALENDAR
-- real Gregorian date relationships
-- WEEK_START derived from worksheet convention and recorded explicitly
-- invalid dates prohibited
+## 13. Capacity/volume parameters
 
-### DATA_READING
-- DATASET is canonical before visualization
-- graph/table must visualize exact dataset
-- 3D/perspective graph distortion prohibited
-- preferred render path = DOCUMENT_FIRST, HYBRID, or DETERMINISTIC_VECTOR depending visualization
+`CAPACITY_SUBDOMAIN=READ_SCALE|MENISCUS|CAPACITY_CALCULATION|UNIT_CONVERSION|SOLID_VOLUME`
+`UNIT=ML|L|MIXED|CM3|M3`
+`SCALE_MIN`
+`SCALE_MAX`
+`MAJOR_DIVISION`
+`MINOR_DIVISION`
+`CONTAINER_TYPE`
+`MENISCUS_MODE=SIMPLE_FLAT|SCIENTIFIC`
+`MENISCUS_READ_POINT=BOTTOM|TOP`
+`TARGET_LEVELS`
+`CAPACITY_TASK_TYPE=READ|ADD|SUBTRACT|COMPARE|DIFFERENCE|CONVERT`
+`SOLID_VOLUME_TASK=RECTANGULAR_PRISM|SIMPLE_COMPOSITE_RECTANGULAR_PRISMS`
 
-## 8. Prompt-generation defaults
+Exact relations:
 
-Unless explicitly overridden:
+`1000 mL=1 L`
+`1 cm³=1 mL` when explicitly taught
+`1000 cm³=1 L` when explicitly taught
 
-`OUTPUT_MODE=PROMPT_PACKAGE`
-`PRIMARY_DELIVERABLE=FINAL_IMAGE_GENERATION_PROMPT`
+Rectangular-prism volume:
 
-A visual question is production-complete only when its final prompt has one canonical template plus an explicit renderer state for every item. High-risk instrument states use:
+`V=length×width×height`
 
-`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`.
+All dimensions must be expressed in compatible units before multiplication.
 
-## 9. Default resolution algorithm
+## 14. Grade progression AUTO
 
-For every field:
+Use conservative defaults from `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
-1. valid explicit user value wins;
-2. else apply domain-specific default;
-3. else apply core default/auto rule;
-4. record resolved value;
-5. resolve KB route/compatibility;
-6. resolve `RENDER_PATH`;
-7. run one-page feasibility planning;
-8. if no safe rule exists and correctness changes, ask one concise clarification.
+General pattern:
 
-## 10. Teacher-friendly rule
+- P1: direct comparison/basic whole-unit reading; minimal conversion
+- P2: simple reading and one-step arithmetic with familiar units
+- P3: finer graduations, duration, ruler mm/cm, kg/ขีด, mL/L, basic distance
+- P4: multi-unit length/time, more nonzero-start ruler reading, route arithmetic, basic unit conversion
+- P5: mixed-unit/decimal conversions where appropriate, capacity/volume applications
+- P6: multi-step measurement reasoning, composite distance/time/volume problems
 
-Bad interaction:
+Do not introduce a higher-grade complexity merely because the renderer can display it.
 
-> Please provide MAX_CAPACITY, MINOR_DIVISION, TEMPLATE_LOCK, GEOMETRY_LOCK...
+## 15. Default resolution algorithm
 
-Good interaction:
+1. valid explicit user value wins
+2. else owning worker/domain default
+3. else grade/curriculum-profile default
+4. else core default/AUTO
+5. record resolved value
+6. route workers
+7. resolve one render path
+8. run one-page feasibility
+9. if no safe rule exists and correctness changes, ask one concise clarification
 
-> ได้ครับ ป.3 การอ่านตราชั่ง 10 ข้อ ผมจะใช้ตราชั่ง 5 กก. ขีดย่อย 0.1 กก. A4 แนวตั้ง ขาวดำ ไม่ใส่เฉลย จัดให้จบใน 1 หน้าเป็นอันดับแรก และสร้าง Final Image Generation Prompt ที่ล็อกหน้าปัดกับตำแหน่งเข็มให้ครบทุกข้อ
+## 16. Teacher-friendly interaction
 
-The teacher may override visible educational choices in ordinary language.
+Never ask ordinary teachers for technical fields such as `TICK_POSITION_COUNT` when a safe domain default exists. Translate natural language into parameters internally.
 
-## 11. Advanced users
-
-Automation builders may provide structured parameters directly. The same normalization, KB routing, and QA still apply. Technical input never bypasses validation.
+Advanced users may provide structured parameters directly; structured input never bypasses worker/domain validation.
