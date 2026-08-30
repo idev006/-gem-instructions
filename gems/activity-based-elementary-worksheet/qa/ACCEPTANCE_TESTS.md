@@ -1,6 +1,6 @@
 # Acceptance Tests — Activity-Based Elementary Worksheet Generator
 
-Version: 2.2.1
+Version: 2.2.2
 Status: Critical QA / Regression Suite
 
 A production release passes only when all applicable critical tests pass. Weighted score never overrides a critical blocker.
@@ -337,6 +337,44 @@ If an engine header and `DOMAIN_REGISTRY.md` disagree, `DOMAIN_MATURITY_QA=FAIL`
 ### Test 100 — Academic maturity is not overall maturity
 A deterministic academic calculation layer may be reported as mature, but overall `DOMAIN_MATURITY` remains the registry value until release-matrix evidence is satisfied.
 
+## Q. v2.2.2 cross-domain graduation-count regression
+
+### Test 101 — Interval/tick distinction
+For an endpoint-inclusive linear scale, `EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`. The system must not confuse intervals with tick positions.
+
+### Test 102 — Exact representability
+A graduated scale whose `(MAX-MIN)/MINOR_INTERVAL` is non-integer is rejected or normalized before render; renderer never approximates a nonrepresentable graduation system.
+
+### Test 103 — Ruler 1 cm topology
+A 0–1 cm span at 1 mm resolution contains exactly 10 equal intervals and 11 endpoint-inclusive graduation positions.
+
+### Test 104 — Clock cyclic topology
+A full minute-mark analog clock contains exactly 60 equal intervals and 60 distinct minute positions; minute 0 and minute 60 share the same 12-o'clock location and must not create a duplicate tick.
+
+### Test 105 — Thermometer count
+A 0–50°C thermometer with 1°C minor interval contains exactly 50 intervals and 51 endpoint-inclusive graduation positions.
+
+### Test 106 — Thermometer zero placement
+A -10–40°C thermometer with 1°C interval places 0°C exactly 10 intervals above -10°C and preserves 50 intervals/51 positions overall.
+
+### Test 107 — Capacity count 100 mL
+A 0–1000 mL scale with 100 mL minor interval contains exactly 10 intervals and 11 endpoint-inclusive graduation positions.
+
+### Test 108 — Capacity count 50 mL
+A 0–1000 mL scale with 50 mL minor interval contains exactly 20 intervals and 21 endpoint-inclusive graduation positions.
+
+### Test 109 — No missing/extra graduation
+Any missing, duplicated, merged, or extra instructional graduation in a learner-read scale is `CRITICAL_ACADEMIC` and blocks release even if spacing otherwise looks regular.
+
+### Test 110 — No graduation outside active scale
+No value tick may appear in an inactive or non-scale region. This includes the 60° inactive gap of the canonical 0–5 kg teaching dial.
+
+### Test 111 — Major/minor ratio
+When both major and minor intervals exist, each major interval contains exactly `MAJOR_INTERVAL / MINOR_INTERVAL` equal minor intervals.
+
+### Test 112 — Per-instrument graduation audit
+Post-render QA verifies graduation count for every instructional instrument individually; a page-level spot check is insufficient.
+
 ## Release gates
 
 Global required statuses:
@@ -362,10 +400,14 @@ LAYOUT_QA
 READABILITY_QA
 PRINT_QA
 PROMPT_QA
+INTERVAL_COUNT_QA when graduated instruments are present
+TICK_POSITION_COUNT_QA/GRADUATION_COUNT_QA when graduated instruments are present
+NO_MISSING_TICK_QA when graduated instruments are present
+NO_EXTRA_TICK_QA when graduated instruments are present
 ```
 
 Plus all applicable domain-specific geometry/data gates.
 
-Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage anywhere in visible output, wrong count, wrong artifact type, incorrect maturity claim, unsafe page-lock override, missing glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
+Critical blockers include wrong academic result, invalid data/geometry, wrong graduation count, missing/extra instructional marks, ambiguous instrument, answer leakage anywhere in visible output, wrong count, wrong artifact type, incorrect maturity claim, unsafe page-lock override, missing glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
 
 Dry-run score target: >=95/100 AND zero critical blockers. Actual classroom release additionally requires post-render inspection when nondeterministic rendering is used.
