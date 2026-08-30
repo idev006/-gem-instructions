@@ -1,26 +1,26 @@
 # คู่มือสำหรับครู — Activity-Based Elementary Worksheet Generator
 
-Version: 2.3.0
+Version: 2.3.2
 Status: Teacher-facing guide aligned with production prompt-generator baseline
 
 ## Gem นี้ทำอะไร
 
-Gem นี้มีหน้าที่ **สร้าง Prompt สำหรับใบงาน** ไม่ใช่จำเป็นต้องสร้างภาพใบงานเอง
+Gem นี้มีหน้าที่ **สร้าง Prompt สำหรับใบงาน** ไม่ใช่สร้างภาพใบงานเองเป็นค่าเริ่มต้น
 
 ครูบอกความต้องการด้วยภาษาธรรมดา แล้ว Gem จะ:
 
 - วิเคราะห์ระดับชั้น/เรื่อง/จำนวนข้อ;
-- เลือก Domain Engine ที่เหมาะสม;
+- route ไปยัง Domain Engine ที่ถูกต้อง;
 - สร้างและตรวจโจทย์/คำตอบภายในแบบ deterministic เมื่อทำได้;
-- แยกคำตอบภายในออกจากสิ่งที่จะพิมพ์ให้นักเรียน;
+- แยกคำตอบภายในออกจากสิ่งที่เด็กเห็น;
 - คำนวณ geometry/ขีด/เข็ม/ระดับของมาตรวัดที่เป็นข้อมูลการเรียน;
 - วางแผน A4 และพยายามจัด 1 หน้าเป็นอันดับแรก;
-- เลือก render-path ที่เหมาะกับงาน;
+- เลือก render-path ที่เหมาะกับ downstream AI;
 - สร้าง `FINAL_IMAGE_GENERATION_PROMPT` ที่พร้อม COPY ไปสั่ง AI สร้างภาพอื่นได้ทันที.
 
 แนวคิดหลัก:
 
-`คำสั่งครู → ตรวจเนื้อหา → ตรวจ geometry → วาง layout → compile prompt → QA → prompt พร้อมใช้`
+`คำสั่งครู → route KB/domain → ตรวจเนื้อหา → ตรวจ geometry → วาง layout → compile prompt → QA → prompt พร้อมใช้`
 
 ## บอกเพียง 3 อย่างก็เริ่มได้
 
@@ -51,31 +51,30 @@ Gem จะเติมค่าที่ปลอดภัยจาก policy/do
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-**ส่วนที่ 6 คือผลลัพธ์หลัก**
+**ส่วนที่ 6 คือผลลัพธ์หลัก** และต้องสามารถ copy ไปใช้เดี่ยว ๆ ได้
 
-ครูสามารถคัดลอกเฉพาะ `FINAL_IMAGE_GENERATION_PROMPT` แล้วนำไปสั่ง AI สร้างภาพได้เลย โดยไม่ควรต้องรวมข้อความจากส่วนอื่นเอง
+## Final Prompt ต้องมีอะไร
 
-## สิ่งที่ Final Prompt ต้องมี
+อย่างน้อยต้องมี:
 
-Final Prompt ที่ผ่าน production QA ต้องระบุครบอย่างน้อย:
-
-- A4 / orientation / ขาวดำหรือสี;
-- ระดับชั้น วิชา เรื่อง และจุดประสงค์;
-- จำนวนข้อที่แน่นอน;
+- A4 / orientation / color mode;
+- ระดับชั้น วิชา เรื่อง จุดประสงค์;
+- จำนวนข้อแน่นอน;
 - หัวกระดาษ ชื่อ-ชั้น-เลขที่;
-- คำชี้แจงและข้อความที่นักเรียนเห็นจริง;
-- layout ที่ชัดเจน เช่น 2×5 หรือ table 10 rows;
-- ช่องตอบที่เว้นว่าง;
-- รายละเอียดภาพ/มาตรวัดของ **แต่ละข้อ**;
-- geometry/tick topology ที่จำเป็น;
-- ขนาดขั้นต่ำของเครื่องมือ;
+- คำชี้แจงและข้อความนักเรียน;
+- layout ชัดเจน;
+- ช่องตอบว่าง;
+- canonical visual/instrument template;
+- รายละเอียดภาพ/มาตรวัดของ **ทุกข้อ**;
+- geometry/tick topology และขนาดขั้นต่ำเมื่อเกี่ยวข้อง;
 - theme/art style;
-- hard negatives เช่น ห้ามเฉลย ห้ามตัดขอบ ห้ามเพิ่มโจทย์;
-- downstream `RENDER_PATH` guidance.
+- hard negatives;
+- downstream `RENDER_PATH` guidance;
+- `RENDER_OBJECTIVE=STUDENT_WORKSHEET`.
 
 ## ห้าม Final Prompt หยุดที่ placeholder
 
-สิ่งต่อไปนี้อาจใช้เป็น intermediate blueprint ได้ แต่ **ไม่ใช่ Final Prompt ที่พร้อมใช้**:
+สิ่งเหล่านี้ใช้เป็น intermediate blueprint ได้ แต่ไม่ใช่ Final Prompt:
 
 > `[ภาพหน้าปัดนาฬิกา: เข็มสั้นชี้เลข 3]`
 
@@ -87,46 +86,32 @@ Final Prompt ที่ผ่าน production QA ต้องระบุคร�
 
 > `ทำข้ออื่นเหมือนตัวอย่างด้านบน`
 
-Final Prompt ต้องแปลง placeholder เหล่านี้เป็น renderer-ready instructions ก่อนส่งให้ครู
-
-## งานภาพซ้ำหลายข้อ
-
-ถ้ามีหน้าปัด/มาตรวัด 10 ข้อ ระบบควรใช้โครงสร้าง:
-
-`CANONICAL TEMPLATE + ITEM 1 STATE + ITEM 2 STATE + ... + ITEM 10 STATE`
-
-เช่น นาฬิกา:
-
-- template: วงกลมจริง, pivot กลาง, เลข 1–12, เข็มยาว/สั้นตามกฎ;
-- item state: ตำแหน่งเข็มของแต่ละข้อ.
-
-ตราชั่ง:
-
-- template: active sweep, inactive gap, จำนวน interval/tick ที่ถูกต้อง;
-- item state: ตำแหน่งเข็มแต่ละข้อ.
-
-ไม้บรรทัด/เทอร์โมมิเตอร์/ภาชนะตวงก็ใช้หลักเดียวกัน
+Final Prompt ต้องแปลงเป็น renderer-ready instructions ก่อนส่งให้ครู
 
 ## เครื่องมือวัด = ข้อมูลทางการเรียน
 
 ถ้าเด็กต้องอ่านนาฬิกา ตราชั่ง ไม้บรรทัด เทอร์โมมิเตอร์ หรือภาชนะตวง รูปร่าง สเกล ขีด เข็ม ระดับ และตำแหน่งต่าง ๆ เป็น academic data
 
-ขีดหาย/เกิน/ซ้ำหรืออยู่ผิดบริเวณไม่ใช่ข้อผิดพลาดตกแต่ง แต่เป็นความผิดพลาดทางการเรียน
-
-กฎกลาง:
+กฎกลางสำหรับ linear endpoint-inclusive scale:
 
 `EXPECTED_INTERVAL_COUNT = (MAX - MIN) / MINOR_INTERVAL`
 
-สำหรับ linear endpoint-inclusive scale:
-
 `EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
+
+นาฬิกาเป็น cyclic topology: 60 minute intervals / 60 distinct positions
+
+## Actual-render hardening
+
+เนื่องจาก AI สร้างภาพอาจวาดภาพที่ดูสวยแต่ผิดทางวิชาการ Gem v2.3.2 กำหนดให้ visual item ที่เสี่ยงสูงต้องมี:
+
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
 
 ตัวอย่าง:
 
-- 1 ซม. ที่ละเอียด 1 มม. = 10 intervals / 11 positions;
-- เทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C = 50 / 51;
-- ภาชนะ 0–1000 mL ขีดละ 100 mL = 10 / 11;
-- นาฬิกาเป็น cyclic topology: 60 minute intervals / 60 distinct positions.
+- 10:30 → เข็มยาว 180°, เข็มสั้น 315°, กึ่งกลาง 10–11, ห้ามชี้ 10 ตรง ๆ;
+- thermometer → liquid top ต้องตรง valid graduation, ห้ามอยู่ระหว่างขีดโดยไม่ได้ตั้งใจ;
+- meniscus → ระบุ top/bottom read point ให้แน่นอน และห้าม target number หลุดเป็น annotation;
+- ตราชั่ง 0–5 กก. → 300° active + 60° inactive gap, ห้าม full-circle 360° substitution.
 
 ## One-page-first
 
@@ -138,39 +123,40 @@ Default:
 
 Gem จะพยายามออกแบบ prompt ให้ลง A4 หน้าเดียวก่อน โดยไม่ลดความถูกต้อง ขนาดมาตรวัด ความอ่านง่าย หรือพื้นที่เขียนตอบ
 
-ถ้าครูสั่ง `A4 หน้าเดียวเท่านั้น` จะใช้ `ONE_PAGE_LOCK=ON` และถ้าจัดอย่างปลอดภัยไม่ได้ Gem ต้อง FAIL feasibility แทนการบีบจนอ่านไม่ได้
+ถ้าสั่ง `A4 หน้าเดียวเท่านั้น` แล้วจัดอย่างปลอดภัยไม่ได้ Gem ต้อง FAIL feasibility แทนการบีบจนผิด
 
 ## Render path คือคำแนะนำให้ AI ปลายทาง
 
-- `DOCUMENT_FIRST` — งานข้อความ/ตาราง/ตัวเลขมาก ให้รักษา text/table แบบ deterministic เป็นหลัก
-- `HYBRID` — แยก deterministic text/geometry ออกจาก generative theme art
-- `DETERMINISTIC_VECTOR` — geometry สำคัญมาก ให้ใช้รูปทรง/vector ที่แน่นอน
-- `IMAGE_ONLY` — ใช้เมื่อความเสี่ยงต่อข้อมูลต่ำหรือผู้ใช้ระบุ และต้องตรวจภาพหลังสร้าง
+- `DOCUMENT_FIRST` — งานข้อความ/ตาราง/ตัวเลขมาก
+- `HYBRID` — deterministic text/geometry + generative theme art
+- `DETERMINISTIC_VECTOR` — geometry สำคัญมาก
+- `IMAGE_ONLY` — ใช้เมื่อความเสี่ยงต่ำหรือผู้ใช้ระบุ และควรตรวจภาพหลังสร้าง
 
-Gem เองยังคงส่งออกเป็น Prompt Package ไม่ว่าจะเลือก render path ใด
+Gem เองยังคงส่งออก Prompt Package
 
-## ไม่มีเฉลย
+## ไม่มีเฉลย = ต้องกัน 2 แบบ
 
 เมื่อ `SHOW_ANSWER_KEY=NO`:
 
-- ช่องตอบของนักเรียนต้องว่าง;
-- ห้ามมีเฉลย/answer list;
-- ห้าม QA prose เปิดเผยคำตอบ;
-- renderer-only geometry สามารถอยู่ใน prompt เพื่อวาดภาพถูกต้องได้ แต่ห้ามพิมพ์เป็นคำตอบบนใบงาน.
+1. `ANSWER_LEAK_GUARD` — ห้ามเฉลย/answer vector/QA prose เปิดคำตอบ
+2. `TARGET_VALUE_LEAK_GUARD` — target ที่ใช้ควบคุม geometry ห้ามกลายเป็น extra scale label, arrow annotation หรือ completed answer
 
-## ตัวอย่างคำสั่ง
+## Knowledge Base ที่แนะนำ
 
-> ป.3 อ่านนาฬิกาเข็มชั่วโมงเต็ม 10 ข้อ A4 ขาวดำ ไม่มีเฉลย ธีมชีวิตประจำวัน
+ใช้ `GEM_INSTRUCTIONS_PRODUCTION.md` เป็น Instructions หลักของ Gem และอัปโหลด KB ตาม `KB_MANIFEST.md`
 
-> ป.3 อ่านตราชั่ง 0–5 กก. 10 ข้อ ขีดละ 0.1 กก. ตอบเป็นกิโลกรัมและขีด ขาวดำ ไม่มีเฉลย
+ไฟล์หลักที่ควรมี:
 
-> ป.3 อ่านไม้บรรทัด 10 ข้อ ซม.และมม. ธีมเครื่องเขียน
+- `OUTPUT_CONTRACT.md`
+- `KB_ROUTER.md`
+- `KB_MANIFEST.md`
+- `policies/PARAMETER_POLICY.md`
+- `domains/DOMAIN_REGISTRY.md`
+- domain engines ทั้งหมดที่ต้องการรองรับ
+- `domains/INSTRUMENT_READING_ENGINE.md`
+- QA/regression files ที่ manifest ระบุ
 
-> ป.3 อ่านเทอร์โมมิเตอร์ 10 ข้อ °C ขาวดำ
-
-> ป.3 อ่านระดับน้ำจากภาชนะตวง 10 ข้อ 0–1000 mL
-
-> ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ชั่วโมงเต็ม
+Gem จะ route ตาม `KB_ROUTER.md` ไม่ใช่เอากฎจากทุกไฟล์มาปนกันโดยไม่มีลำดับ
 
 ## การขอแก้งาน
 
@@ -184,23 +170,26 @@ Gem เองยังคงส่งออกเป็น Prompt Package ไม
 
 > ทำให้ยากขึ้น
 
-Gem ต้องแก้ canonical state ก่อน แล้ว compile Final Prompt ใหม่ ไม่ควร patch เฉพาะคำปลายทางแบบขัดกับข้อมูลเดิม
+Gem ต้องแก้ canonical state ก่อนแล้ว compile Final Prompt ใหม่
 
 ## เกณฑ์ Prompt พร้อมใช้
 
 ก่อนส่ง Final Prompt ต้องผ่านอย่างน้อย:
 
+`KB_ROUTE_QA`
+`KB_COMPATIBILITY_QA`
 `PROMPT_QA`
 `PROMPT_COMPLETENESS_QA`
 `PROMPT_COPY_READY_QA`
 `PLACEHOLDER_VISUAL_QA`
 `VISIBLE_OUTPUT_SANITIZER_QA`
 `ANSWER_LEAK_QA`
+`TARGET_VALUE_LEAK_QA` เมื่อมี renderer-only target
 
 รวมทั้ง domain-specific QA ที่เกี่ยวข้อง
 
 จำง่าย ๆ:
 
-> **Final Prompt ต้องถูกต้อง + ครบ + ปลอด placeholder + copy ไปใช้ได้ทันที**
+> **Final Prompt ต้องถูกต้อง + ครบ + KB ถูกชุด + ไม่มี placeholder + ไม่มีเฉลย/target leak + copy ไปใช้ได้ทันที**
 
-ภาพที่ AI ปลายทางสร้างยังควรตรวจอีกครั้งก่อนใช้จริง โดยเฉพาะใบงานมาตรวัด เพราะ third-party renderer อาจวาด geometry ผิดแม้ prompt ถูกต้อง.
+ภาพที่ AI ปลายทางสร้างยังต้องตรวจอีกครั้งก่อนใช้จริง โดยเฉพาะใบงานมาตรวัด เพราะ Prompt QA ไม่ใช่ Artifact QA.
