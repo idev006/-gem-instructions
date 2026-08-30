@@ -46,7 +46,7 @@ Allowed:
 
 `AUTO | TH_PRIMARY_2568_P1_P3 | TH_CORE_2551_REV2560 | CUSTOM`
 
-`AUTO` uses the conservative grade progression in `domains/MEASUREMENT_COVERAGE_P1_P6.md`; it is a pedagogical default, not a claim that every school uses one identical curriculum sequence.
+AUTO uses the conservative progression in `domains/MEASUREMENT_COVERAGE_P1_P6.md`; it is a pedagogical default, not a claim that every school uses one identical sequence.
 
 Explicit teacher requirements override AUTO when academically valid.
 
@@ -69,7 +69,7 @@ Final `RENDER_PATH` must resolve to exactly one:
 
 `DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY`
 
-`AUTO` is input-only.
+AUTO is input-only.
 
 Default resolution:
 
@@ -124,10 +124,12 @@ Never reduce question count, crop, merge ticks, or shrink below minimum to force
 
 ## 9. Time/clock parameters
 
-`TIME_SUBDOMAIN=CLOCK_READING|TIME_CALCULATION`
+`TIME_SUBDOMAIN=CLOCK_READING|TIME_CALCULATION|TIME_UNIT_CONVERSION`
 `TIME_FORMAT=12_HOUR|24_HOUR`
+`TIME_PRECISION=HOUR|MINUTE|SECOND`
 `MINUTE_GRANULARITY=60|30|15|5|1`
-`TIME_TASK_TYPE=READ_CLOCK|START_PLUS_DURATION|START_END_TO_DURATION|END_MINUS_DURATION|COMPARE_TIME|SCHEDULE`
+`SECOND_GRANULARITY=60|30|15|10|5|1` when second precision is active
+`TIME_TASK_TYPE=READ_CLOCK|START_PLUS_DURATION|START_END_TO_DURATION|END_MINUS_DURATION|COMPARE_TIME|SCHEDULE|CONVERT`
 `CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`
 `DAY_NIGHT_MODE=OFF|ON`
 `TIME_CROSS_MIDNIGHT_ALLOWED=NO|YES`
@@ -137,11 +139,19 @@ Never reduce question count, crop, merge ticks, or shrink below minimum to force
 `TARGET_TIMES`
 `ANSWER_TIME_FORMAT`
 
-Default Thai elapsed-time mode: 24-hour, no midnight crossing unless requested.
+Exact relations:
 
-## 10. Length/ruler/distance parameters
+`60 s=1 min`
+`60 min=1 h`
+`24 h=1 day`
 
-`LENGTH_SUBDOMAIN=RULER_READING|LENGTH_CALCULATION|DISTANCE_CALCULATION|UNIT_CONVERSION`
+Default Thai elapsed-time mode: minute precision, 24-hour, no midnight crossing unless requested.
+
+Seconds are introduced only when explicitly requested or grade/objective warrants them. Do not add a seconds hand merely because second conversion is taught.
+
+## 10. Length/ruler/distance/measurement-geometry parameters
+
+`LENGTH_SUBDOMAIN=RULER_READING|LENGTH_CALCULATION|DISTANCE_CALCULATION|UNIT_CONVERSION|ANGLE_PROTRACTOR|PERIMETER|AREA|CIRCLE_MEASUREMENT`
 `UNIT_SET=MM|CM|M|KM|CM_MM|M_CM|KM_M|MIXED_METRIC`
 `RULER_SCALE_MIN`
 `RULER_SCALE_MAX`
@@ -152,19 +162,35 @@ Default Thai elapsed-time mode: 24-hour, no midnight crossing unless requested.
 `LENGTH_TASK_TYPE=READ|ADD|SUBTRACT|COMPARE|DIFFERENCE|CONVERT`
 `DISTANCE_TASK_TYPE=TOTAL|DIFFERENCE|ROUND_TRIP|MULTI_SEGMENT|ROUTE_COMPARE|CONVERT`
 `DISTANCE_CONTEXT=DAILY_LIFE|ROUTE|MAP_STYLE|WORD_PROBLEM`
+`ANGLE_TASK_TYPE=READ|CLASSIFY|COMPARE|CONSTRUCT`
+`PROTRACTOR_RANGE=0_180|0_360`
+`ANGLE_MINOR_DIVISION_DEG`
+`TARGET_ANGLES`
+`PROTRACTOR_SCALE_DIRECTION=LEFT_ZERO|RIGHT_ZERO`
+`PERIMETER_TASK_TYPE=POLYGON|RECTANGLE|SQUARE|MIXED`
+`AREA_TASK_TYPE=RECTANGLE|SQUARE|TRIANGLE|PARALLELOGRAM|TRAPEZOID|CIRCLE|MIXED`
+`AREA_UNIT=CM2|M2|KM2|MIXED`
+`PI_POLICY=3.14|22/7|SYMBOLIC|CUSTOM` when circle calculation is used
 
-Exact metric relations:
+Exact length relations:
 
 `10 mm=1 cm`
 `100 cm=1 m`
 `1000 m=1 km`
 
-Normalize to a canonical base unit before arithmetic.
+Exact area relations:
+
+`1 m²=10,000 cm²`
+`1 km²=1,000,000 m²`
+
+Normalize to compatible units before arithmetic/formulas. Squared-unit conversion uses the square of the linear factor.
+
+Protractor reading requires an explicit active 0° baseline/scale direction when dual scales are visible.
 
 ## 11. Weight parameters
 
 `WEIGHT_SUBDOMAIN=DIAL_READING|WEIGHT_CALCULATION|UNIT_CONVERSION`
-`UNIT_SET=G|KG|KG_AND_G|KG_AND_TICK`
+`UNIT_SET=G|KG|KG_AND_G|KG_AND_TICK|METRIC_TONNE`
 `DIAL_MAX_KG`
 `MAJOR_DIVISION_KG`
 `MINOR_DIVISION_KG`
@@ -182,6 +208,7 @@ Thai Grade 3 dial default when appropriate:
 Exact conversion:
 
 `1000 g=1 kg`
+`1000 kg=1 metric tonne` when explicitly taught/requested
 
 ## 12. Temperature parameters
 
@@ -198,8 +225,8 @@ Discrete reading targets must be exactly representable by the minor interval unl
 
 ## 13. Capacity/volume parameters
 
-`CAPACITY_SUBDOMAIN=READ_SCALE|MENISCUS|CAPACITY_CALCULATION|UNIT_CONVERSION|SOLID_VOLUME`
-`UNIT=ML|L|MIXED|CM3|M3`
+`CAPACITY_SUBDOMAIN=READ_SCALE|MENISCUS|CAPACITY_CALCULATION|UNIT_CONVERSION|SOLID_VOLUME|CUBIC_UNIT_CONVERSION`
+`UNIT=ML|L|MIXED|CM3|DM3|M3`
 `SCALE_MIN`
 `SCALE_MAX`
 `MAJOR_DIVISION`
@@ -214,14 +241,21 @@ Discrete reading targets must be exactly representable by the minor interval unl
 Exact relations:
 
 `1000 mL=1 L`
-`1 cm³=1 mL` when explicitly taught
-`1000 cm³=1 L` when explicitly taught
+`1000 cm³=1 dm³`
+`1000 dm³=1 m³`
+`1 m³=1,000,000 cm³`
+
+When explicitly taught:
+
+`1 cm³=1 mL`
+`1 dm³=1 L`
+`1 m³=1000 L`
 
 Rectangular-prism volume:
 
 `V=length×width×height`
 
-All dimensions must be expressed in compatible units before multiplication.
+All dimensions must be expressed in compatible linear units before multiplication. Cubic conversion uses cubed linear factors.
 
 ## 14. Grade progression AUTO
 
@@ -231,12 +265,12 @@ General pattern:
 
 - P1: direct comparison/basic whole-unit reading; minimal conversion
 - P2: simple reading and one-step arithmetic with familiar units
-- P3: finer graduations, duration, ruler mm/cm, kg/ขีด, mL/L, basic distance
-- P4: multi-unit length/time, more nonzero-start ruler reading, route arithmetic, basic unit conversion
-- P5: mixed-unit/decimal conversions where appropriate, capacity/volume applications
-- P6: multi-step measurement reasoning, composite distance/time/volume problems
+- P3: finer graduations, duration, ruler mm/cm, kg/ขีด, mL/L, basic distance/perimeter
+- P4: multi-unit length/time, nonzero-start ruler, route arithmetic, protractor, rectangle/square area/perimeter, seconds when taught
+- P5: mixed/decimal conversions, broader area tasks, rectangular-prism volume, cm³/dm³ relations when taught
+- P6: multi-step measurement reasoning, polygon/circle measurement, composite rectangular-prism volume, cm³/dm³/m³ conversion
 
-Do not introduce a higher-grade complexity merely because the renderer can display it.
+Do not introduce higher-grade complexity merely because the renderer can display it.
 
 ## 15. Default resolution algorithm
 
