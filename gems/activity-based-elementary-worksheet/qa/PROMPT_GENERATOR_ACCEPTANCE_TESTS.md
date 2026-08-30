@@ -1,7 +1,7 @@
 # Prompt Generator Acceptance Tests
 
-Version: 1.0.0
-Applies to Gem baseline: 2.3.0+
+Version: 1.1.0
+Applies to Gem baseline: 2.3.2+
 Status: Critical regression suite
 
 Purpose: verify that `activity-based-elementary-worksheet` behaves as a production worksheet **prompt generator**, not as a renderer and not as a blueprint-only assistant.
@@ -9,151 +9,103 @@ Purpose: verify that `activity-based-elementary-worksheet` behaves as a producti
 A critical failure in this suite blocks production prompt release.
 
 ## PG-01 — Primary deliverable exists
-
-Input:
-
-`ป.3 อ่านนาฬิกาเข็มชั่วโมงเต็ม 10 ข้อ A4 ขาวดำ ไม่มีเฉลย`
+Input: `ป.3 อ่านนาฬิกาเข็มชั่วโมงเต็ม 10 ข้อ A4 ขาวดำ ไม่มีเฉลย`
 
 Expected:
-
 - visible response contains `FINAL_IMAGE_GENERATION_PROMPT`;
 - final prompt is not empty;
 - response does not stop after student content/blueprint.
 
-Failure class: `CRITICAL_PROMPT_COMPLETENESS`.
-
 ## PG-02 — Copy-ready standalone prompt
+Copy only `FINAL_IMAGE_GENERATION_PROMPT` into a new context.
 
-Copy only the contents of `FINAL_IMAGE_GENERATION_PROMPT` into a new context.
+Expected: downstream renderer can determine learner, subject, topic, page size, orientation, color mode, exact count, layout, student text, response blanks, visual states, constraints, and hard negatives without reading earlier Gem sections.
 
-Expected: the downstream renderer has enough information to determine learner, subject, topic, page size, orientation, color mode, exact count, layout, student text, response blanks, visual states, constraints, and hard negatives without reading any earlier Gem section.
-
-Forbidden dependencies:
-
-- `see above`
-- `use the blueprint above`
-- `ตามตารางด้านบน`
-- `ตามข้อมูลข้างต้น`
-- unresolved external references.
-
-Failure class: `CRITICAL_PROMPT_COMPLETENESS`.
+Forbidden dependencies: `see above`, `use the blueprint above`, `ตามตารางด้านบน`, `ตามข้อมูลข้างต้น`, unresolved external references.
 
 ## PG-03 — No pseudo-image placeholders
+Final prompt contains none of: `[ภาพ...]`, `[รูป...]`, `[insert clock]`, `<draw here>`, `TBD`, `same as above`.
 
-For visual worksheets, final prompt must contain no unresolved placeholders such as:
-
-- `[ภาพ...]`
-- `[รูป...]`
-- `[insert clock]`
-- `<draw here>`
-- `TBD`
-- `same as above`
-
-Expected: every required visual is serialized as renderer-ready instructions.
-
-Failure class: `CRITICAL_PLACEHOLDER`.
+Every required visual is renderer-ready.
 
 ## PG-04 — Clock per-item serialization
-
-For 10 analog-clock questions, define one canonical clock template and exactly 10 item states.
-
-Each item state must contain enough renderer geometry to place both hands correctly. For minute-level faces, include required minute-mark topology.
-
-A list such as `[ภาพนาฬิกา: เข็มสั้นชี้ 3]` without final renderer instructions fails.
+For N analog-clock questions, define one canonical clock template and exactly N item states. Each state contains minute angle/relationship, continuous hour-hand angle/relationship, and an item-specific negative when minutes are nonzero.
 
 ## PG-05 — Scale per-item serialization
-
 For canonical 0–5 kg / 0.1 kg scale reading:
-
-- prompt defines 300° active sweep;
-- 60° inactive gap;
+- 300° active sweep;
+- visible 60° inactive gap;
 - 50 active intervals;
 - 51 active tick positions;
 - no value ticks in inactive gap;
+- explicit `DO NOT draw a 360-degree value scale`;
 - one canonical dial template;
-- exactly N needle/item states for N questions.
-
-No state may be left for the renderer to invent.
+- exactly N needle/item states.
 
 ## PG-06 — Linear graduation serialization
-
-Ruler, thermometer, and graduated-capacity prompts must provide scale range + minor interval + expected interval/tick-position topology, or equivalent exact deterministic instructions.
-
-Examples that must be representable:
-
-- 1 cm at 1 mm resolution = 10 intervals / 11 endpoint-inclusive positions;
-- 0–50°C at 1°C = 50 / 51;
-- 0–1000 mL at 100 mL = 10 / 11.
+Ruler, thermometer, and capacity prompts provide scale range + minor interval + exact interval/tick-position topology or equivalent deterministic instructions.
 
 ## PG-07 — Student-visible answer integrity
-
-When `SHOW_ANSWER_KEY=NO`:
-
-- answer blanks remain blank;
-- no solved answer list/key appears;
-- no QA prose reveals answers;
-- renderer-only geometry may exist only as instructions needed to draw the visual and must not be printed as worksheet answer text.
+When `SHOW_ANSWER_KEY=NO`, answer blanks remain blank; no answer list/key or QA prose reveals answers.
 
 ## PG-08 — Exact question-count serialization
-
-For a request of N questions:
-
-- blueprint has N items;
-- final prompt has N student question regions/states;
-- no `etc.`, `repeat similarly`, or implicit omitted remainder is allowed.
-
-Failure class: `CRITICAL_PROMPT_COMPLETENESS`.
+For N questions, blueprint and final prompt both contain exactly N question states. No `etc.` or implicit omitted remainder.
 
 ## PG-09 — Layout is explicit
-
-Final prompt specifies a concrete layout suitable for the requested count, such as table rows or a 2×5 card grid.
-
-It must include page orientation, title/header/instruction zones, response space, and minimum instrument size when applicable.
-
-The downstream renderer must not have to infer how 10 questions fit on A4.
+Final prompt specifies concrete page/layout structure, zones, response space, and minimum instrument size when applicable.
 
 ## PG-10 — Render path is downstream guidance
-
-For `DOCUMENT_FIRST`, `HYBRID`, or `DETERMINISTIC_VECTOR`, final prompt explains how the downstream system should preserve deterministic text/data/geometry.
-
-The Gem must not claim that it rendered the artifact itself merely because a render path was selected.
+Gem does not claim it rendered an artifact merely because a render path was selected.
 
 ## PG-11 — No meta worksheet artifact
-
-The requested downstream image target is a student worksheet.
-
-Final prompt must prohibit rendering:
-
-- QA dashboard;
-- prompt poster;
-- rubric;
-- production notes;
-- blueprint labels;
-- hidden metadata;
-- internal answers.
-
-Use `RENDER_OBJECTIVE=STUDENT_WORKSHEET`.
+Final prompt requires `RENDER_OBJECTIVE=STUDENT_WORKSHEET` and prohibits QA dashboard, prompt poster, rubric, hidden metadata, internal answers.
 
 ## PG-12 — Prompt-release gate
+Before release all applicable critical gates pass, including prompt, placeholder, sanitizer, count, layout, domain and geometry gates.
 
-Before release all must PASS:
+## PG-13 — KB route is explicit and complete
+For each supported domain, `KB_ROUTE_QA` selects the required engine set defined by `DOMAIN_REGISTRY.md` and `KB_ROUTER.md`.
 
-`PROMPT_QA`
-`PROMPT_COMPLETENESS_QA`
-`PROMPT_COPY_READY_QA`
-`PLACEHOLDER_VISUAL_QA`
-`VISIBLE_OUTPUT_SANITIZER_QA`
-`ANSWER_LEAK_QA`
-`QUESTION_COUNT_QA`
-`LAYOUT_QA`
+Visual instrument domain without `INSTRUMENT_READING_ENGINE.md` = FAIL.
 
-Plus applicable domain/geometry/topology gates.
+## PG-14 — KB compatibility gate
+If required core KB is missing or known incompatible with `KB_MANIFEST.md`, `KB_COMPATIBILITY_QA=FAIL` and the Gem must not claim a production-ready prompt.
 
-One critical failure blocks final prompt release.
+## PG-15 — Core completeness regression
+A baseline upgrade must not silently remove major production contracts. Core must retain at least:
+- mission/product boundary;
+- parameter policy link;
+- two-view separation;
+- domain/KB routing;
+- instrument rules;
+- render-path guidance;
+- one-page policy;
+- layout policy;
+- Thai/text policy;
+- prompt compiler/no-placeholder rule;
+- render-objective lock;
+- visible-output sanitizer;
+- QA framework;
+- downstream artifact-QA distinction;
+- revision/release policy.
 
-## Reference regression — the failure we must prevent
+A shortened replacement that drops these contracts = `CRITICAL_GOVERNANCE`.
 
-This output is **not sufficient** as the final deliverable:
+## PG-16 — Dual leak guard
+For visual instruments with renderer-only targets, both `ANSWER_LEAK_QA` and `TARGET_VALUE_LEAK_QA` must pass. Blank student answer fields do not compensate for a target number printed beside a scale/arrow.
+
+## PG-17 — Redundant high-risk visual state
+Every high-risk visual item contains:
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`.
+
+Semantic-only state such as `show 10:30` is insufficient for a clock :30 regression case.
+
+## PG-18 — Prompt QA vs artifact QA distinction
+The Gem may report prompt QA after prompt compilation. It must not report actual rendered artifact QA as PASS unless the actual downstream artifact has been inspected.
+
+## Reference regressions
+
+Insufficient final deliverable:
 
 ```text
 1.
@@ -161,12 +113,10 @@ This output is **not sufficient** as the final deliverable:
 ตอบ: ........ นาฬิกา
 ```
 
-It may appear as an intermediate student-content representation, but production mode must continue to compile a standalone `FINAL_IMAGE_GENERATION_PROMPT` containing the canonical clock template, exact item geometry, page/layout instructions, visual constraints, and hard negatives.
+Required production principle:
+
+`VERIFIED + STUDENT-SAFE + SELF-CONTAINED + PLACEHOLDER-FREE + COPY-READY + KB-COMPATIBLE + PER-ITEM-EXACT`
 
 ## Release rule
 
-A prompt that is academically correct but requires the user to manually convert placeholders/blueprints into renderer instructions is **incomplete**.
-
-A production-ready prompt must be:
-
-`VERIFIED + STUDENT-SAFE + SELF-CONTAINED + PLACEHOLDER-FREE + COPY-READY`.
+A prompt that is academically correct but requires manual conversion from placeholders/blueprints is incomplete. A prompt that uses missing/incompatible KB or leaves high-risk geometry to renderer inference is also incomplete.
