@@ -1,25 +1,26 @@
 # คู่มือสำหรับครู — Activity-Based Elementary Worksheet Generator
 
-Version: 2.2.1
-Status: Teacher-facing guide aligned with production baseline
-
-คู่มือนี้สำหรับครูและผู้สร้างสื่อที่ไม่จำเป็นต้องรู้ชื่อพารามิเตอร์หรือรายละเอียดเชิงเทคนิค สามารถสั่งงานด้วยภาษาไทยธรรมดาได้
+Version: 2.3.0
+Status: Teacher-facing guide aligned with production prompt-generator baseline
 
 ## Gem นี้ทำอะไร
 
-Gem ช่วยเปลี่ยนความต้องการของครูให้เป็นใบงานประถมที่มีเนื้อหาถูกต้อง จัดหน้าอ่านง่าย และมี QA ก่อนปล่อย โดยทำงานตามแนวคิด `content first → deterministic validation → student-safe blueprint → render-path selection → one-page feasibility → layout → render instructions → visible-output sanitizer → QA`.
+Gem นี้มีหน้าที่ **สร้าง Prompt สำหรับใบงาน** ไม่ใช่จำเป็นต้องสร้างภาพใบงานเอง
 
-ระบบช่วยทำให้โดยอัตโนมัติ เช่น:
+ครูบอกความต้องการด้วยภาษาธรรมดา แล้ว Gem จะ:
 
-- เข้าใจระดับชั้น เรื่อง และจำนวนข้อ
-- เลือก Domain Engine ที่เหมาะสม
-- สร้างและตรวจโจทย์/คำตอบภายในก่อนจัดหน้า
-- แยกคำตอบภายในออกจากสิ่งที่นักเรียนเห็น
-- ตรวจ geometry ของเครื่องมือวัดเมื่อภาพเป็นข้อมูลทางการเรียน
-- พยายามจัด A4 ให้จบใน 1 หน้าเป็นอันดับแรก
-- เลือก render path ที่เหมาะกับเนื้อหา
-- ตรวจภาษาไทย ตัวเลข หน่วย พื้นที่เขียนตอบ และการพิมพ์ขาวดำ
-- ป้องกันคำตอบหลุดในทั้ง worksheet และ prompt package
+- วิเคราะห์ระดับชั้น/เรื่อง/จำนวนข้อ;
+- เลือก Domain Engine ที่เหมาะสม;
+- สร้างและตรวจโจทย์/คำตอบภายในแบบ deterministic เมื่อทำได้;
+- แยกคำตอบภายในออกจากสิ่งที่จะพิมพ์ให้นักเรียน;
+- คำนวณ geometry/ขีด/เข็ม/ระดับของมาตรวัดที่เป็นข้อมูลการเรียน;
+- วางแผน A4 และพยายามจัด 1 หน้าเป็นอันดับแรก;
+- เลือก render-path ที่เหมาะกับงาน;
+- สร้าง `FINAL_IMAGE_GENERATION_PROMPT` ที่พร้อม COPY ไปสั่ง AI สร้างภาพอื่นได้ทันที.
+
+แนวคิดหลัก:
+
+`คำสั่งครู → ตรวจเนื้อหา → ตรวจ geometry → วาง layout → compile prompt → QA → prompt พร้อมใช้`
 
 ## บอกเพียง 3 อย่างก็เริ่มได้
 
@@ -33,125 +34,143 @@ Gem ช่วยเปลี่ยนความต้องการของ�
 
 > ป.3 การอ่านตราชั่ง 10 ข้อ
 
-> ป.3 อ่านนาฬิกาเข็มแบบกลางวันและกลางคืน 10 ข้อ
+> ป.3 อ่านนาฬิกาเข็ม 10 ข้อ
 
 > ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ
 
-> ป.4 อ่านกราฟแท่ง 10 ข้อ
+Gem จะเติมค่าที่ปลอดภัยจาก policy/domain ให้อัตโนมัติ
 
-ค่าที่ไม่จำเป็นต้องถามครูจะถูก resolve จาก default/domain policy อัตโนมัติ
+## Output ที่ควรได้รับ
 
-## สถานะความพร้อมของ Domain
+ค่าเริ่มต้นคือ `PROMPT_PACKAGE` 6 ส่วน:
 
-สถานะจริงให้ยึด `domains/DOMAIN_REGISTRY.md` เป็น SSOT เสมอ ปัจจุบัน overall domain หลักอยู่ใน `PRODUCTION_CANDIDATE` จนกว่าจะมี release evidence ครบตาม `qa/DOMAIN_RELEASE_MATRIX.md` แม้ว่าบาง domain จะมี deterministic academic rules ที่ mature แล้วก็ตาม
+1. `NORMALIZED_WORKSHEET_SPEC`
+2. `STUDENT_CONTENT_BLUEPRINT`
+3. `LAYOUT_BLUEPRINT`
+4. `RENDER_CONSTRAINTS`
+5. `QA_REPORT`
+6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-อย่าสับสนระหว่าง:
+**ส่วนที่ 6 คือผลลัพธ์หลัก**
 
-- `ACADEMIC_RULES=DETERMINISTIC_MATURE` — สูตร/ตรรกะภายในเชื่อถือได้
-- `DOMAIN_MATURITY=PRODUCTION_CANDIDATE` — artifact pipeline ทั้งหมดกำลังสะสม actual-render evidence
+ครูสามารถคัดลอกเฉพาะ `FINAL_IMAGE_GENERATION_PROMPT` แล้วนำไปสั่ง AI สร้างภาพได้เลย โดยไม่ควรต้องรวมข้อความจากส่วนอื่นเอง
 
-## ค่าเริ่มต้นสำคัญ
+## สิ่งที่ Final Prompt ต้องมี
 
-โดยทั่วไป:
+Final Prompt ที่ผ่าน production QA ต้องระบุครบอย่างน้อย:
 
-- วิชา: คณิตศาสตร์เมื่อหัวข้อชัดเจน
-- ภาษา: ไทย
-- กระดาษ: A4
-- แนว: ตั้ง
-- สี: ขาวดำ
-- ส่วนหัว: ชื่อ / ชั้น / เลขที่
-- ไม่มีเฉลย เว้นแต่สั่ง
-- `ONE_PAGE_PREFERRED=YES`
-- `TARGET_PAGE_COUNT=1`
-- `ONE_PAGE_LOCK=OFF`
-- `RENDER_PATH=AUTO`
-- Thai/data/answer/geometry locks เปิดอัตโนมัติตามชนิดใบงาน
+- A4 / orientation / ขาวดำหรือสี;
+- ระดับชั้น วิชา เรื่อง และจุดประสงค์;
+- จำนวนข้อที่แน่นอน;
+- หัวกระดาษ ชื่อ-ชั้น-เลขที่;
+- คำชี้แจงและข้อความที่นักเรียนเห็นจริง;
+- layout ที่ชัดเจน เช่น 2×5 หรือ table 10 rows;
+- ช่องตอบที่เว้นว่าง;
+- รายละเอียดภาพ/มาตรวัดของ **แต่ละข้อ**;
+- geometry/tick topology ที่จำเป็น;
+- ขนาดขั้นต่ำของเครื่องมือ;
+- theme/art style;
+- hard negatives เช่น ห้ามเฉลย ห้ามตัดขอบ ห้ามเพิ่มโจทย์;
+- downstream `RENDER_PATH` guidance.
 
-## นโยบาย 1 หน้า — ใช้กับใบงานทุกชนิด
+## ห้าม Final Prompt หยุดที่ placeholder
 
-Gem จะพยายามทำให้จบใน A4 1 หน้าเป็นอันดับแรก โดยรักษาลำดับความสำคัญดังนี้:
+สิ่งต่อไปนี้อาจใช้เป็น intermediate blueprint ได้ แต่ **ไม่ใช่ Final Prompt ที่พร้อมใช้**:
 
-1. ความถูกต้องและจำนวนข้อ
-2. ขนาดขั้นต่ำของเครื่องมือ/กราฟ/ภาพการเรียน
-3. ตัวอักษรที่อ่านได้และช่องเขียนตอบ
-4. เลือก layout ที่ประหยัดพื้นที่กว่าเดิม
-5. ลดของตกแต่ง
-6. ย่อคำชี้แจงที่ไม่จำเป็น
-7. ลด padding/white space ที่ไม่จำเป็น
-8. ลดขนาดภาพตกแต่ง
+> `[ภาพหน้าปัดนาฬิกา: เข็มสั้นชี้เลข 3]`
 
-ถ้ายังใส่ไม่ได้และครูไม่ได้ล็อก 1 หน้า ระบบจึงค่อยแบ่งหน้า
+> `[ใส่รูปตราชั่ง]`
 
-ถ้าครูสั่งว่า `1 หน้าเท่านั้น` หรือ `A4 หน้าเดียว` ระบบจะตั้ง `ONE_PAGE_LOCK=ON`; ห้ามสร้างหน้า 2 และห้ามบีบเนื้อหาจนอ่านไม่ได้ หากทำ 1 หน้าอย่างปลอดภัยไม่ได้ Gem ต้องรายงาน `ONE_PAGE_FEASIBILITY_QA=FAIL` แทนการสร้างใบงานเสียคุณภาพ
+> `<draw clock>`
 
-## Render path
+> `TBD`
 
-Gem ไม่ควรใช้ image model แบบเดียวกับทุกงาน
+> `ทำข้ออื่นเหมือนตัวอย่างด้านบน`
 
-- งานข้อความ/ตาราง/ตัวเลขมาก → `DOCUMENT_FIRST` หรือ `HYBRID`
-- งานเครื่องมือวัด/กราฟที่ geometry สำคัญ → `HYBRID` หรือ `DETERMINISTIC_VECTOR`
-- `IMAGE_ONLY` ใช้เมื่อความเสี่ยงต่อข้อความ/ตัวเลข/geometry ต่ำ หรือผู้ใช้ร้องขอ และต้องมี visual QA
+Final Prompt ต้องแปลง placeholder เหล่านี้เป็น renderer-ready instructions ก่อนส่งให้ครู
 
-ดังนั้นใบงานเวลาแบบตารางควรเน้น deterministic text/layout ขณะที่หน้าปัดนาฬิกา ตราชั่ง ไม้บรรทัด เทอร์โมมิเตอร์ และภาชนะตวงควรใช้ deterministic geometry เมื่อทำได้
+## งานภาพซ้ำหลายข้อ
+
+ถ้ามีหน้าปัด/มาตรวัด 10 ข้อ ระบบควรใช้โครงสร้าง:
+
+`CANONICAL TEMPLATE + ITEM 1 STATE + ITEM 2 STATE + ... + ITEM 10 STATE`
+
+เช่น นาฬิกา:
+
+- template: วงกลมจริง, pivot กลาง, เลข 1–12, เข็มยาว/สั้นตามกฎ;
+- item state: ตำแหน่งเข็มของแต่ละข้อ.
+
+ตราชั่ง:
+
+- template: active sweep, inactive gap, จำนวน interval/tick ที่ถูกต้อง;
+- item state: ตำแหน่งเข็มแต่ละข้อ.
+
+ไม้บรรทัด/เทอร์โมมิเตอร์/ภาชนะตวงก็ใช้หลักเดียวกัน
 
 ## เครื่องมือวัด = ข้อมูลทางการเรียน
 
-ถ้าเด็กต้องอ่านตราชั่ง นาฬิกา ไม้บรรทัด เทอร์โมมิเตอร์ หรือภาชนะตวง รูปร่าง สเกล ขีด เข็ม ระดับ และตำแหน่งต่าง ๆ ถือเป็น academic data ไม่ใช่ decoration
+ถ้าเด็กต้องอ่านนาฬิกา ตราชั่ง ไม้บรรทัด เทอร์โมมิเตอร์ หรือภาชนะตวง รูปร่าง สเกล ขีด เข็ม ระดับ และตำแหน่งต่าง ๆ เป็น academic data
 
-ถ้าพบอย่างใดอย่างหนึ่งต่อไปนี้ ให้ถือว่า worksheet ไม่ผ่าน:
+ขีดหาย/เกิน/ซ้ำหรืออยู่ผิดบริเวณไม่ใช่ข้อผิดพลาดตกแต่ง แต่เป็นความผิดพลาดทางการเรียน
 
-- เข็ม/ตัวชี้ไม่ยึดตำแหน่งที่ถูกต้อง
-- ขีดไม่เท่ากัน
-- label ผิดตำแหน่ง
-- หน้าปัดเป็นวงรีหรือถูกบิด
-- ruler วัดจากขอบแทน graduation zero
-- liquid/temperature level ไม่ตรงค่าที่กำหนด
-- clock hands ผิดเวลา
-- เครื่องมือเล็กจนเด็กอ่านไม่ได้
+กฎกลาง:
 
-## นาฬิกาแบบกลางวัน–กลางคืน
+`EXPECTED_INTERVAL_COUNT = (MAX - MIN) / MINOR_INTERVAL`
 
-รองรับ `CLOCK_READING_MODE=DAY_NIGHT_PAIR`:
+สำหรับ linear endpoint-inclusive scale:
 
-- 1 ข้อ = หน้าปัดนาฬิกา 1 เรือน
-- นักเรียนตอบ 2 ช่องจากหน้าปัดเดียว: `กลางวัน` และ `กลางคืน`
-- geometry ของเข็มวาดครั้งเดียว
-- การแปลงเป็นเวลา 24 ชั่วโมงคำนวณแบบ deterministic ภายใน
-- คำตอบต้องไม่ปรากฏใน visible package เมื่อไม่มีเฉลย
+`EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
 
-ตัวอย่างคำสั่ง:
+ตัวอย่าง:
 
-> ป.3 อ่านนาฬิกาเข็มแบบกลางวันและกลางคืน 10 ข้อ ทุก 5 นาที A4 ขาวดำ ไม่มีเฉลย
+- 1 ซม. ที่ละเอียด 1 มม. = 10 intervals / 11 positions;
+- เทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C = 50 / 51;
+- ภาชนะ 0–1000 mL ขีดละ 100 mL = 10 / 11;
+- นาฬิกาเป็น cyclic topology: 60 minute intervals / 60 distinct positions.
 
-## ตัวอย่างคำสั่งอื่น
+## One-page-first
 
-### การอ่านตราชั่ง
+Default:
 
-> ป.3 การอ่านตราชั่ง 10 ข้อ ธีมสวนผัก ตราชั่งสูงสุด 5 กิโลกรัม ตอบเป็นกิโลกรัมและขีด ขาวดำ ไม่ต้องมีเฉลย
+`ONE_PAGE_PREFERRED=YES`
+`TARGET_PAGE_COUNT=1`
+`ONE_PAGE_LOCK=OFF`
 
-### ระยะเวลา
+Gem จะพยายามออกแบบ prompt ให้ลง A4 หน้าเดียวก่อน โดยไม่ลดความถูกต้อง ขนาดมาตรวัด ความอ่านง่าย หรือพื้นที่เขียนตอบ
 
-> ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ แบบชั่วโมงและนาที ธีมสวนสนุก ไม่มีเฉลย
+ถ้าครูสั่ง `A4 หน้าเดียวเท่านั้น` จะใช้ `ONE_PAGE_LOCK=ON` และถ้าจัดอย่างปลอดภัยไม่ได้ Gem ต้อง FAIL feasibility แทนการบีบจนอ่านไม่ได้
 
-### ไม้บรรทัด
+## Render path คือคำแนะนำให้ AI ปลายทาง
 
-> ป.3 อ่านความยาวจากไม้บรรทัด 10 ข้อ ใช้เซนติเมตรและมิลลิเมตร
+- `DOCUMENT_FIRST` — งานข้อความ/ตาราง/ตัวเลขมาก ให้รักษา text/table แบบ deterministic เป็นหลัก
+- `HYBRID` — แยก deterministic text/geometry ออกจาก generative theme art
+- `DETERMINISTIC_VECTOR` — geometry สำคัญมาก ให้ใช้รูปทรง/vector ที่แน่นอน
+- `IMAGE_ONLY` — ใช้เมื่อความเสี่ยงต่อข้อมูลต่ำหรือผู้ใช้ระบุ และต้องตรวจภาพหลังสร้าง
 
-### อุณหภูมิ
+Gem เองยังคงส่งออกเป็น Prompt Package ไม่ว่าจะเลือก render path ใด
 
-> ป.3 อ่านเทอร์โมมิเตอร์ 10 ข้อ หน่วยองศาเซลเซียส
+## ไม่มีเฉลย
 
-### ความจุ
+เมื่อ `SHOW_ANSWER_KEY=NO`:
 
-> ป.3 อ่านระดับน้ำจากภาชนะตวง 10 ข้อ หน่วยมิลลิลิตร
+- ช่องตอบของนักเรียนต้องว่าง;
+- ห้ามมีเฉลย/answer list;
+- ห้าม QA prose เปิดเผยคำตอบ;
+- renderer-only geometry สามารถอยู่ใน prompt เพื่อวาดภาพถูกต้องได้ แต่ห้ามพิมพ์เป็นคำตอบบนใบงาน.
 
-### เงิน / ปฏิทิน / กราฟ
+## ตัวอย่างคำสั่ง
 
-> ป.3 ซื้อของ 10 ข้อ ให้หายอดรวมและเงินทอน
+> ป.3 อ่านนาฬิกาเข็มชั่วโมงเต็ม 10 ข้อ A4 ขาวดำ ไม่มีเฉลย ธีมชีวิตประจำวัน
 
-> ป.2 อ่านปฏิทิน 10 ข้อ
+> ป.3 อ่านตราชั่ง 0–5 กก. 10 ข้อ ขีดละ 0.1 กก. ตอบเป็นกิโลกรัมและขีด ขาวดำ ไม่มีเฉลย
 
-> ป.4 อ่านกราฟแท่ง 10 ข้อ ธีมผลไม้
+> ป.3 อ่านไม้บรรทัด 10 ข้อ ซม.และมม. ธีมเครื่องเขียน
+
+> ป.3 อ่านเทอร์โมมิเตอร์ 10 ข้อ °C ขาวดำ
+
+> ป.3 อ่านระดับน้ำจากภาชนะตวง 10 ข้อ 0–1000 mL
+
+> ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ชั่วโมงเต็ม
 
 ## การขอแก้งาน
 
@@ -159,31 +178,29 @@ Gem ไม่ควรใช้ image model แบบเดียวกับท
 
 > เปลี่ยนธีมเป็นอวกาศ แต่ห้ามเปลี่ยนโจทย์
 
-> ต้องอยู่ใน A4 หน้าเดียวเท่านั้น
+> ทำให้เป็น A4 หน้าเดียวเท่านั้น
 
 > เปลี่ยนเป็นแนวนอน แต่ใช้ข้อมูลเดิม
 
-> เพิ่มหน้าเฉลยแยกต่างหาก
-
 > ทำให้ยากขึ้น
 
-Gem ต้องแก้ canonical data/spec ก่อน แล้ว rerun QA ที่ได้รับผลกระทบ ไม่ patch เฉพาะ prompt ปลายทาง
+Gem ต้องแก้ canonical state ก่อน แล้ว compile Final Prompt ใหม่ ไม่ควร patch เฉพาะคำปลายทางแบบขัดกับข้อมูลเดิม
 
-## Output ที่จะได้รับ
+## เกณฑ์ Prompt พร้อมใช้
 
-ค่าเริ่มต้นเป็น prompt package 6 ส่วน:
+ก่อนส่ง Final Prompt ต้องผ่านอย่างน้อย:
 
-1. `NORMALIZED_WORKSHEET_SPEC`
-2. `STUDENT_CONTENT_BLUEPRINT`
-3. `LAYOUT_BLUEPRINT`
-4. `RENDER_CONSTRAINTS`
-5. `QA_REPORT`
-6. final render instruction package (ชื่อ section legacy อาจยังเป็น `FINAL_IMAGE_GENERATION_PROMPT` เพื่อ compatibility แต่เนื้อหาต้องตรงกับ resolved `RENDER_PATH`)
+`PROMPT_QA`
+`PROMPT_COMPLETENESS_QA`
+`PROMPT_COPY_READY_QA`
+`PLACEHOLDER_VISUAL_QA`
+`VISIBLE_OUTPUT_SANITIZER_QA`
+`ANSWER_LEAK_QA`
 
-Internal verified answers ต้องไม่ปรากฏใน visible package เมื่อปิดเฉลย
+รวมทั้ง domain-specific QA ที่เกี่ยวข้อง
 
-## ก่อนนำเข้าห้องเรียน
+จำง่าย ๆ:
 
-Prompt ผ่านไม่ได้แปลว่า artifact ผ่าน หากมีภาพ/PDF/document จริง ให้ตรวจ post-render QA โดยเฉพาะ question count, page count, ภาษาไทย/ตัวเลข, answer leakage, cropping, writable space และเครื่องมือ/กราฟทุกชิ้น
+> **Final Prompt ต้องถูกต้อง + ครบ + ปลอด placeholder + copy ไปใช้ได้ทันที**
 
-รายละเอียดสำหรับผู้ดูแลระบบอยู่ที่ `GEM_INSTRUCTIONS_PRODUCTION.md`, `OUTPUT_CONTRACT.md`, `policies/PARAMETER_POLICY.md`, `domains/DOMAIN_REGISTRY.md`, `domains/INSTRUMENT_READING_ENGINE.md`, และ `qa/DOMAIN_RELEASE_MATRIX.md`.
+ภาพที่ AI ปลายทางสร้างยังควรตรวจอีกครั้งก่อนใช้จริง โดยเฉพาะใบงานมาตรวัด เพราะ third-party renderer อาจวาด geometry ผิดแม้ prompt ถูกต้อง.
