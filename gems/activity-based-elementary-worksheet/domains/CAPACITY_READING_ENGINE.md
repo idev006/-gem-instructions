@@ -1,6 +1,6 @@
 # CAPACITY_READING_ENGINE — Graduated Capacity / Volume Reading
 
-Version: 1.1.0
+Version: 1.2.0
 Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 
@@ -30,9 +30,27 @@ For early primary worksheets default to:
 - no decorative waves/bubbles creating alternative reading lines
 - identical scale orientation and direction across repeated questions
 
-## Deterministic mapping
+## Deterministic graduation structure
 
 Let `d = MINOR_DIVISION`.
+
+`EXPECTED_INTERVAL_COUNT = round((MAX_CAPACITY - SCALE_MIN) / d)`
+
+`EXPECTED_TICK_POSITION_COUNT = EXPECTED_INTERVAL_COUNT + 1`
+
+Require exact representability within tolerance.
+
+Examples:
+
+- `0–1000 mL`, minor `100 mL` → 10 equal intervals, 11 endpoint-inclusive graduation positions
+- `0–1000 mL`, minor `50 mL` → 20 intervals, 21 positions
+- `500–1500 mL`, minor `100 mL` → 10 intervals, 11 positions; do not invent a zero mark outside the active scale
+
+When major and minor divisions are both defined, each major interval must contain exactly `MAJOR_DIVISION / MINOR_DIVISION` equal minor intervals.
+
+Missing, duplicated, or extra graduations are critical academic failures.
+
+## Deterministic mapping
 
 `tick_index = round((target - SCALE_MIN) / d)`
 
@@ -66,18 +84,30 @@ The chosen reading point must be visually explicit and used consistently.
 - reserve fixed instrument zones
 - smallest active graduation must remain readable after print/photocopy
 - labels and liquid line may not collide
-- if tick density becomes ambiguous, enlarge/paginate rather than shrink
+- preserve exact graduation count before decoration
+- if tick density becomes ambiguous, enlarge/paginate according to global one-page policy rather than shrink/merge marks
 
 ## Render-only metadata
 
 Compile per item:
 
-`TARGET_LEVEL, TICK_INDEX, LEVEL_RATIO, SCALE_MIN, SCALE_MAX, MINOR_DIVISION, MENISCUS_RULE, UNIT`
+`TARGET_LEVEL, TICK_INDEX, LEVEL_RATIO, SCALE_MIN, SCALE_MAX, MINOR_DIVISION, MENISCUS_RULE, UNIT, EXPECTED_INTERVAL_COUNT, EXPECTED_TICK_POSITION_COUNT`
 
 This is geometry control and must not become visible answer text.
 
+## Post-render QA
+
+Inspect every container individually and verify:
+
+- active range endpoints;
+- exact interval count and graduation-position count;
+- major/minor ratio;
+- no missing/duplicate/extra graduations;
+- no decorative line mistaken for a scale mark;
+- target liquid level aligned to the intended graduation.
+
 ## QA
 
-`CONTAINER_GEOMETRY_QA, SCALE_RANGE_QA, SCALE_DIRECTION_QA, GRADUATION_QA, LEVEL_ALIGNMENT_QA, MENISCUS_QA, LABEL_QA, TARGET_VOLUME_QA, UNIT_QA, MINIMUM_SIZE_QA`
+`CONTAINER_GEOMETRY_QA, SCALE_RANGE_QA, SCALE_DIRECTION_QA, INTERVAL_COUNT_QA, GRADUATION_COUNT_QA, TICK_SPACING_QA, MAJOR_MINOR_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, LEVEL_ALIGNMENT_QA, MENISCUS_QA, LABEL_QA, TARGET_VOLUME_QA, UNIT_QA, MINIMUM_SIZE_QA`
 
-Ambiguous or incorrect liquid level, scale baseline, or graduation blocks release.
+Ambiguous or incorrect liquid level, scale baseline, graduation count, or spacing blocks release.
