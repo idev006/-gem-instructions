@@ -1,201 +1,102 @@
 # CLOCK_READING_ENGINE — Analog Clock Reading
 
-Version: 1.2.0
+Version: 1.2.1
 Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 Registry authority: `domains/DOMAIN_REGISTRY.md`
 
 ## Learning goal
-
-Student reads hour and minute from an analog clock accurately and, when requested, connects one analog-clock geometry to its two valid 24-hour readings in a day/night pair.
+Student reads hour and minute from an analog clock accurately and, when requested, connects one analog geometry to valid day/night 24-hour readings.
 
 ## Core parameters
+`CLOCK_FORMAT=12_HOUR`, `MINUTE_GRANULARITY`, `SHOW_MINUTE_MARKS`, `SHOW_NUMBERS`, `HOUR_HAND_MODE`, `ANSWER_FORMAT`, `TARGET_TIMES`, `CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`, `ANSWER_TIME_FORMAT=12_HOUR|24_HOUR`.
 
-`CLOCK_FORMAT=12_HOUR`, `MINUTE_GRANULARITY`, `SHOW_MINUTE_MARKS`, `SHOW_NUMBERS`, `HOUR_HAND_MODE`, `ANSWER_FORMAT`, `TARGET_TIMES`, `CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR`, `ANSWER_TIME_FORMAT=12_HOUR|24_HOUR`, `DAY_NIGHT_LABEL_MODE=TEXT|ICON_TEXT`
-
-Suggested progression:
-
-- EASY: whole hours / half hours
-- MEDIUM: 5-minute intervals
-- HARD: 1-minute intervals when grade-appropriate
-
-For Thai elementary dual-reading worksheets, prefer:
-
-- `CLOCK_READING_MODE=DAY_NIGHT_PAIR`
-- `ANSWER_TIME_FORMAT=24_HOUR`
-- one clock face per question
-- two blank response fields: `กลางวัน` and `กลางคืน`
+Suggested progression: EASY whole/half hours; MEDIUM 5-minute intervals; HARD 1-minute intervals when grade-appropriate.
 
 ## Geometry invariants
-
-- true circular clock face in square reserved box
+- perfect circular face in square reserved box
 - exact center pivot
-- exactly two instructional hands unless seconds explicitly requested
+- exactly two instructional hands unless seconds requested
 - minute hand visibly longer than hour hand
 - 12 hour positions evenly spaced
 - standard clockwise grammar: 12 top, 3 right, 6 bottom, 9 left
 - no decorative pointer/hand
 
 ## Deterministic minute-mark topology
+A clock is cyclic. For a full minute-mark face:
+- exactly 60 equal minute intervals around 360°
+- exactly 60 distinct minute positions
+- 6° spacing
+- 12 hour positions every fifth minute mark = 30°
+- minute 0/60 is one shared position at 12; never duplicate the tick
+- major hour marks may be stronger but do not add positions
+- no missing/duplicated/merged/extra minute positions
 
-An analog clock is a **cyclic scale**. Unlike a linear ruler, the 60th minute interval returns to the starting position at 12.
-
-When minute-level reading is active:
-
-- exactly **60 equal minute intervals** around 360°;
-- exactly **60 distinct minute-mark positions** around the circle;
-- angular spacing = `360° / 60 = 6°`;
-- exactly 12 hour positions, each separated by 5 minute intervals = `30°`;
-- minute positions 0/60 share the same geometric location at 12 and must not be rendered as two overlapping ticks;
-- hour/5-minute marks may be longer/stronger but do not add extra positions;
-- no missing, duplicated, merged, or extra minute positions.
-
-For a simplified clock that intentionally hides some minute marks, the hidden-mark policy must match the learning objective; the underlying hand mapping still uses the full 60-position clock geometry.
-
-A renderer that draws 59, 61, or another count of distinct minute positions for a full minute-mark clock fails academically.
-
-## Hand placement
-
+## Continuous hand placement — CRITICAL
 For analog time `h:m`:
+- `minute_hand_angle_deg = 6*m` clockwise from 12
+- `hour_hand_angle_deg = 30*(h mod 12) + 0.5*m` clockwise from 12
 
-- minute-hand angle = `6*m` degrees clockwise from 12
-- hour-hand angle = `30*(h mod 12) + 0.5*m` degrees clockwise from 12
+The hour hand moves continuously. It is permitted to point exactly at an hour numeral only when `m=00`.
 
-The hour hand MUST move continuously. At 7:30 it is halfway between 7 and 8.
+Mandatory relational interpretation:
+- `m=15` → hour hand is 25% of the way from h to h+1
+- `m=30` → hour hand is exactly halfway from h to h+1
+- `m=45` → hour hand is 75% of the way from h to h+1
 
-Compile semantic + geometric instructions redundantly.
+Example: `10:30` MUST place the hour hand exactly halfway between 10 and 11; it MUST NOT point directly at 10.
 
-## DAY_NIGHT_PAIR — one clock, two answers
+Any rendered nonzero-minute clock whose hour hand remains on the original hour numeral is `CRITICAL_ACADEMIC`.
 
-One question contains one clock and two answer fields:
+## Prompt serialization redundancy
+For every item, the final image prompt MUST serialize both geometry and human-readable relation. Example renderer-only state:
 
-`☀ กลางวัน ........ นาฬิกา ........ นาที`
+`ITEM 4: semantic time=10:30; minute=30; minute_hand_angle=180°; minute hand exactly at 6; hour_hand_angle=315°; hour hand exactly halfway between 10 and 11; NEVER place hour hand directly on 10.`
 
-`☾ กลางคืน ........ นาฬิกา ........ นาที`
+Do not rely on only a semantic phrase such as “10:30”. Do not rely on only angles. Use both.
 
-or compact equivalent:
+For all nonzero-minute items add an item-specific negative such as:
+`WRONG: hour hand directly on the starting hour numeral.`
 
-`กลางวัน ........ น.    กลางคืน ........ น.`
+## DAY_NIGHT_PAIR
+One question = one clock + two blank response fields. Do not create two clocks unless explicitly requested.
 
-Do not create separate day/night clocks unless explicitly requested.
+Thai mapping:
+- h12 1–5: DAY=h+12, NIGHT=h
+- h12 6–11: DAY=h, NIGHT=h+12
+- h12=12: DAY=12, NIGHT=0
+Minutes remain identical.
 
-### Deterministic Thai mapping
+Verified day/night values remain internal when key is off. Renderer geometry may be serialized but must not be printed as answers.
 
-Let `h12` be 1..12 and minute `m` be 0..59.
+## Layout
+Preferred printed diameter >=30 mm for 5-minute reading; larger for 1-minute reading. For 10 items A4 portrait, first attempt 2×5 only if hand positions and minute marks remain distinguishable. Readability outranks one-page density.
 
-- if `1 <= h12 <= 5`: DAY=`h12+12`, NIGHT=`h12`
-- if `6 <= h12 <= 11`: DAY=`h12`, NIGHT=`h12+12`
-- if `h12 = 12`: DAY=`12`, NIGHT=`0`
-
-Minutes stay identical.
-
-Examples:
-
-- 2:30 → day 14:30 / night 02:30
-- 7:45 → day 07:45 / night 19:45
-- 12:15 → day 12:15 / night 00:15
-
-Do not use a universal `night = day + 12` rule without normalization. Do not derive answers from icons.
-
-The pair must represent the two occurrences of the same 12-hour geometry in 24 hours.
-
-## Blueprint
-
-### Internal
-
+## Mandatory final-prompt block
 ```text
-{
- id: 1,
- analog_hour: 2,
- minute: 30,
- minute_hand_angle_deg: 180,
- hour_hand_angle_deg: 75,
- expected_minute_interval_count: 60,
- expected_minute_position_count: 60,
- verified_day_time_24: "14:30",
- verified_night_time_24: "02:30",
- validation: PASS
-}
+CLOCK GEOMETRY — CRITICAL
+- use one canonical circular clock template for all items
+- exactly 12 hour positions; full minute face = exactly 60 distinct minute marks at 6° spacing
+- exactly two hands; minute hand longer
+- minute angle = 6*m
+- hour angle = 30*(h mod 12)+0.5*m
+- hour hand moves continuously; if m != 00 it must NOT stay on the hour numeral
+- at :30 hour hand is exactly halfway between adjacent hour numerals
+- serialize per-item semantic relation + exact angles + visual relation
+- no decorative extra hands, no ellipse, no perspective, no missing/extra minute marks
 ```
 
-### Student
-
-```text
-{
- id: 1,
- clock_template_id: "TH_ANALOG_12H_V1",
- hand_target_relation: "RENDER_ONLY_NOT_VISIBLE",
- day_answer_render: "กลางวัน ........ น.",
- night_answer_render: "กลางคืน ........ น."
-}
-```
-
-Verified answers remain internal when key is off.
-
-## Layout / one-page policy
-
-Preferred printed clock diameter >=30 mm for 5-minute reading; increase for 1-minute reading.
-
-For DAY_NIGHT_PAIR, reserve two response lines before decoration.
-
-For 10 questions on A4 portrait, first attempt a 2-column × 5-row grid if minimum clock diameter, minute-mark distinguishability, and answer space remain valid.
-
-Apply global one-page optimization before pagination. If one page remains impossible:
-
-- `ONE_PAGE_LOCK=OFF` → paginate;
-- `ONE_PAGE_LOCK=ON` → `ONE_PAGE_FEASIBILITY_QA=FAIL` and `LAYOUT_QA=FAIL`; do not create page 2 and do not shrink the clock below minimum readability.
-
-Sun/moon icons are optional; text labels are authoritative and must remain readable in monochrome.
-
-## Render-path guidance
-
-Preferred:
-
-`HYBRID` or `DETERMINISTIC_VECTOR`
-
-Clock face, minute marks, center pivot, and hands are educational geometry and should be deterministic when possible. Theme art may be generative outside the clock zone.
-
-## Post-render graduation QA
-
-Inspect every instructional clock individually. For a full minute-mark face verify:
-
-- 60 distinct minute positions;
-- 6° spacing;
-- 12 major/hour positions at every fifth minute mark;
-- no double tick at 12 from treating minute 0 and minute 60 separately;
-- no missing/extra/merged marks;
-- labels align to the correct major positions;
-- hands do not visually erase the only readable evidence of the target minute.
-
-## Answer integrity
-
-When `SHOW_ANSWER_KEY=NO`:
-
-- do not print verified day/night values anywhere visible;
-- do not expose internal answer vectors in notes, QA prose, parentheticals, or active examples;
-- render-only hand geometry is non-visible compiler metadata only.
+## Post-render QA
+Inspect every clock individually:
+- 60 distinct minute positions when full marks shown
+- exact hand count/length
+- minute hand on target minute
+- hour hand on computed continuous angle
+- for every `m!=00`, verify hour hand is displaced from the hour numeral by `0.5*m` degrees
+- for `:30`, verify midpoint visually and geometrically
+- no answer leakage
 
 ## QA
+`CLOCK_CIRCLE_QA, CLOCK_PIVOT_QA, HAND_COUNT_QA, HAND_LENGTH_QA, MINUTE_INTERVAL_COUNT_QA, MINUTE_POSITION_COUNT_QA, MINUTE_MARK_SPACING_QA, HOUR_POSITION_QA, HOUR_HAND_INTERPOLATION_QA, NONZERO_MINUTE_HOUR_DISPLACEMENT_QA, HALF_HOUR_MIDPOINT_QA, TARGET_TIME_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, MINIMUM_SIZE_QA, ONE_CLOCK_TWO_ANSWERS_QA, DAY_NIGHT_MAPPING_QA, DAY_NIGHT_ANSWER_LEAK_QA`.
 
-Base:
-
-`CLOCK_CIRCLE_QA, CLOCK_PIVOT_QA, HAND_COUNT_QA, HAND_LENGTH_QA, MINUTE_INTERVAL_COUNT_QA, MINUTE_POSITION_COUNT_QA, MINUTE_MARK_SPACING_QA, HOUR_POSITION_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, HOUR_HAND_INTERPOLATION_QA, TARGET_TIME_QA, MINIMUM_SIZE_QA`
-
-DAY_NIGHT_PAIR:
-
-`DAY_NIGHT_PAIR_MODE_QA`
-`ONE_CLOCK_TWO_ANSWERS_QA`
-`DAY_TIME_MAPPING_QA`
-`NIGHT_TIME_MAPPING_QA`
-`MINUTE_PRESERVATION_QA`
-`TWELVE_ZERO_MAPPING_QA`
-`PAIR_12_HOUR_EQUIVALENCE_QA`
-`DAY_NIGHT_LABEL_QA`
-`DAY_NIGHT_ANSWER_LEAK_QA`
-
-Global integration:
-
-`ONE_PAGE_FEASIBILITY_QA`
-`RENDER_PATH_QA`
-
-Any wrong minute-mark topology/count, wrong hand position, wrong mapping, missing second answer field, unintended duplicate clock, unsafe shrinking, or visible answer leakage blocks release.
+Any wrong hand position, especially an hour hand pinned to the hour numeral when minutes are nonzero, blocks release.
