@@ -1,6 +1,6 @@
 # CLOCK_READING_ENGINE — Analog Clock Reading
 
-Version: 1.1.1
+Version: 1.2.0
 Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 Registry authority: `domains/DOMAIN_REGISTRY.md`
@@ -33,9 +33,26 @@ For Thai elementary dual-reading worksheets, prefer:
 - exactly two instructional hands unless seconds explicitly requested
 - minute hand visibly longer than hour hand
 - 12 hour positions evenly spaced
-- 60 minute intervals when minute-level reading is required
 - standard clockwise grammar: 12 top, 3 right, 6 bottom, 9 left
 - no decorative pointer/hand
+
+## Deterministic minute-mark topology
+
+An analog clock is a **cyclic scale**. Unlike a linear ruler, the 60th minute interval returns to the starting position at 12.
+
+When minute-level reading is active:
+
+- exactly **60 equal minute intervals** around 360°;
+- exactly **60 distinct minute-mark positions** around the circle;
+- angular spacing = `360° / 60 = 6°`;
+- exactly 12 hour positions, each separated by 5 minute intervals = `30°`;
+- minute positions 0/60 share the same geometric location at 12 and must not be rendered as two overlapping ticks;
+- hour/5-minute marks may be longer/stronger but do not add extra positions;
+- no missing, duplicated, merged, or extra minute positions.
+
+For a simplified clock that intentionally hides some minute marks, the hidden-mark policy must match the learning objective; the underlying hand mapping still uses the full 60-position clock geometry.
+
+A renderer that draws 59, 61, or another count of distinct minute positions for a full minute-mark clock fails academically.
 
 ## Hand placement
 
@@ -93,6 +110,8 @@ The pair must represent the two occurrences of the same 12-hour geometry in 24 h
  minute: 30,
  minute_hand_angle_deg: 180,
  hour_hand_angle_deg: 75,
+ expected_minute_interval_count: 60,
+ expected_minute_position_count: 60,
  verified_day_time_24: "14:30",
  verified_night_time_24: "02:30",
  validation: PASS
@@ -119,7 +138,7 @@ Preferred printed clock diameter >=30 mm for 5-minute reading; increase for 1-mi
 
 For DAY_NIGHT_PAIR, reserve two response lines before decoration.
 
-For 10 questions on A4 portrait, first attempt a 2-column × 5-row grid if minimum clock diameter and answer space remain valid.
+For 10 questions on A4 portrait, first attempt a 2-column × 5-row grid if minimum clock diameter, minute-mark distinguishability, and answer space remain valid.
 
 Apply global one-page optimization before pagination. If one page remains impossible:
 
@@ -136,6 +155,18 @@ Preferred:
 
 Clock face, minute marks, center pivot, and hands are educational geometry and should be deterministic when possible. Theme art may be generative outside the clock zone.
 
+## Post-render graduation QA
+
+Inspect every instructional clock individually. For a full minute-mark face verify:
+
+- 60 distinct minute positions;
+- 6° spacing;
+- 12 major/hour positions at every fifth minute mark;
+- no double tick at 12 from treating minute 0 and minute 60 separately;
+- no missing/extra/merged marks;
+- labels align to the correct major positions;
+- hands do not visually erase the only readable evidence of the target minute.
+
 ## Answer integrity
 
 When `SHOW_ANSWER_KEY=NO`:
@@ -148,7 +179,7 @@ When `SHOW_ANSWER_KEY=NO`:
 
 Base:
 
-`CLOCK_CIRCLE_QA, CLOCK_PIVOT_QA, HAND_COUNT_QA, HAND_LENGTH_QA, MINUTE_MARK_QA, HOUR_HAND_INTERPOLATION_QA, TARGET_TIME_QA, MINIMUM_SIZE_QA`
+`CLOCK_CIRCLE_QA, CLOCK_PIVOT_QA, HAND_COUNT_QA, HAND_LENGTH_QA, MINUTE_INTERVAL_COUNT_QA, MINUTE_POSITION_COUNT_QA, MINUTE_MARK_SPACING_QA, HOUR_POSITION_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, HOUR_HAND_INTERPOLATION_QA, TARGET_TIME_QA, MINIMUM_SIZE_QA`
 
 DAY_NIGHT_PAIR:
 
@@ -167,4 +198,4 @@ Global integration:
 `ONE_PAGE_FEASIBILITY_QA`
 `RENDER_PATH_QA`
 
-Any wrong hand position, wrong mapping, missing second answer field, unintended duplicate clock, unsafe shrinking, or visible answer leakage blocks release.
+Any wrong minute-mark topology/count, wrong hand position, wrong mapping, missing second answer field, unintended duplicate clock, unsafe shrinking, or visible answer leakage blocks release.
