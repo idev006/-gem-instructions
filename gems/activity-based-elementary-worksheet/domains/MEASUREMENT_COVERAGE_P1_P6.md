@@ -1,20 +1,22 @@
 # Measurement Coverage P1–P6 — Activity-Based Elementary Worksheet Generator
 
-Version: 1.0.0
+Version: 1.1.0
 Compatible Gem baseline: 2.6.x
 Status: Canonical capability/progression guide
 
 ## 1. Purpose
 
-Define what the Gem can generate and validate across elementary measurement topics from ป.1–ป.6.
+Define formal worksheet-generation coverage for elementary measurement topics from ป.1–ป.6.
 
-This document is a **conservative pedagogical progression**, not a claim that every Thai school follows one identical sequence. Use `CURRICULUM_PROFILE` when a specific curriculum mapping is required.
+This document is a **conservative pedagogical progression**, not a claim that every Thai school follows one identical sequence. Use `CURRICULUM_PROFILE` when a specific mapping is required.
 
 ## 2. Formal coverage
 
 ### TIME / CLOCK
+
 - read analog clock
 - whole hour, half hour, quarter hour, 5-minute and 1-minute precision when grade-appropriate
+- seconds/time-unit conversion when explicitly taught
 - 12-hour and 24-hour representations
 - day/night paired reading
 - start time + duration → end time
@@ -23,16 +25,30 @@ This document is a **conservative pedagogical progression**, not a claim that ev
 - compare times/schedules
 - controlled midnight crossing
 
+Exact time relations:
+
+`60 seconds = 1 minute`
+`60 minutes = 1 hour`
+`24 hours = 1 day`
+
 ### LENGTH / RULER
+
 - direct ruler reading
 - zero-start and nonzero-start measurement
 - mm, cm, m, km
-- cm/mm mixed expression
+- cm/mm and mixed metric expression
 - addition/subtraction/difference/comparison
 - exact metric conversion
 - endpoint mapping and graduation counting
 
+Exact length relations:
+
+`10 mm = 1 cm`
+`100 cm = 1 m`
+`1000 m = 1 km`
+
 ### DISTANCE
+
 - total distance
 - difference between routes
 - round trip
@@ -43,21 +59,77 @@ This document is a **conservative pedagogical progression**, not a claim that ev
 
 Speed/rate is not included automatically. Distance remains distance unless speed is explicitly requested.
 
+### ANGLE / PROTRACTOR
+
+- identify/compare angles
+- read a semicircular protractor
+- explicit baseline ray and selected scale direction
+- acute/right/obtuse/straight classification
+- target angle aligned to exact graduation
+- optional drawing/construction prompts when explicitly requested
+
+Canonical 0–180° protractor with 1° resolution:
+
+- 180 intervals
+- 181 endpoint-inclusive positions
+- vertex at exact origin
+- one ray at selected 0° baseline
+- second ray at exact target graduation
+
+Dual-scale protractors must make the active direction unambiguous.
+
+### PERIMETER
+
+- polygon perimeter = sum all side lengths exactly once
+- rectangle `P=2(l+w)`
+- square `P=4s`
+- mixed-unit perimeter after unit normalization
+
+### AREA
+
+Supported deterministic formulas when grade/objective supports them:
+
+- rectangle `A=l×w`
+- square `A=s²`
+- triangle `A=1/2×b×h`
+- parallelogram `A=b×h`
+- trapezoid `A=1/2×(a+b)×h`
+- circle `A=πr²`
+- circle circumference `C=2πr=πd`
+
+Circle tasks require one explicit `PI_POLICY`, e.g. `3.14` or `22/7`, used consistently within the worksheet.
+
+Area-unit relations:
+
+`1 m² = 10,000 cm²`
+`1 km² = 1,000,000 m²`
+
+Area conversions square the linear conversion factor; never use a linear factor for squared units.
+
 ### WEIGHT / MASS
+
 - dial scale reading
 - kg, g, kg+g
 - Thai elementary `ขีด` relation when applicable
 - add/subtract/difference/compare
 - kg↔g conversion
-- exact target-to-dial mapping for canonical teaching dial
+- optional metric-tonne conversion when explicitly requested
+
+Exact relations:
+
+`1000 g = 1 kg`
+`1000 kg = 1 metric tonne`
+Thai elementary context: `1 ขีด = 100 g = 0.1 kg`
 
 ### TEMPERATURE
+
 - read thermometer
 - °C / °F scale when requested
 - compare temperature/change
 - exact discrete tick representability
 
 ### CAPACITY
+
 - read graduated container
 - mL/L
 - add/subtract/difference/compare
@@ -65,193 +137,219 @@ Speed/rate is not included automatically. Distance remains distance unless speed
 - simple flat liquid level
 - scientific meniscus when explicitly requested
 
+Exact relation:
+
+`1000 mL = 1 L`
+
 ### SOLID VOLUME
+
 - rectangular prism: `V = length × width × height`
-- compatible-unit normalization before multiplication
-- simple composite shapes made from rectangular prisms when grade-appropriate
-- `cm³` and `m³`
-- capacity relation `1 cm³ = 1 mL`, `1000 cm³ = 1 L` only when explicitly part of the lesson
+- compatible linear units before multiplication
+- simple composite shapes made from non-overlapping rectangular prisms
+- cm³, dm³, m³
+- capacity-volume relation when explicitly part of the lesson
 
-## 3. Exact unit relations
+Exact cubic relations:
 
-Length:
+`1000 cm³ = 1 dm³`
+`1000 dm³ = 1 m³`
+`1 m³ = 1,000,000 cm³`
 
-- `10 mm = 1 cm`
-- `100 cm = 1 m`
-- `1000 m = 1 km`
+Capacity-volume relations when explicitly taught:
 
-Weight:
+`1 cm³ = 1 mL`
+`1 dm³ = 1 L`
+`1 m³ = 1000 L`
 
-- `1000 g = 1 kg`
-- Thai elementary context: `1 ขีด = 100 g = 0.1 kg`
+Cubic-unit conversion uses the **cube** of the linear conversion factor.
 
-Capacity:
+## 3. Calculation integrity
 
-- `1000 mL = 1 L`
-
-Volume/capacity when explicitly taught:
-
-- `1 cm³ = 1 mL`
-- `1000 cm³ = 1 L`
-
-Always compute in one canonical base unit before converting the verified result to the requested answer format.
-
-## 4. Conservative grade progression
-
-### ป.1 — Direct comparison and simple whole-unit reading
-Recommended AUTO scope:
-
-- compare longer/shorter, heavier/lighter, more/less capacity
-- simple direct length measurement with clear whole-unit marks
-- familiar whole-unit contexts
-- simple clock reading where requested, normally whole-hour emphasis
-- no complex mixed-unit conversion by default
-
-Avoid by default:
-
-- dense millimetre graduations
-- multi-step conversions
-- nonzero ruler starts without explicit teaching intent
-- complex elapsed-time regrouping
-
-### ป.2 — Basic instrument reading and one-step measurement arithmetic
-Recommended AUTO scope:
-
-- ruler reading with clear cm scale; mm only when explicitly appropriate
-- simple m/cm relationships
-- basic kg/g contexts
-- L and simple capacity comparisons
-- hour/minute reading with familiar increments
-- one-step addition/subtraction of like units
-
-### ป.3 — Finer graduations and core measurement relationships
-Recommended AUTO scope:
-
-- ruler cm/mm reading
-- zero and controlled nonzero starts
-- kg/ขีด dial reading
-- mL/L graduated container reading
-- analog clock to 5/30-minute levels as requested
-- start/end/duration calculations
-- basic length/distance sum/difference
-- simple unit conversions using exact integer relationships
-
-### ป.4 — Multi-unit reasoning and route/time applications
-Recommended AUTO scope:
-
-- mm/cm/m/km conversion with integer values
-- mixed-unit length arithmetic after canonical conversion
-- multi-segment distance and round trip
-- more varied elapsed-time tasks
-- nonzero-start ruler reading
-- measurement comparison/difference problems
-- capacity/weight conversion and arithmetic
-
-### ป.5 — Mixed units, decimals where appropriate, capacity/volume applications
-Recommended AUTO scope:
-
-- decimal or mixed-unit length/weight/capacity conversions when requested/appropriate
-- multi-step distance problems
-- elapsed-time reasoning with regrouping/cross-hour complexity
-- rectangular-prism volume
-- capacity-volume relationships when explicitly taught
-- thermometer/capacity scales with finer but readable graduations
-
-### ป.6 — Multi-step measurement reasoning
-Recommended AUTO scope:
-
-- multi-step conversion + arithmetic
-- combined length/distance/time contexts without silently introducing speed
-- rectangular-prism and simple composite rectangular-prism volume
-- advanced comparison/difference problems
-- mixed-unit results and reasoning
-
-The Gem must not automatically raise difficulty merely because a grade is higher. Explicit learning objective remains primary.
-
-## 5. Instrument-specific progression rules
-
-### Ruler
-- beginner: start at exact zero
-- intermediate: explicit nonzero start and compute `end − start`
-- mm scale requires distinguishable 1 mm graduations after printing
-- do not confuse physical ruler edge with zero graduation
-
-### Clock
-- hour hand moves continuously
-- nonzero minutes displace hour hand from numeral
-- :30 = midpoint between adjacent numerals
-- full minute face = 60 equal intervals / 60 distinct positions
-
-### Dial scale
-Canonical 0–5 kg teaching dial:
-
-- 300° active sweep
-- 60° inactive gap
-- 50 intervals / 51 active positions at 0.1 kg
-- no ticks in inactive gap
-
-### Thermometer / capacity
-- discrete targets must be exactly representable by minor division
-- endpoint/read point aligns exactly with intended graduation
-- target values may control renderer geometry but must not become learner-visible callouts
-
-## 6. Calculation integrity
-
-For measurement arithmetic:
+For any measurement arithmetic:
 
 1. parse each quantity and unit;
-2. convert to one canonical base unit;
-3. perform exact arithmetic;
+2. convert to one canonical compatible unit;
+3. perform exact arithmetic/formula;
 4. independently recompute/verify;
 5. convert verified result to requested display unit;
 6. build student-visible givens/blanks without answer leakage.
 
-Never add values with incompatible units before conversion.
+Never add/subtract incompatible units as raw numerals.
 
-## 7. Distance integrity
+## 4. Conservative grade progression
 
-Supported distance task types:
+### ป.1 — direct comparison/basic whole-unit concepts
+
+Recommended AUTO:
+
+- compare longer/shorter, heavier/lighter, more/less capacity
+- simple whole-unit length measurement
+- simple clock whole-hour tasks when requested
+- intuitive boundary/perimeter language only when objective calls for it
+- no dense mm scales, multi-step conversion, scientific meniscus or advanced area formulas by default
+
+### ป.2 — basic instrument reading and one-step measurement arithmetic
+
+Recommended AUTO:
+
+- clear cm ruler reading
+- simple m/cm contexts
+- basic kg/g and L contexts
+- hour/minute reading with familiar increments
+- one-step like-unit addition/subtraction
+- simple perimeter by counting/summing clearly given sides when appropriate
+
+### ป.3 — finer graduations and core relationships
+
+Recommended AUTO:
+
+- ruler cm/mm reading
+- controlled nonzero ruler starts
+- kg/ขีด dial reading
+- mL/L graduated container reading
+- analog clock common minute increments
+- start/end/duration calculations
+- basic length/distance sum/difference
+- simple exact unit conversions
+- basic perimeter of rectangles/squares when requested
+
+### ป.4 — multi-unit reasoning and measurement geometry
+
+Recommended AUTO:
+
+- mm/cm/m/km integer conversion
+- mixed-unit length arithmetic
+- multi-segment/round-trip distance
+- varied elapsed-time tasks
+- nonzero ruler starts
+- kg/g and L/mL conversion/arithmetic
+- angle reading with a protractor
+- rectangle/square perimeter and area
+- seconds/time-unit conversion when objective supports it
+
+### ป.5 — mixed units, area and volume applications
+
+Recommended AUTO:
+
+- mixed/decimal metric conversion when appropriate
+- multi-step distance/time problems
+- triangle/parallelogram/trapezoid area when taught
+- rectangular-prism volume
+- cm³/dm³ and capacity-volume relations when explicitly taught
+- thermometer/capacity scales with finer but readable graduations
+
+### ป.6 — multi-step measurement reasoning
+
+Recommended AUTO:
+
+- multi-step conversion + arithmetic
+- combined length/distance/time contexts without silently introducing speed
+- polygon/circle perimeter/area when explicitly requested
+- consistent π policy for circle problems
+- rectangular-prism and simple composite rectangular-prism volume
+- cm³/dm³/m³ conversion when appropriate
+- advanced comparison/difference problems
+
+The Gem must not automatically raise complexity merely because a grade is higher. Explicit learning objective remains primary.
+
+## 5. Instrument-specific rules
+
+### Ruler
+
+- beginner: exact zero start
+- advanced: explicit nonzero start and `end-start`
+- 1 cm @1 mm = 10 intervals / 11 positions
+- physical ruler edge is not the zero graduation
+
+### Clock
+
+- hour hand moves continuously
+- nonzero minutes displace hour hand
+- :30 = midpoint between adjacent numerals
+- full minute face = 60 intervals / 60 distinct positions
+- seconds hand only when explicitly requested
+
+### Protractor
+
+- vertex exactly at origin
+- baseline ray exactly at selected 0°
+- second ray intersects exact target graduation
+- selected inner/outer scale direction unambiguous
+- no decorative radial lines that resemble angle rays
+
+### Dial scale
+
+Canonical 0–5 kg @0.1 kg:
+
+- 300° active sweep
+- 60° inactive gap
+- 50 intervals / 51 active positions
+- no ticks in inactive gap
+
+### Thermometer / capacity
+
+- discrete targets exactly representable by minor interval
+- endpoint/read point exactly on intended graduation
+- target value controls renderer geometry but is not a learner-visible callout
+
+## 6. Distance integrity
+
+Task types:
 
 `TOTAL | DIFFERENCE | ROUND_TRIP | MULTI_SEGMENT | ROUTE_COMPARE | CONVERT`
 
-Examples:
+- total = sum verified segments once
+- difference = absolute or directional according to wording
+- same-route round trip = `2×one_way` only when same route is explicit/clear
+- asymmetric return = outbound + return
 
-- total: `a+b+c`
-- difference: `|routeA-routeB|`
-- same-route round trip: `2×one_way_distance`
-- asymmetric round trip: `outbound + return`
+Do not invent map scale or speed.
 
-Do not assume outbound and return distances are equal unless the problem states/safely implies the same route.
+## 7. Area/perimeter integrity
+
+- normalize side/dimension units before formulas
+- perimeter counts boundary lengths, not interior diagonals unless explicitly part of boundary
+- area uses square units
+- height in triangle/parallelogram/trapezoid formulas must be perpendicular height, not an arbitrary slanted side
+- circle tasks use one consistent π policy
 
 ## 8. Volume integrity
 
 Rectangular prism:
 
-`V = length × width × height`
+`V=l×w×h`
 
-All three dimensions must be in compatible units before multiplication.
+All dimensions must be in one compatible linear unit before multiplication.
 
-Simple composite rectangular prisms:
+Composite rectangular prisms:
 
-- decompose into non-overlapping rectangular prisms;
-- compute each verified volume;
-- sum exactly once;
-- do not double-count overlap.
+- decompose into non-overlapping components
+- compute each once
+- no double-counted overlap
 
-Complex solids outside this explicit grammar route to generic support and must not claim deterministic specialized coverage.
+Complex solids outside this grammar route to generic support and must not claim specialized deterministic coverage.
 
 ## 9. Coverage QA
 
-Applicable gates:
+Applicable gates include:
 
 `PROMPT_MEASUREMENT_GRADE_APPROPRIATENESS_QA`
 `PROMPT_UNIT_COMPATIBILITY_QA`
 `PROMPT_UNIT_CONVERSION_QA`
+`PROMPT_TIME_UNIT_CONVERSION_QA`
 `PROMPT_MEASUREMENT_CALCULATION_QA`
 `PROMPT_DISTANCE_RELATION_QA`
 `PROMPT_RULER_REFERENCE_QA`
+`PROMPT_PROTRACTOR_TOPOLOGY_QA`
+`PROMPT_PROTRACTOR_BASELINE_QA`
+`PROMPT_ANGLE_TARGET_QA`
+`PROMPT_PERIMETER_QA`
+`PROMPT_AREA_FORMULA_QA`
+`PROMPT_AREA_UNIT_CONVERSION_QA`
+`PROMPT_PI_POLICY_QA` when circles are used
 `PROMPT_INSTRUMENT_TOPOLOGY_QA`
 `PROMPT_VOLUME_FORMULA_QA`
-`PROMPT_VOLUME_DECOMPOSITION_QA` when composite volume is used
+`PROMPT_CUBIC_UNIT_CONVERSION_QA`
+`PROMPT_VOLUME_DECOMPOSITION_QA`
 
-Any wrong unit relationship, wrong arithmetic, ambiguous reference point, or unsupported complexity presented as specialized deterministic coverage blocks prompt release.
+Wrong unit relation, arithmetic/formula, ruler/protractor reference, route assumption, squared/cubic conversion, instrument topology or unsupported complexity presented as deterministic specialized coverage blocks prompt release.
