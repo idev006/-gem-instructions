@@ -1,9 +1,10 @@
 # SCALE_READING_ENGINE — Deterministic Dial-Scale Worksheet Rules
 
-Version: 1.1.0
-Status: PRODUCTION_HARDENED
+Version: 1.1.1
+Status: PRODUCTION_CANDIDATE
 Requires: `INSTRUMENT_READING_ENGINE.md`
 Applies to: `DOMAIN=MEASUREMENT_WEIGHT`, `QUESTION_TYPE=DIAL_SCALE_READING`
+Registry authority: `domains/DOMAIN_REGISTRY.md`
 
 ## 1. Learning goal
 
@@ -20,61 +21,59 @@ Thai Grade 3 defaults:
 - `1 ขีด = 0.1 กิโลกรัม = 100 กรัม`
 - answer: `........ กิโลกรัม ........ ขีด`
 
-The large instructional dial is academic data and has priority over theme art.
+The instructional dial is academic data and has priority over theme art.
 
 ## 2. Mandatory geometry
 
 ### True circle
-
 - dial face = perfect 1:1 circle
 - front-facing orthographic view
 - reserved square box
 - no perspective, tilt, ellipse, stretch, squeeze, skew, or crop
 
 ### Center pivot
-
 - needle root = exact geometric center
 - visible central hub/dot
 - no floating/off-center pointer
 - exactly one instructional needle
 
-Recommended needle length: 70–82% of radius, ending at tick ring without covering label.
+Recommended needle length: 70–82% of radius, ending at the tick ring without covering labels.
 
 Any off-center needle or distorted circle is a critical blocker.
 
 ## 3. Canonical 5 kg teaching dial
 
-### Critical correction: DO NOT use a 360° value sweep
+Do **not** use a 360° value sweep. The default teaching dial uses a **300° active sweep** and a **60° inactive gap** so 0 and 5 have distinct endpoints.
 
-A 0–5 kg scale needs distinct positions for both 0 and 5. Therefore the default teaching dial uses a **300° active sweep**, leaving a 60° inactive gap between endpoints.
+Angle convention: `0° = top`, increasing clockwise.
 
-Use angle convention: `0° = top`, increasing clockwise.
+Locked label mapping:
 
-Default locked label mapping:
+- `0 kg = 240°`
+- `1 kg = 300°`
+- `2 kg = 0°`
+- `3 kg = 60°`
+- `4 kg = 120°`
+- `5 kg = 180°`
 
-- `0 kg = 240°` (lower-left)
-- `1 kg = 300°` (upper-left)
-- `2 kg =   0°` (top)
-- `3 kg =  60°` (upper-right)
-- `4 kg = 120°` (lower-right)
-- `5 kg = 180°` (bottom)
+Therefore:
 
-Thus:
-
-- each 1 kg interval = 60°
-- each 0.1 kg interval = 6°
-- total active sweep from 0→5 clockwise = 300°
-- inactive gap from 5→0 = 60° and contains NO value ticks
-
-This mapping is locked across every question on the worksheet.
+- 1 kg interval = 60°
+- 0.1 kg interval = 6°
+- active sweep 0→5 = 300°
+- inactive gap 5→0 = 60° with no value ticks
 
 ### Target mapping
 
-For weight `w` where `0 <= w <= 5`:
+For `0 <= w <= 5`:
 
 `tick_index = round(w / 0.1)`
 
 `angle = (240° + tick_index * 6°) mod 360°`
+
+Require exact representability:
+
+`abs(w - tick_index*0.1) < tolerance`
 
 Examples:
 
@@ -83,41 +82,27 @@ Examples:
 - 2.4 kg → tick 24 → 24°
 - 5.0 kg → tick 50 → 180°
 
-Require exact representability:
-
-`abs(w - tick_index*0.1) < tolerance`
-
 ## 4. Tick construction
-
-For the active 300° scale:
 
 - 50 equal minor intervals
 - 51 tick positions including both endpoints 0 and 5
-- exactly 10 equal minor intervals between each adjacent whole-kilogram label
+- exactly 10 equal intervals between adjacent whole-kilogram labels
 - major kilogram ticks longer/thicker
 - minor ticks uniform and clearly separated
 - no value ticks in the inactive 60° gap
-- labels `0,1,2,3,4,5` aligned with their major ticks
+- labels `0,1,2,3,4,5` aligned with major ticks
 
 Do not improvise tick counts.
 
 ## 5. No clock confusion
 
-The circular geometry uses six-degree minor spacing, but this is NOT a clock.
-
-Never add 12/3/6/9 clock labels, hour/minute hands, or 60-minute semantics. Use only kilogram labels 0–5 and weight units.
+This is not a clock. Never add 12/3/6/9 clock labels, hour/minute hands, or 60-minute semantics. Use only kilogram labels 0–5 and weight units.
 
 ## 6. Target instruction redundancy
 
-For each item compile all of:
+For each item compile semantic target value, global tick index, kg component + minor-tick component, exact target angle, and relational wording.
 
-- semantic target value
-- global tick index
-- kg component + minor-tick component
-- exact target angle
-- relational wording
-
-Example:
+Example render-only metadata:
 
 `TARGET 2.4 kg; tick_index=24; 2 kg + 4 minor ticks; target_angle=24° clockwise from top; needle starts at exact center and terminates exactly on fourth minor tick after 2.`
 
@@ -125,7 +110,7 @@ This metadata is render-only and must not appear as visible answer text.
 
 ## 7. Blueprint
 
-### Internal
+### Internal verified object
 
 ```text
 {
@@ -141,39 +126,38 @@ This metadata is render-only and must not appear as visible answer text.
 }
 ```
 
-### Student render
+### Student render object
 
 ```text
 {
  id: 1,
  object: "กะหล่ำปลี",
  dial_template_id: "TH_G3_5KG_0P1_V1",
- needle_target_relation: "RENDER_ONLY: tick 24 / angle 24°",
+ needle_target_relation: "RENDER_ONLY_NOT_VISIBLE: tick 24 / angle 24°",
  answer_render: "........ กิโลกรัม ........ ขีด"
 }
 ```
 
-## 8. Layout
+## 8. Layout + one-page behavior
 
 Preferred card anatomy:
 
 `NUMBER | CONTEXT OBJECT | LARGE INSTRUCTIONAL DIAL | ANSWER`
 
-For 10 questions A4 portrait, prefer 2 columns × 5 rows if each dial remains readable.
+For 10 questions on A4 portrait, first attempt 2 columns × 5 rows.
 
-Preferred printed dial diameter: 32–42 mm.
-Absolute minimum for 0.1 kg reading: 30 mm.
+Preferred printed dial diameter: 32–42 mm. Absolute minimum for 0.1 kg reading: 30 mm.
 
-If this cannot fit, paginate. Never compress circle geometry.
+Apply global `ONE_PAGE_PREFERRED` policy before pagination. Reduce decoration and use a more efficient layout before reducing dial size.
+
+If minimum dial size cannot fit:
+
+- `ONE_PAGE_LOCK=OFF` → paginate;
+- `ONE_PAGE_LOCK=ON` → `ONE_PAGE_FEASIBILITY_QA=FAIL` and `LAYOUT_QA=FAIL`; do not create page 2 and do not shrink below 30 mm.
 
 ## 9. Decorative context scale
 
-A small illustrated kitchen scale beneath a vegetable/object is optional context only.
-
-- child reads the large separate dial
-- small decorative dial may be neutral/simplified
-- it must not contradict the large dial
-- ideally remove detailed ticks from the decorative dial to avoid competing readings
+A small illustrated kitchen scale is optional context only. The child reads the large separate dial. A decorative dial must not contradict the instructional dial and should avoid detailed competing ticks.
 
 ## 10. Mandatory prompt block
 
@@ -181,33 +165,19 @@ A small illustrated kitchen scale beneath a vegetable/object is optional context
 DIAL GEOMETRY — CRITICAL
 - perfect front-facing circular dial in a square reserved zone
 - exact center pivot with one needle and visible hub
-- use canonical 300° active sweep, not a 360° value sweep
+- canonical 300° active sweep, not a 360° value sweep
 - labels: 0@240°, 1@300°, 2@0°, 3@60°, 4@120°, 5@180°
 - 10 equal minor intervals per kg; each 0.1 kg = 6°
 - no scale ticks in the 60° inactive gap between 5 and 0
 - identical template for every question; only needle angle changes
-- endpoint must land exactly on target tick
+- endpoint lands exactly on target tick
 - no clock labels/clock semantics
 - no overlap, skew, ellipse, crop, or perspective
 ```
 
 ## 11. Hard negatives
 
-Critical failures:
-
-- off-center/floating needle
-- oval/distorted dial
-- wrong 0–5 label order/positions
-- 360° scale that causes 0 and 5 to overlap
-- ticks in inactive gap
-- unequal minor spacing
-- wrong number of minor intervals
-- multiple needles
-- endpoint between ticks
-- changed template between questions
-- clock-face substitution
-- dial too small to distinguish 0.1 kg marks
-- object/text covering tick band
+Critical failures include off-center/floating needle, oval/distorted dial, wrong 0–5 order/positions, 360° overlapping endpoint scale, ticks in inactive gap, unequal spacing, wrong minor interval count, multiple needles, endpoint between ticks, changed template, clock-face substitution, unreadably small dial, or text/art covering the tick band.
 
 ## 12. QA gates
 
@@ -224,6 +194,7 @@ Critical failures:
 `DIAL_SIZE_QA`
 `DIAL_CLEARANCE_QA`
 `SCALE_READING_PEDAGOGY_QA`
+`ONE_PAGE_FEASIBILITY_QA`
 
 Inspect every dial individually after render. One incorrect dial blocks release.
 
@@ -233,4 +204,8 @@ Best production path:
 
 `AI THEME ART/LAYOUT → DETERMINISTIC SVG DIAL → THAI TEXT OVERLAY → COMPOSITE → VISUAL QA`
 
-For SVG/vector generation, construct all ticks and the needle from the formulas above. Generative image output alone is never treated as mathematically guaranteed.
+Generative image output alone is never treated as mathematically guaranteed.
+
+## 14. Maturity note
+
+The deterministic-overlay path has strong regression evidence, but the **overall domain remains `PRODUCTION_CANDIDATE`** until the promotion criteria in `qa/DOMAIN_RELEASE_MATRIX.md` are satisfied. Do not report this engine as overall hardened merely because its deterministic geometry rules are mature.
