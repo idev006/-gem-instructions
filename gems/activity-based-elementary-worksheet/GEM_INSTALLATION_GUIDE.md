@@ -1,7 +1,8 @@
 # Gem Installation Guide — activity-based-elementary-worksheet
 
-Version: 1.0.0
-Target Gem baseline: 2.3.2
+Version: 2.6.0-LTS
+Target Gem baseline: 2.6.x
+Installation profile: Orchestrator + 9 Specialist Workers
 
 ## 1. Main Instructions
 
@@ -9,137 +10,165 @@ Use the complete contents of:
 
 `GEM_INSTRUCTIONS_PRODUCTION.md`
 
-as the Gem's primary Instructions.
+in the Gem **Instructions** field.
 
-Do not replace it with a shortened summary. Baseline 2.3.2 deliberately restores the full production core and protects against accidental instruction truncation.
+Do not shorten it into a domain formula dump. The main file is the Orchestrator: route, visibility, integration, output contract and release policy.
 
-## 2. Knowledge Base upload
+## 2. Knowledge upload — exactly 9 base files
 
-Upload supporting files according to `KB_MANIFEST.md`.
+Upload the compact `.txt` forms generated from these repository worker SSOT files:
 
-Recommended full supported-domain installation:
+1. `workers/W01_ACADEMIC_CONTENT.md`
+2. `workers/W02_TIME_CLOCK.md`
+3. `workers/W03_WEIGHT_SCALE.md`
+4. `workers/W04_LENGTH_DISTANCE.md`
+5. `workers/W05_TEMPERATURE_CAPACITY_VOLUME.md`
+6. `workers/W06_MONEY_CALENDAR_DATA.md`
+7. `workers/W07_INSTRUMENT_AUDITOR.md`
+8. `workers/W08_LAYOUT_RENDER_THAI.md`
+9. `workers/W09_QA_RELEASE.md`
 
-```text
-OUTPUT_CONTRACT.md
-ARCHITECTURE.md
-KB_ROUTER.md
-KB_MANIFEST.md
-policies/PARAMETER_POLICY.md
-domains/DOMAIN_REGISTRY.md
-domains/INSTRUMENT_READING_ENGINE.md
-domains/TIME_ENGINE.md
-domains/CLOCK_READING_ENGINE.md
-domains/SCALE_READING_ENGINE.md
-domains/LENGTH_READING_ENGINE.md
-domains/TEMPERATURE_READING_ENGINE.md
-domains/CAPACITY_READING_ENGINE.md
-domains/MONEY_ENGINE.md
-domains/CALENDAR_ENGINE.md
-domains/TABLE_GRAPH_READING_ENGINE.md
-qa/ACCEPTANCE_TESTS.md
-qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md
-qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md
-qa/BASELINE_2_3_2_RELEASE_CHECKLIST.md
-qa/DOMAIN_RELEASE_MATRIX.md
-USER_GUIDE.md
-```
+Knowledge slot 10 remains empty by default and is reserved for `W10_HOTFIX_OVERRIDE`.
 
-If the platform has a low KB-file limit, prioritize required core files, the domain engines you actually use, `INSTRUMENT_READING_ENGINE.md` for visual instruments, and the critical QA suites.
+Do not separately upload all domain/core/QA repository files when using the compact 9-worker package; the installation package consolidates the necessary operational rules.
 
-## 3. Routing behavior
+## 3. Health check after installation
 
-The Gem must apply `KB_ROUTER.md` rather than blending every uploaded file indiscriminately.
+Send:
 
-Examples:
+`ตรวจสุขภาพ Gem`
 
-- elapsed time → `TIME_ENGINE.md`
-- analog clock → `CLOCK_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md`
-- dial scale → `SCALE_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md`
-- ruler → `LENGTH_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md`
-- thermometer → `TEMPERATURE_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md`
-- capacity/meniscus → `CAPACITY_READING_ENGINE.md` + `INSTRUMENT_READING_ENGINE.md`
+Expected:
 
-`DOMAIN_REGISTRY.md` remains SSOT for domain maturity.
+- baseline 2.6.x
+- W01..W09 present
+- all worker schema versions = 1
+- W10 absent unless an approved hotfix is installed
+- `KB_COMPATIBILITY_QA=PASS`
+- `INSTALLATION_HEALTH=PASS`
 
-## 4. Expected output behavior
+The health check should not generate a worksheet unless requested separately.
 
-A normal request should produce a Prompt Package whose primary deliverable is:
+## 4. Measurement smoke tests
 
-`FINAL_IMAGE_GENERATION_PROMPT`
+### A — elapsed time
 
-The user should be able to copy that final prompt alone into another AI/image-generation system.
+`ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ไม่มีเฉลย`
 
-The final prompt must not stop at `[ภาพ...]`, Markdown worksheet text, `TBD`, `same as above`, or missing per-item visual states.
+Expected: W02+W08+W09; deterministic time relations; one resolved render path; no answer leak.
 
-## 5. Installation smoke tests
+### B — clock half-hour regression
 
-Run these after installation.
+`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
 
-### Test A — elapsed time
+For 10:30 final renderer state must include:
 
-`ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ชั่วโมงเต็ม ไม่มีเฉลย`
-
-Expected: deterministic time content + copy-ready final image prompt; no solved answers.
-
-### Test B — clock 10:30 regression
-
-`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลา 10:30 และเวลาครึ่งชั่วโมง ไม่มีเฉลย`
-
-Expected final prompt must state for 10:30:
-- minute hand = 180° / at 6
-- hour hand = 315°
+- minute hand 180° / at 6
+- hour hand 315°
 - exactly halfway between 10 and 11
-- never directly on 10
+- hard negative: not directly on 10
+- clock numerals preserved
 
-### Test C — canonical scale
+Student Blueprint must not print target times/angles.
+
+### C — ruler
+
+`ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ ไม่มีเฉลย`
+
+Expected:
+
+- 1 cm @1 mm = 10 intervals / 11 positions
+- zero graduation distinct from physical edge
+- exact endpoint mapping
+- no target length/tick index in Student Blueprint
+
+### D — nonzero ruler start
+
+`ป.4 วัดความยาวจากไม้บรรทัดโดยวัตถุไม่ได้เริ่มที่ 0 จำนวน 10 ข้อ`
+
+Expected verified relation `length=end-start`, not `length=end`.
+
+### E — distance
+
+`ป.4 คำนวณระยะทางรวมและระยะทางไปกลับ หน่วยเมตรและกิโลเมตร 10 ข้อ`
+
+Expected unit normalization before arithmetic; round-trip doubling only when same route is explicit.
+
+### F — canonical scale
 
 `ป.3 อ่านตราชั่ง 0–5 กก. ขีดละ 0.1 กก. 10 ข้อ ไม่มีเฉลย`
 
 Expected:
-- 300° active sweep
-- visible 60° inactive gap
-- 50 intervals / 51 active positions
-- zero value ticks inside gap
-- explicit no-360° substitution
 
-### Test D — thermometer
+- 300° active + 60° inactive gap
+- 50 intervals / 51 positions
+- no ticks in gap
+- no 360° substitution
+- labels 0–5 preserved
 
-Use a discrete minor interval. Expected target levels are exactly representable and liquid endpoints align exactly to valid ticks.
+### G — weight conversion
 
-### Test E — meniscus
+`ป.4 แปลงและคำนวณกิโลกรัมกับกรัม 10 ข้อ`
 
-Use top or bottom meniscus explicitly. Expected final prompt defines the designated read point and prohibits target-value labels/arrow annotations.
+Expected exact `1000 g=1 kg`; normalize before calculation.
 
-## 6. Pass criteria
+### H — thermometer
 
-Installation is considered structurally correct only if:
+`ป.5 อ่านเทอร์โมมิเตอร์ 20–120°F ขีดย่อย 2°F 10 ข้อ`
 
-`KB_ROUTE_QA=PASS`
-`KB_COMPATIBILITY_QA=PASS`
-`PROMPT_COMPLETENESS_QA=PASS`
-`PROMPT_COPY_READY_QA=PASS`
-`PLACEHOLDER_VISUAL_QA=PASS`
-`ANSWER_LEAK_QA=PASS`
-`TARGET_VALUE_LEAK_QA=PASS` when applicable
-`PER_ITEM_RENDER_STATE_QA=PASS` for visual tasks
+Expected targets only `20+2k`; endpoint specification exactly on valid graduation.
 
-plus all selected domain-specific gates.
+### I — capacity
 
-## 7. Important boundary
+`ป.4 คำนวณและแปลงลิตรกับมิลลิลิตร 10 ข้อ`
 
-The Gem validates and releases the prompt. It does not guarantee third-party rendered pixels.
+Expected exact `1000 mL=1 L`; mixed units normalized before arithmetic.
 
-After another AI creates the worksheet image, inspect the actual artifact before classroom use. Prompt QA and artifact QA are separate stages.
+### J — meniscus
 
-## 8. Upgrade procedure
+Request explicit bottom/top convention. Expected unambiguous curve/read point and no target-number annotation.
 
-When upgrading the Gem:
+### K — rectangular-prism volume
 
-1. replace the primary Instructions with the new full `GEM_INSTRUCTIONS_PRODUCTION.md`;
-2. read the new `KB_MANIFEST.md`;
-3. update changed required KB files;
-4. keep compatible independent domain engines unless manifest/regression says otherwise;
-5. run smoke tests;
-6. update any external command catalog that names the old Gem baseline.
+`ป.5 ปริมาตรทรงสี่เหลี่ยมมุมฉาก 10 ข้อ`
 
-Do not mix a new core baseline with an old Output Contract/Parameter Policy/Registry unless the manifest explicitly declares that combination compatible.
+Expected compatible dimension units before `V=l×w×h`.
+
+### L — arithmetic/color-by-code
+
+Test W01 to ensure measurement expansion did not regress general worksheet behavior.
+
+## 5. Prompt/artifact boundary
+
+After Gem generates a prompt and before any downstream image is inspected:
+
+`PROMPT_RELEASE=APPROVED` may be valid.
+
+But it must still report:
+
+`ARTIFACT_QA=NOT_YET_TESTED`
+`CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
+
+Prompt QA does not guarantee third-party pixels.
+
+## 6. Update policy
+
+Baseline 2.6.x is an LTS-style installation.
+
+For a narrow future defect, prefer one slot-10 hotfix file with:
+
+`HOTFIX_ID`
+`APPLIES_TO_BASELINE=2.6.x`
+`TARGET_WORKER`
+`SCOPE`
+`REPLACED_RULE`
+`NEW_RULE`
+`REGRESSION_TEST`
+
+Full reinstall should be reserved for worker-schema, architecture/routing, visibility/output-contract, or multi-domain critical changes.
+
+## 7. Source of truth
+
+GitHub repository `idev006/-gem-instructions`, folder `gems/activity-based-elementary-worksheet`, is the project SSOT.
+
+Installation ZIPs must be generated from this SSOT. A ZIP must not become a competing specification newer than GitHub.
