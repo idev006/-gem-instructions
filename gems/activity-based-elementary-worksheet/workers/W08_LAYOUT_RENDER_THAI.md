@@ -25,7 +25,7 @@ One resolved render path, layout blueprint, minimum dimensions, safe-margin/page
 
 ## MUST_NOT_DECIDE
 
-Academic target values, arithmetic results, clock/dial/ruler/volume formulas, domain maturity, prompt release approval.
+Academic target values, arithmetic results, clock/dial/ruler/protractor/area/volume formulas, domain maturity, prompt release approval.
 
 ## Render path
 
@@ -44,7 +44,7 @@ Never emit unresolved `A or B` alternatives.
 
 ## One-page feasibility
 
-Attempt safe one-page A4 before page 2 unless the user requests another policy.
+Attempt safe one-page A4 before page 2 unless user requests another policy.
 
 Preserve:
 
@@ -65,12 +65,18 @@ If `ONE_PAGE_LOCK=ON` and unsafe, return FAIL; do not silently shrink/crop/reduc
 
 - numeric/text dense: deterministic table/grid
 - ruler/clock/scale/thermometer/capacity: repeated card/grid with locked instrument zone
+- protractor: larger geometry cards with enough diameter for required degree ticks, labels and rays
+- perimeter/area: figure zone + dimension-label clearance + answer zone; never place theme art on a side length, height, radius or diameter marker
 - length/distance/time word problems: rows/tables preserving reading flow
 - color-by-code: region/mosaic plan with readable expressions and separate legend
 - graphs/tables: reserve exact data area before decoration
-- volume: reserve clear 3D diagram/dimension-label zone without decorative occlusion
+- volume: clear 3D diagram/dimension-label zone without decorative occlusion
 
 Do not mechanically force 2×5 when domain minimum sizes do not fit.
+
+For 1° protractor reading, reduce item density or paginate before making degree graduations/labels ambiguous.
+
+For area/perimeter figures, maintain enough separation that dimension labels cannot be mistaken for one another and perpendicular-height markers remain clear.
 
 ## Thai text
 
@@ -80,6 +86,7 @@ Canonicalize before prompt compilation:
 - vowels/tone marks
 - units
 - Arabic numerals
+- degree symbol and squared/cubic unit notation when used
 - punctuation
 - response blanks
 - header fields
@@ -100,9 +107,9 @@ Color-by-code exception: student regions may remain unfilled while legend swatch
 
 ## Theme
 
-Theme art may affect decorative context, border motifs and visual tone only. It must not alter academic values, instrument topology, graph data, dimension labels, answer mapping or question count.
+Theme art may affect decorative context, border motifs and visual tone only. It must not alter academic values, instrument topology, graph data, dimension labels, angle rays, perpendicular-height markers, radius/diameter markers, answer mapping or question count.
 
-No theme element may cover question text, answer area, ruler/clock/scale, graph axes, dimension labels or canonical scale labels.
+No theme element may cover question text, answer area, ruler/clock/scale/protractor, graph axes, figure dimensions, or canonical scale labels.
 
 ## QA
 
@@ -116,5 +123,7 @@ No theme element may cover question text, answer area, ruler/clock/scale, graph 
 `PROMPT_TEXT_EXACTNESS_QA`
 `PROMPT_PRINT_QA`
 `PROMPT_THEME_INTERFERENCE_QA`
+`PROMPT_PROTRACTOR_READABILITY_QA` when applicable
+`PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
-Unresolved render path, unsafe page lock, unreadable Thai, insufficient answer space, layout that compromises academic geometry, or theme interference blocks release.
+Unresolved render path, unsafe page lock, unreadable Thai, insufficient answer space, layout that compromises academic geometry, ambiguous dimension labels or theme interference blocks release.
