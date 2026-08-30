@@ -9,14 +9,16 @@ This file is the single source of truth for domain routing and **overall domain 
 | Domain | Question family | Owning worker | Visual auditor | Maturity |
 |---|---|---|---|---|
 | ACADEMIC_CONTENT | arithmetic/color-by-code/Thai literacy/generic content | W01 | optional | PRODUCTION_CANDIDATE |
-| TIME | elapsed time/start-end-duration/schedule | W02 | no | PRODUCTION_CANDIDATE |
+| TIME | elapsed time/start-end-duration/time-unit conversion/schedule | W02 | no | PRODUCTION_CANDIDATE |
 | TIME_CLOCK | analog clock reading/day-night | W02 | W07 | PRODUCTION_CANDIDATE |
 | MEASUREMENT_WEIGHT | weight arithmetic/conversion/dial reading | W03 | W07 for dial | PRODUCTION_CANDIDATE |
 | MEASUREMENT_LENGTH | ruler reading/length arithmetic/conversion | W04 | W07 for ruler | PRODUCTION_CANDIDATE |
 | MEASUREMENT_DISTANCE | route/round-trip/multi-segment distance | W04 | optional | PRODUCTION_CANDIDATE |
-| MEASUREMENT_TEMPERATURE | thermometer reading/temperature comparison | W05 | W07 for thermometer | PRODUCTION_CANDIDATE |
+| MEASUREMENT_ANGLE | angle classification/protractor reading/construction prompts | W04 | W07 for protractor | PRODUCTION_CANDIDATE |
+| MEASUREMENT_PERIMETER_AREA | perimeter/area/circle measurement and squared-unit conversion | W04 | optional; W07 when learner-read geometry is encoded | PRODUCTION_CANDIDATE |
+| MEASUREMENT_TEMPERATURE | thermometer reading/temperature comparison/change | W05 | W07 for thermometer | PRODUCTION_CANDIDATE |
 | MEASUREMENT_CAPACITY | mL/L reading/arithmetic/conversion/meniscus | W05 | W07 for graduated container | PRODUCTION_CANDIDATE |
-| MEASUREMENT_VOLUME | rectangular-prism/simple composite volume | W05 | optional | PRODUCTION_CANDIDATE |
+| MEASUREMENT_VOLUME | rectangular-prism/simple composite volume/cubic-unit conversion | W05 | optional | PRODUCTION_CANDIDATE |
 | MONEY | shopping/coins/notes/change | W06 | optional | PRODUCTION_CANDIDATE |
 | CALENDAR | dates/days/months | W06 | optional | PRODUCTION_CANDIDATE |
 | DATA_READING | tables/pictographs/bar graphs | W06 | W07 when exact scale/axis geometry matters | PRODUCTION_CANDIDATE |
@@ -24,16 +26,16 @@ This file is the single source of truth for domain routing and **overall domain 
 
 ## Routing examples
 
-- `หาระยะเวลา`, `เวลาเริ่มต้น/สิ้นสุด`, `เวลาเริ่ม + ระยะเวลา` → TIME
+- `หาระยะเวลา`, `เวลาเริ่มต้น/สิ้นสุด`, `แปลงชั่วโมง นาที วินาที` → TIME
 - `อ่านนาฬิกาเข็ม` → TIME_CLOCK
-- `อ่านตราชั่ง`, `kg/ขีด` → MEASUREMENT_WEIGHT
-- `บวก/ลบน้ำหนัก`, `แปลง kg/g` → MEASUREMENT_WEIGHT
-- `อ่านไม้บรรทัด`, `cm/mm` → MEASUREMENT_LENGTH
-- `บวกความยาว`, `แปลง mm/cm/m/km` → MEASUREMENT_LENGTH
+- `อ่านตราชั่ง`, `kg/ขีด`, `แปลง kg/g` → MEASUREMENT_WEIGHT
+- `อ่านไม้บรรทัด`, `cm/mm`, `บวกความยาว`, `แปลง mm/cm/m/km` → MEASUREMENT_LENGTH
 - `ระยะทางไปกลับ`, `ระยะทางรวมหลายช่วง`, `เปรียบเทียบเส้นทาง` → MEASUREMENT_DISTANCE
+- `อ่านมุมจากโพรแทรกเตอร์`, `จำแนกมุม` → MEASUREMENT_ANGLE
+- `รอบรูป`, `พื้นที่`, `พื้นที่วงกลม`, `แปลงหน่วยพื้นที่` → MEASUREMENT_PERIMETER_AREA
 - `เทอร์โมมิเตอร์` → MEASUREMENT_TEMPERATURE
 - `อ่านระดับน้ำ`, `L/mL`, `เมนิสคัส` → MEASUREMENT_CAPACITY
-- `ปริมาตรทรงสี่เหลี่ยมมุมฉาก` → MEASUREMENT_VOLUME
+- `ปริมาตรทรงสี่เหลี่ยมมุมฉาก`, `แปลง cm³/dm³/m³` → MEASUREMENT_VOLUME
 - `ซื้อของ`, `เงินทอน` → MONEY
 - `วัน เดือน วันที่`, `ปฏิทิน` → CALENDAR
 - `ตาราง`, `แผนภูมิรูปภาพ`, `กราฟแท่ง` → DATA_READING
@@ -42,7 +44,9 @@ This file is the single source of truth for domain routing and **overall domain 
 
 Formal P1–P6 capability/progression guidance lives in `MEASUREMENT_COVERAGE_P1_P6.md`.
 
-The measurement family includes direct instrument reading and deterministic calculation/conversion. Do not route every measurement word problem to generic content when a specialized measurement worker owns the arithmetic.
+The measurement family includes direct instrument reading and deterministic calculation/conversion. Do not route specialized measurement problems to generic content when W02–W05 owns the rule.
+
+Speed/rate is not part of the baseline measurement ownership unless explicitly requested and covered by a future specialized rule. Do not silently infer speed from distance/time wording.
 
 ## Routing validation
 
@@ -80,6 +84,7 @@ Known high-risk families include:
 - clock hour-hand interpolation
 - canonical dial full-circle substitution
 - ruler graduation/start-reference errors
+- protractor baseline/inner-outer scale ambiguity
 - thermometer between-tick endpoints
 - capacity/meniscus read-point ambiguity and target-number leakage
 
