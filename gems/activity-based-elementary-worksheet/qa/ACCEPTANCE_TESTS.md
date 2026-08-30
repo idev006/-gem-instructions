@@ -1,6 +1,6 @@
 # Acceptance Tests — Activity-Based Elementary Worksheet Generator
 
-Version: 2.1.0
+Version: 2.2.0
 Status: Critical QA / Regression Suite
 
 A production release passes only when all applicable critical tests pass. Weighted score never overrides a critical blocker.
@@ -42,241 +42,271 @@ Target geometry needed to draw an instrument may exist as render-only metadata b
 ### Test 11 — Separate answer key
 When key is on, default is unsolved student sheet + separate answer key.
 
+### Test 12 — Whole-response sanitizer
+When key is off, the complete visible response contains no active answer vector/list/internal solved note anywhere, including QA prose and parentheticals.
+
 ## C. Layout / readability / print
 
-### Test 12 — Safe margins
+### Test 13 — Safe margins
 No essential content enters unsafe print margins.
 
-### Test 13 — No cropping
+### Test 14 — No cropping
 All question regions fit.
 
-### Test 14 — Writable answer area
+### Test 15 — Writable answer area
 Student can physically write the expected response.
 
-### Test 15 — Decoration priority
+### Test 16 — Decoration priority
 Decorative art never covers instructional text/diagram/answer area.
 
-### Test 16 — Capacity repair
+### Test 17 — Capacity repair
 If one page makes content too small, paginate rather than shrink below domain minimum.
 
-### Test 17 — Monochrome readability
+### Test 18 — Monochrome readability
 Black-and-white output does not rely on color coding.
 
-### Test 18 — Stable repeated structure
+### Test 19 — Stable repeated structure
 Equivalent question cards/rows have consistent dimensions and hierarchy.
 
 ## D. Thai / text QA
 
-### Test 19 — Canonical Thai text
+### Test 20 — Canonical Thai text
 Title, instructions, units, and labels are correctly spelled in canonical data.
 
-### Test 20 — Unit consistency
+### Test 21 — Unit consistency
 Unit shown matches expected answer type.
 
-### Test 21 — Hybrid text readiness
+### Test 22 — Hybrid text readiness
 Thai-heavy layout preserves clean text zones for deterministic correction.
 
 ## E. TIME_ENGINE
 
-### Test 22 — Whole hour
+### Test 23 — Whole hour
 08:15→10:15 = 120 min.
 
-### Test 23 — Mixed minutes
+### Test 24 — Mixed minutes
 08:15→09:45 = 90 min.
 
-### Test 24 — Invalid minute rejected
+### Test 25 — Invalid minute rejected
 08:75 is invalid.
 
-### Test 25 — Midnight guard
+### Test 26 — Midnight guard
 20:00→08:00 rejected when crossing disabled.
 
-### Test 26 — Midnight enabled
+### Test 27 — Midnight enabled
 23:30→00:30 = 60 min when explicitly enabled.
 
-### Test 27 — Zero duration guard
+### Test 28 — Zero duration guard
 08:00→08:00 rejected unless explicitly allowed.
 
-### Test 28 — Unit rendering
+### Test 29 — Unit rendering
 1h30m task must not provide only an hours-only response field.
 
 ## F. SCALE_READING_ENGINE
 
-### Test 29 — True circle
+### Test 30 — True circle
 Instructional dial is not oval/skewed.
 
-### Test 30 — Center pivot
+### Test 31 — Center pivot
 Needle root equals geometric center.
 
-### Test 31 — One needle
+### Test 32 — One needle
 Exactly one instructional pointer.
 
-### Test 32 — Correct labels
+### Test 33 — Correct labels
 0–5 labels are complete and consistently ordered.
 
-### Test 33 — Minor division count
+### Test 34 — Minor division count
 Exactly 10 equal intervals per kilogram for 0.1 kg mode.
 
-### Test 34 — Uniform tick spacing
+### Test 35 — Uniform tick spacing
 Minor tick spacing is visually uniform.
 
-### Test 35 — Exact target
+### Test 36 — Exact target
 2.4 kg points exactly to fourth minor tick after 2.
 
-### Test 36 — Template lock
+### Test 37 — Template lock
 All dials share identical scale geometry; only needle changes.
 
-### Test 37 — No clock grammar
+### Test 38 — No clock grammar
 No accidental clock-style scale substitution.
 
-### Test 38 — Minimum dial size
+### Test 39 — Minimum dial size
 Dial is not reduced below configured printable minimum.
 
-### Test 39 — Decorative scale separation
+### Test 40 — Decorative scale separation
 Tiny context scale is not the authoritative student-reading instrument.
 
-### Test 40 — Scale answer format
+### Test 41 — Scale answer format
 Thai Grade 3 kg/tick mode uses `........ กิโลกรัม ........ ขีด` unless overridden.
 
 ## G. CLOCK_READING_ENGINE
 
-### Test 41 — True clock circle
+### Test 42 — True clock circle
 Clock face preserves circle geometry.
 
-### Test 42 — Two hands
+### Test 43 — Two hands
 Exactly hour + minute hands unless seconds requested.
 
-### Test 43 — Hand lengths
+### Test 44 — Hand lengths
 Minute hand is visibly longer.
 
-### Test 44 — Minute mapping
+### Test 45 — Minute mapping
 7:35 minute hand points to 35-minute mark.
 
-### Test 45 — Hour interpolation
+### Test 46 — Hour interpolation
 At 7:30, hour hand is halfway between 7 and 8.
 
-### Test 46 — Standard label orientation
+### Test 47 — Standard label orientation
 12 top, 3 right, 6 bottom, 9 left.
+
+### Test 48 — Day/night one-clock structure
+In `CLOCK_READING_MODE=DAY_NIGHT_PAIR`, one question contains exactly one instructional clock face and exactly two blank answer fields.
+
+### Test 49 — Day/night mapping for 1–5
+Analog 2:30 maps internally to daytime 14:30 and nighttime 02:30.
+
+### Test 50 — Day/night mapping for 6–11
+Analog 7:45 maps internally to daytime 07:45 and nighttime 19:45.
+
+### Test 51 — Twelve/zero mapping
+Analog 12:15 maps internally to daytime 12:15 and nighttime 00:15.
+
+### Test 52 — Minute preservation
+Day/night paired answers preserve the same minute value as the analog face.
+
+### Test 53 — Paired-answer leak guard
+When answer key is off, neither verified day nor verified night time appears anywhere in the visible package.
+
+### Test 54 — Sun/moon cue is not computation
+Decorative day/night icons may support labels but cannot replace deterministic mapping or be the sole source of answer semantics.
 
 ## H. LENGTH_READING_ENGINE
 
-### Test 47 — Zero alignment
+### Test 55 — Zero alignment
 Beginner object begins at zero graduation, not merely ruler edge.
 
-### Test 48 — Uniform ruler ticks
+### Test 56 — Uniform ruler ticks
 1 cm and 1 mm spacing are consistent.
 
-### Test 49 — Endpoint mapping
+### Test 57 — Endpoint mapping
 6.7 cm endpoint maps to 67 mm from zero under the 1 mm profile.
 
-### Test 50 — Nonzero-start arithmetic
+### Test 58 — Nonzero-start arithmetic
 Length = end mark - start mark.
 
 ## I. TEMPERATURE_READING_ENGINE
 
-### Test 51 — Uniform thermometer scale
+### Test 59 — Uniform thermometer scale
 Major/minor intervals are consistent.
 
-### Test 52 — Level mapping
+### Test 60 — Level mapping
 Column top aligns exactly with target temperature.
 
-### Test 53 — Unit consistency
+### Test 61 — Unit consistency
 °C/°F is consistent with configured domain.
 
 ## J. CAPACITY_READING_ENGINE
 
-### Test 54 — Container not distorted
+### Test 62 — Container not distorted
 Scale-reading geometry remains front-facing and readable.
 
-### Test 55 — Uniform graduations
+### Test 63 — Uniform graduations
 Graduation intervals are correct.
 
-### Test 56 — Liquid-level mapping
+### Test 64 — Liquid-level mapping
 Surface/meniscus aligns with target graduation.
 
-### Test 57 — Meniscus convention
+### Test 65 — Meniscus convention
 When scientific mode is active, reading convention is explicit and consistent.
 
 ## K. MONEY_ENGINE
 
-### Test 58 — Total arithmetic
+### Test 66 — Total arithmetic
 Sum of item prices recomputes correctly.
 
-### Test 59 — Change arithmetic
+### Test 67 — Change arithmetic
 `change = paid-total` and paid>=total.
 
-### Test 60 — Price association
+### Test 68 — Price association
 Each price label belongs unambiguously to one item.
 
 ## L. CALENDAR_ENGINE
 
-### Test 61 — Valid date
+### Test 69 — Valid date
 No 31 April.
 
-### Test 62 — Leap year
+### Test 70 — Leap year
 February length is correct for configured year.
 
-### Test 63 — Weekday mapping
+### Test 71 — Weekday mapping
 Dates align to correct weekday.
 
-### Test 64 — Seven columns
+### Test 72 — Seven columns
 Monthly calendar has exactly seven weekday columns.
 
 ## M. TABLE_GRAPH_READING_ENGINE
 
-### Test 65 — Dataset first
+### Test 73 — Dataset first
 Visualization values exactly match canonical dataset.
 
-### Test 66 — Bar height
+### Test 74 — Bar height
 Every bar height maps to configured axis scale/value.
 
-### Test 67 — No perspective distortion
+### Test 75 — No perspective distortion
 No 3D bar treatment that changes perceived magnitude.
 
-### Test 68 — Pictograph key
+### Test 76 — Pictograph key
 Icon count × key equals canonical value.
 
-### Test 69 — Table alignment
+### Test 77 — Table alignment
 Headers and cells map unambiguously.
 
 ## N. Revision / impact analysis
 
-### Test 70 — Theme-only revision
+### Test 78 — Theme-only revision
 Academic content remains unchanged when user requests only theme change.
 
-### Test 71 — Difficulty revision
+### Test 79 — Difficulty revision
 Affected academic values regenerate and revalidate.
 
-### Test 72 — Orientation revision
+### Test 80 — Orientation revision
 Content preserved; layout/print QA reruns.
 
-### Test 73 — Instrument resolution change
+### Test 81 — Instrument resolution change
 All target relations and geometry regenerate.
 
-### Test 74 — Dataset revision
+### Test 82 — Dataset revision
 Graph/table visualization and dependent questions rebuild.
+
+### Test 83 — Clock mode revision
+Changing SINGLE↔DAY_NIGHT_PAIR rebuilds response schema/layout and reruns clock/answer-leak QA without silently changing intended hand geometry.
 
 ## O. Post-render QA
 
-### Test 75 — Prompt pass is not artifact pass
+### Test 84 — Prompt pass is not artifact pass
 A rendered image can fail even if prompt passes.
 
-### Test 76 — Per-instrument inspection
+### Test 85 — Per-instrument inspection
 Every instructional instrument is inspected individually.
 
-### Test 77 — One wrong instrument blocks release
+### Test 86 — One wrong instrument blocks release
 One incorrect needle/hand/endpoint/level causes FAIL.
 
-### Test 78 — Photocopy test
+### Test 87 — Photocopy test
 Educational marks remain distinguishable in monochrome print.
 
-### Test 79 — Render-objective lock
+### Test 88 — Render-objective lock
 A request to render a student worksheet must produce a student worksheet, not an audit dashboard, QA poster, report, rubric, prompt summary, or meta-document.
 
-### Test 80 — Thai + numeral glyph coverage
+### Test 89 — Thai + numeral glyph coverage
 When deterministic text overlay is used, the selected font/render path must visibly support required Thai text plus Arabic numerals, decimal point, punctuation, and unit symbols. Missing-glyph boxes/tofu fail release.
 
-### Test 81 — Render recovery after artifact-type failure
+### Test 90 — Render recovery after artifact-type failure
 If a renderer returns the wrong artifact type, mark the attempt FAIL, strengthen/route the render path, and rerun. Never count the failed meta-artifact as worksheet evidence.
+
+### Test 91 — Paired clock post-render structure
+For DAY_NIGHT_PAIR, each rendered question visibly contains one readable clock and two clearly labelled blank response fields associated with that same clock.
 
 ## Release gates
 
@@ -290,6 +320,7 @@ ACADEMIC_QA
 CALCULATION_QA
 CONSTRAINT_QA
 ANSWER_LEAK_QA
+VISIBLE_OUTPUT_SANITIZER_QA
 DUPLICATE_QA
 THAI_QA
 GLYPH_COVERAGE_QA when deterministic text is rendered
@@ -302,6 +333,6 @@ PROMPT_QA
 
 Plus all applicable domain-specific geometry/data gates.
 
-Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage, wrong count, wrong artifact type, missing text glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
+Critical blockers include wrong academic result, invalid data/geometry, ambiguous instrument, answer leakage anywhere in the visible package, wrong count, wrong artifact type, missing text glyphs/tofu, unreadable/cropped layout, or malformed canonical text.
 
 Dry-run score target: >=95/100 AND zero critical blockers. Actual classroom release additionally requires post-render inspection when nondeterministic rendering is used.
