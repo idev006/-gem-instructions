@@ -18,6 +18,7 @@ Grade, subdomain, question count, scale min/max, major/minor interval, unit, ori
 - scientific meniscus convention
 - rectangular-prism volume
 - simple composite rectangular-prism volume
+- cm³/dm³/m³ conversion
 - capacity-volume relation when explicitly taught
 
 ## RETURNS
@@ -30,12 +31,21 @@ Final page layout, global render path, clock/ruler/dial formulas, global answer-
 
 ## Exact relations
 
+Capacity:
+
 `1000 mL=1 L`
 
-When explicitly part of the lesson:
+Cubic metric:
+
+`1000 cm³=1 dm³`
+`1000 dm³=1 m³`
+`1 m³=1,000,000 cm³`
+
+Capacity-volume when explicitly part of the lesson:
 
 `1 cm³=1 mL`
-`1000 cm³=1 L`
+`1 dm³=1 L`
+`1 m³=1000 L`
 
 Rectangular prism:
 
@@ -81,9 +91,16 @@ A nearly flat ambiguous meniscus fails scientific mode.
 
 Rectangular prism:
 
-1. normalize dimension units;
+1. normalize all dimensions to one linear unit;
 2. compute `l×w×h`;
-3. attach correct cubic unit.
+3. attach the corresponding cubic unit;
+4. convert cubic units only using cubed conversion factors.
+
+Example principle:
+
+`1 m = 100 cm` therefore `1 m³ = 100³ cm³ = 1,000,000 cm³`.
+
+Do not convert cubic units using linear factors.
 
 Simple composite rectangular prisms:
 
@@ -104,7 +121,7 @@ Configured scale labels remain visible; only item-specific target values are for
 
 Use `domains/MEASUREMENT_COVERAGE_P1_P6.md`, `domains/TEMPERATURE_READING_ENGINE.md`, and `domains/CAPACITY_READING_ENGINE.md`.
 
-Do not assume scientific meniscus merely because grade is higher; require explicit objective/context.
+Do not assume scientific meniscus or cubic-unit conversion merely because grade is higher; require objective/context.
 
 ## QA
 
@@ -120,7 +137,8 @@ Do not assume scientific meniscus merely because grade is higher; require explic
 `PROMPT_MENISCUS_READ_POINT_QA`
 `PROMPT_VOLUME_FORMULA_QA`
 `PROMPT_VOLUME_UNIT_COMPATIBILITY_QA`
+`PROMPT_CUBIC_UNIT_CONVERSION_QA`
 `PROMPT_VOLUME_DECOMPOSITION_QA`
 `PROMPT_CAPACITY_LABEL_PRESERVATION_QA`
 
-Wrong conversion, between-tick target, wrong meniscus read point, wrong volume formula/decomposition, or target leak blocks release.
+Wrong conversion, between-tick target, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, or target leak blocks release.
