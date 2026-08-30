@@ -12,17 +12,17 @@ Primary deliverable:
 
 `FINAL_IMAGE_GENERATION_PROMPT`
 
-The Gem is an **Orchestrator**. It routes requests to Specialist Worker knowledge, validates academic content/measurement rules, separates student-visible content from renderer-only metadata, resolves layout/render strategy, and releases a self-contained downstream prompt.
+The Gem is an **Orchestrator**. It routes requests to Specialist Workers, validates academic/measurement rules, separates student-visible content from renderer-only metadata, resolves layout/render strategy, and releases a self-contained downstream prompt.
 
-It does not claim the final image has passed visual QA until the artifact is actually inspected.
+It does not claim the final image has passed visual QA until the actual artifact is inspected.
 
 ## Nine Specialist Workers
 
 - `W01_ACADEMIC_CONTENT` — arithmetic, color-by-code, Thai literacy, generic content
-- `W02_TIME_CLOCK` — elapsed time and analog clock
+- `W02_TIME_CLOCK` — time units/calculation and analog clock
 - `W03_WEIGHT_SCALE` — weight calculation/conversion and dial scale
-- `W04_LENGTH_DISTANCE` — ruler, length, distance, metric conversion
-- `W05_TEMPERATURE_CAPACITY_VOLUME` — thermometer, capacity, meniscus, volume
+- `W04_LENGTH_DISTANCE` — ruler, length, distance, angle/protractor, perimeter, area
+- `W05_TEMPERATURE_CAPACITY_VOLUME` — thermometer, capacity, meniscus, solid volume
 - `W06_MONEY_CALENDAR_DATA` — money, calendar, tables/graphs
 - `W07_INSTRUMENT_AUDITOR` — shared geometry/topology audit
 - `W08_LAYOUT_RENDER_THAI` — layout, render path, Thai/text, print/theme
@@ -45,49 +45,65 @@ Knowledge slot 10 is intentionally reserved for a narrow compatible hotfix.
 - `qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md`
 - `qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md`
 - `qa/DOMAIN_RELEASE_MATRIX.md`
+- `examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 - `USER_GUIDE.md`
 - `GEM_INSTALLATION_GUIDE.md`
 
-GitHub is the project SSOT. Installation ZIPs must be generated from these rules and must not become a newer competing specification.
+GitHub is the project SSOT. Installation packages must be generated from these rules and must not become a newer competing specification.
 
-## Measurement coverage
+## Formal measurement coverage P1–P6
 
-Baseline 2.6.x formally supports:
+Baseline 2.6.x supports, when grade/objective appropriate:
 
+### Time
 - analog clock reading
-- elapsed-time/start-end-duration calculation
+- elapsed/start/end/duration calculation
+- hours/minutes/seconds conversion
+- schedules/day-night/midnight policy
+
+### Length / distance / measurement geometry
 - ruler reading including nonzero starts
 - length arithmetic/comparison
 - mm/cm/m/km conversion
-- distance totals, differences, round trips, multi-segment and route comparison
-- dial weight reading
+- distance total/difference/round trip/multi-segment/route comparison
+- angle/protractor reading
+- perimeter
+- supported elementary area formulas
+- squared-unit conversion and consistent circle π policy
+
+### Weight
+- dial reading
 - g/kg/ขีด arithmetic/conversion
+
+### Temperature / capacity / volume
 - thermometer reading
 - mL/L capacity reading/arithmetic/conversion
 - scientific meniscus when explicitly requested
-- rectangular-prism volume and simple composite rectangular-prism volume when grade-appropriate
+- rectangular-prism/simple composite rectangular-prism volume
+- cm³/dm³/m³ conversion
+- capacity-volume relations only when explicitly taught
 
 See `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
-## Exact measurement relations
+Speed/rate is not silently inferred from distance.
 
-Length:
+## Exact core relations
 
-`10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`
+Time: `60 s=1 min`, `60 min=1 h`, `24 h=1 day`
 
-Weight:
+Length: `10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`
 
-`1000 g=1 kg`; Thai elementary context where appropriate: `1 ขีด=100 g=0.1 kg`
+Area: `1 m²=10,000 cm²`, `1 km²=1,000,000 m²`
 
-Capacity:
+Weight: `1000 g=1 kg`; Thai context where appropriate `1 ขีด=100 g=0.1 kg`
 
-`1000 mL=1 L`
+Capacity: `1000 mL=1 L`
 
-When explicitly taught:
+Volume: `1000 cm³=1 dm³`, `1000 dm³=1 m³`, `1 m³=1,000,000 cm³`
 
-`1 cm³=1 mL`, `1000 cm³=1 L`
+When explicitly taught: `1 cm³=1 mL`, `1 dm³=1 L`, `1 m³=1000 L`
 
-Mixed-unit arithmetic normalizes to one base unit before calculation.
+Mixed-unit arithmetic normalizes to compatible units before calculation. Area conversions square linear factors; cubic conversions cube them.
 
 ## Three visibility scopes
 
@@ -108,6 +124,7 @@ Known guards include:
 - clock 10:30 → minute 180°, hour 315°, midpoint 10–11, not on 10
 - canonical 0–5 kg dial → 300° active + 60° gap, 50 intervals/51 positions, no 360° substitution
 - ruler 1 cm @1 mm → 10 intervals/11 positions
+- protractor → exact origin/0° baseline/active scale direction/target graduation
 - discrete thermometer/capacity target → exact valid graduation
 - meniscus → explicit read point; no target-number annotation
 
@@ -147,4 +164,4 @@ Before downstream artifact inspection:
 
 See `GEM_INSTALLATION_GUIDE.md`.
 
-The compact production package uses one Orchestrator Instructions text plus exactly 9 Knowledge worker `.txt` files, leaving slot 10 free for a narrow hotfix.
+Compact production installation uses one Orchestrator Instructions text plus exactly 9 Knowledge worker `.txt` files, leaving slot 10 free for a narrow hotfix.
