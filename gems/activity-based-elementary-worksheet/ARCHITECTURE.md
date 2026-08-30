@@ -17,7 +17,7 @@ The Gem is an Orchestrator over nine logical Specialist Workers.
 8. `QA_RELEASE_LAYER` — W09 validates compatibility, ownership, leaks, regressions, and release phase.
 9. `DOWNSTREAM_ARTIFACT_PHASE` — image exists outside the Gem and requires separate inspection.
 
-The production endpoint of the Gem is the prompt, not the final pixels.
+The production endpoint of the Gem is the prompt, not the final rendered pixels.
 
 ## 2. Worker registry
 
@@ -33,7 +33,7 @@ The production endpoint of the Gem is the prompt, not the final pixels.
 
 Optional slot 10: `W10_HOTFIX_OVERRIDE`.
 
-Every worker has contract fields:
+Every worker contract defines:
 
 `ACCEPTS | OWNS | RETURNS | MUST_NOT_DECIDE | QA`
 
@@ -45,25 +45,25 @@ Ownership prevents cross-domain contamination.
 Raw teacher request + references + revision instructions.
 
 ### NORMALIZED_WORKSHEET_SPEC
-Resolved parameters, domain/subdomain, grade, curriculum profile, render path input, page policy.
+Resolved parameters, domain/subdomain, grade, curriculum profile, render-path input, page policy.
 
 ### WORKER_ROUTE_DECISION
 Selected worker IDs, reason, compatibility, ownership map, applicable QA.
 
 ### INTERNAL_VERIFIED_STATE
-Hidden answers/calculations/target values/geometry.
+Hidden academic content, answers, formulas, normalized-unit values, target geometry/data and QA state.
 
 ### STUDENT_CONTENT_BLUEPRINT
-Only learner-visible givens, canonical labels/template IDs and blank responses. It must not expose renderer target values, angles, tick indices, levels, or solved answers.
+Only learner-visible givens, canonical labels/template IDs and blank responses. It must not expose renderer targets, angles, tick indices, levels or solved answers.
 
 ### TEACHER_VISIBLE_RENDER_STATE
 Renderer-only metadata needed to draw visuals correctly; marked `RENDER_ONLY_NOT_FOR_WORKSHEET`.
 
 ### LAYOUT_BLUEPRINT
-Page zones, minimum sizes, one-page feasibility and pagination decision.
+Page regions, minimum sizes, one-page feasibility and pagination decision.
 
 ### FINAL_IMAGE_GENERATION_PROMPT
-Self-contained copy-ready downstream prompt.
+Primary self-contained copy-ready downstream prompt.
 
 ### QA_REPORT
 Prompt-phase gates + explicit artifact phase status.
@@ -90,25 +90,63 @@ Prompt-phase gates + explicit artifact phase status.
 
 Three scopes are mandatory:
 
-1. `INTERNAL_VERIFIED_STATE` — hidden system calculations.
+1. `INTERNAL_VERIFIED_STATE` — hidden calculations and answers.
 2. `TEACHER_VISIBLE_PROMPT_METADATA` — renderer-only state in the final prompt.
 3. `STUDENT_VISIBLE_WORKSHEET` — actual learner-facing content.
 
 Answer/target leak rules apply to scope 3. Necessary renderer metadata is allowed in scope 2 but must explicitly say not to print it.
 
-## 6. Measurement subsystem
+## 6. Measurement subsystem ownership
 
-Formal measurement coverage is documented in `domains/MEASUREMENT_COVERAGE_P1_P6.md` and owned across:
+Formal coverage is documented in `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
-- W02: time/clock
-- W03: weight/scale
-- W04: ruler/length/distance/unit conversion
-- W05: temperature/capacity/volume
+- W02: time units, elapsed time, schedules, analog clocks
+- W03: weight arithmetic/conversion and dial scales
+- W04: ruler, length, distance, angle/protractor, perimeter, area
+- W05: thermometer, capacity, meniscus, solid volume and cubic-unit conversion
 - W07: shared instrument topology auditor
 
-Measurement calculations normalize to exact base units before arithmetic.
+Measurement calculations normalize to exact compatible units before arithmetic/formulas.
 
-## 7. Instrument contract
+## 7. Measurement coverage
+
+### Time
+- `60 s=1 min`, `60 min=1 h`, `24 h=1 day`
+- clock reading; start/end/duration; schedules; day/night; controlled midnight crossing
+
+### Length & distance
+- ruler zero/nonzero start
+- mm/cm/m/km conversion
+- sum/difference/comparison
+- multi-segment/round trip/route comparison
+- no implicit speed/rate
+
+### Angle
+- semicircular protractor 0–180°
+- explicit selected 0° baseline and scale direction
+- 1° resolution ⇒ 180 intervals / 181 positions
+
+### Perimeter & area
+- perimeter = boundary side sum once
+- rectangle/square/triangle/parallelogram/trapezoid formulas when grade/objective supports
+- circle area/circumference with one consistent `PI_POLICY`
+- squared-unit conversion uses squared linear factors
+
+### Weight
+- kg/g/ขีด arithmetic/conversion
+- canonical dial topology for 0–5 kg teaching scale
+
+### Capacity/temperature
+- thermometer discrete target mapping
+- mL/L reading/conversion/arithmetic
+- explicit meniscus convention when requested
+
+### Volume
+- rectangular prism and simple non-overlapping composite rectangular prisms
+- cm³/dm³/m³ conversion uses cubed linear factors
+- capacity-volume relations only when explicitly taught
+
+## 8. Instrument contract
 
 Learner-read geometry is academic data.
 
@@ -122,15 +160,15 @@ High-risk item serialization:
 
 `SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
 
-## 8. Render-path contract
+## 9. Render-path contract
 
-Final prompt must contain exactly one of:
+Final prompt contains exactly one of:
 
 `DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY`
 
 `AUTO` is normalization-only. Unresolved alternatives are invalid.
 
-## 9. One-page contract
+## 10. One-page contract
 
 Default:
 
@@ -138,34 +176,19 @@ Default:
 `TARGET_PAGE_COUNT=1`
 `ONE_PAGE_LOCK=OFF`
 
-Correctness, minimum educational geometry, Thai readability, and answer space outrank page count. Locked infeasibility blocks prompt release instead of unsafe compression.
-
-## 10. Measurement expansion ownership
-
-### Time
-Clock reading; start/end/duration; schedules; 12/24-hour relations; controlled midnight crossing.
-
-### Length/Distance
-Ruler reading; nonzero starts; length sum/difference/comparison; mm/cm/m/km conversion; multi-segment distance; round trip; route comparison.
-
-### Weight
-Dial reading; kg/g/ขีด; comparison; arithmetic/conversion.
-
-### Capacity/Volume
-mL/L reading/conversion/arithmetic; meniscus; rectangular-prism volume and simple composite volume when grade-appropriate.
-
-Speed/rate is not silently implied by distance.
+Correctness, minimum educational geometry, Thai readability and answer space outrank page count. Locked infeasibility blocks prompt release instead of unsafe compression.
 
 ## 11. Change impact
 
 | Change | Preserve | Rebuild |
 |---|---|---|
 | Theme | academic state | W08 art/layout language |
-| Difficulty/grade | theme where possible | owning academic worker data + layout |
+| Difficulty/grade | theme where possible | owning worker data + layout |
 | Count | skill/theme | item distribution + layout |
 | Orientation/page lock | academic state | W08 layout |
 | Answer key | givens | visibility/output package |
 | Unit/range/resolution | context | owning measurement calculations + geometry |
+| Figure/formula type | theme | W04/W05 academic state + diagram instructions |
 | Render path | academic state | W08 renderer architecture |
 | Worker/hotfix version | intent | route/affected worker output + W09 QA |
 
@@ -187,7 +210,7 @@ Critical errors block prompt release.
 
 ## 13. QA phase boundary
 
-Before a downstream image exists, only `PROMPT_*` checks may be PASS.
+Before downstream image exists, only `PROMPT_*` checks may be PASS.
 
 Always report:
 
@@ -198,4 +221,4 @@ Actual artifact QA begins only after the image/document is supplied.
 
 ## 14. LTS maintenance
 
-Baseline 2.6.x reserves Knowledge slot 10 for a narrow hotfix. Broad routing, visibility, worker-schema, or multi-domain academic changes require a new base release rather than accumulating overrides.
+Baseline 2.6.x reserves Knowledge slot 10 for a narrow hotfix. Broad routing, visibility, worker-schema or multi-domain academic changes require a new base release rather than accumulating overrides.
