@@ -14,7 +14,7 @@ Route decision, selected worker outputs, normalized spec, Student Blueprint, lay
 - integration QA
 - visibility/leak QA
 - prompt completeness/copy-readiness
-- regression gates
+- measurement/global regression gates
 - prompt-vs-artifact phase semantics
 - release decision
 - installation health/self-check
@@ -41,7 +41,7 @@ Required base worker IDs:
 `W08_LAYOUT_RENDER_THAI`
 `W09_QA_RELEASE`
 
-Every base worker must declare:
+Every base worker:
 
 `BASELINE_COMPATIBILITY=2.6.x`
 `WORKER_SCHEMA_VERSION=1`
@@ -57,8 +57,8 @@ Fail if one worker silently overrides another worker's owned academic formula.
 Student Blueprint must not expose:
 
 - answers
-- target times/weights/lengths/levels
-- angles
+- target times/weights/lengths/angles/levels
+- hand/needle/ray angles
 - tick indices
 - liquid levels
 - answer vectors
@@ -68,14 +68,13 @@ Student Blueprint must not expose:
 
 Teacher-visible renderer metadata is allowed/required when needed and must be marked `RENDER_ONLY_NOT_FOR_WORKSHEET`.
 
-Student worksheet must contain no solved answer, target-specific callout, or QA/internal metadata. Canonical instructional labels must remain visible.
+Student worksheet must contain no solved answer, target-specific callout, or QA/internal metadata. Canonical instructional labels remain visible.
 
 ## Prompt completeness
 
 Final prompt must:
 
-- exist
-- be standalone
+- exist and be standalone
 - contain exact question count
 - contain one resolved render path
 - state `RENDER_OBJECTIVE=STUDENT_WORKSHEET`
@@ -87,13 +86,15 @@ Final prompt must:
 ## Measurement regressions
 
 ### Time
+- `60 s=1 min`, `60 min=1 h`, `24 h=1 day`
 - correct start/end/duration transformations
 - no forbidden midnight crossing
-- schedule consistency
+- second precision only when requested/warranted
+- seconds hand not introduced automatically by time-unit conversion
 
 ### Clock
 - 10:30: minute=180°, hour=315°, midpoint 10–11, not on 10
-- every nonzero-minute hour hand is continuously displaced
+- every nonzero-minute hour hand continuously displaced
 - clock numerals preserved when configured
 
 ### Weight/scale
@@ -108,15 +109,33 @@ Final prompt must:
 - `10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`
 - 1 cm @1 mm = 10 intervals / 11 positions
 - nonzero ruler start uses `end-start`
-- round trip doubles one-way only when same route is explicit
+- round trip doubles one-way only when same route explicit
 - multi-segment distance counts each segment once
+- speed/rate not silently inferred
 
-### Capacity/volume
+### Angle/protractor
+- semicircular 0–180° protractor uses exact topology defined by W04/W07
+- vertex exactly at origin
+- baseline ray at selected 0°
+- active inner/outer scale direction unambiguous
+- target ray on exact graduation in exact-reading mode
+- renderer target angle/ray state absent from Student Blueprint
+
+### Perimeter/area
+- perimeter counts each boundary side exactly once
+- area formula matches figure type
+- triangle/parallelogram/trapezoid height is perpendicular height
+- squared-unit conversion uses squared linear factor
+- circle tasks use one consistent `PI_POLICY`
+
+### Temperature/capacity/volume
 - `1000 mL=1 L`
-- `1 cm³=1 mL` only when explicitly taught
+- `1000 cm³=1 dm³`, `1000 dm³=1 m³`, `1 m³=1,000,000 cm³`
+- `1 cm³=1 mL`, `1 dm³=1 L`, `1 m³=1000 L` only when explicitly taught
 - thermometer/capacity discrete target exactly representable
 - meniscus read point explicit/unambiguous
 - rectangular prism `V=l×w×h` with compatible dimension units
+- cubic conversion uses cubed linear factors
 - composite rectangular prisms do not double-count overlap
 
 ## Arithmetic/color-by-code/Thai regressions
@@ -134,7 +153,7 @@ Before actual rendered image:
 - `ARTIFACT_QA=NOT_YET_TESTED`
 - `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-Never claim actual visual circle/tick/hand/alignment/Thai glyph PASS without artifact inspection.
+Never claim actual visual circle/tick/hand/ray/alignment/Thai glyph PASS without artifact inspection.
 
 ## Release gates
 
@@ -144,8 +163,16 @@ Required applicable gates:
 `KB_COMPATIBILITY_QA`
 `WORKER_OWNERSHIP_QA`
 `PROMPT_ACADEMIC_DATA_QA`
+`PROMPT_MEASUREMENT_GRADE_APPROPRIATENESS_QA` for measurement tasks
 `PROMPT_UNIT_COMPATIBILITY_QA` when units are involved
 `PROMPT_UNIT_CONVERSION_QA` when conversion is involved
+`PROMPT_TIME_UNIT_CONVERSION_QA` when time conversion is involved
+`PROMPT_PROTRACTOR_TOPOLOGY_QA` when protractor is used
+`PROMPT_PROTRACTOR_BASELINE_QA` when protractor is used
+`PROMPT_AREA_FORMULA_QA` when area is used
+`PROMPT_AREA_UNIT_CONVERSION_QA` when area conversion is used
+`PROMPT_PI_POLICY_QA` when circles are used
+`PROMPT_CUBIC_UNIT_CONVERSION_QA` when cubic conversion is used
 `RENDER_PATH_RESOLVED_QA`
 `PROMPT_ONE_PAGE_FEASIBILITY_QA`
 `PROMPT_COMPLETENESS_QA`
@@ -164,7 +191,7 @@ If all critical gates pass:
 
 ## Health check
 
-When user asks `ตรวจสุขภาพ Gem` / `Gem self-check`, report baseline, W01..W09 presence/compatibility, W10 present/absent, route table, visibility model, render-path rule, prompt/artifact phase semantics, and `INSTALLATION_HEALTH=PASS|FAIL`. Do not generate a worksheet unless separately requested.
+When user asks `ตรวจสุขภาพ Gem` / `Gem self-check`, report baseline, W01..W09 presence/compatibility, W10 present/absent, route table, measurement capability family, visibility model, render-path rule, prompt/artifact phase semantics, and `INSTALLATION_HEALTH=PASS|FAIL`. Do not generate a worksheet unless separately requested.
 
 ## Hotfix
 
