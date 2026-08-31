@@ -28,11 +28,13 @@ workers = [
 ]
 
 # 1-9: every base worker remains structurally contract-compatible.
+# QA headings are intentionally specialized (e.g. Prompt QA / Release gate semantics).
 for wid in workers:
     txt = read(f"workers/{wid}.md")
+    has_qa_contract = "_QA`" in txt or "QA is conjunctive" in txt
     add(f"worker-contract-{wid}",
         f"WORKER_ID={wid}" in txt and "## ACCEPTS" in txt and "## OWNS" in txt
-        and "## RETURNS" in txt and "## MUST_NOT_DECIDE" in txt and "## QA" in txt)
+        and "## RETURNS" in txt and "## MUST_NOT_DECIDE" in txt and has_qa_contract)
 
 # 10-21: shared profile contains every system-wide protection family.
 profile_tokens = [
@@ -56,7 +58,7 @@ for token in profile_tokens:
 checks = [
     ("builder-shared-profile-path", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md" in builder),
     ("builder-shared-profile-main", "MANDATORY SYSTEM-WIDE QUALITY PROFILE" in builder),
-    ("builder-shared-profile-workers", "SHARED_PROFILE" in builder and "bundle_text" in builder),
+    ("builder-shared-profile-workers", "SHARED_PROFILE" in builder and "effective_sources = [SHARED_PROFILE, *sources]" in builder),
     ("builder-system-gate", "system_wide_quality_regression_suite.py" in builder),
     ("builder-871-total", "871/871 PASS" in builder),
     ("workflow-system-gate", "System-wide quality regression" in workflow),
