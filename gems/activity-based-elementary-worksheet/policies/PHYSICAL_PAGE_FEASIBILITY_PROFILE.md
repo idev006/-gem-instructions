@@ -1,6 +1,6 @@
 # Physical Page Feasibility Profile — Instrument & Graph Packing Safety
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Mandatory page-geometry safety contract
 Compatible Gem baseline: 2.6.x
 Primary owners: `W08_LAYOUT_RENDER_THAI` + independent feasibility evidence from `W10_METROLOGY_ENGINEER`
@@ -39,6 +39,7 @@ Before `PROMPT_ONE_PAGE_FEASIBILITY_QA` or `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA
 `COLUMN_GAP_MM`
 `ROW_GAP_MM`
 `ANSWER_ZONE_HEIGHT_MM`
+`INTERNAL_VERTICAL_CLEARANCE_MM`
 `USABLE_WIDTH_MM`
 `USABLE_HEIGHT_MM`
 `REQUIRED_GRID_WIDTH_MM`
@@ -69,13 +70,39 @@ and
 
 For an item containing a learner-read instrument plus response area:
 
-`ITEM_MIN_HEIGHT_MM >= INSTRUMENT_MIN_HEIGHT_MM + ANSWER_ZONE_HEIGHT_MM + INTERNAL_VERTICAL_CLEARANCE_MM`
+`ITEM_MIN_HEIGHT_MM >= INSTRUMENT_BODY_HEIGHT_MM + ANSWER_ZONE_HEIGHT_MM + INTERNAL_VERTICAL_CLEARANCE_MM`
 
-For circular instruments:
+## Shape-aware bounding boxes — mandatory
 
-`INSTRUMENT_MIN_HEIGHT_MM >= INSTRUMENT_MIN_DIAMETER_MM`
+Page feasibility must use the **actual shape footprint**, not a generic square assumption.
 
-A dial/protractor diameter or width cannot be counted only horizontally while ignoring its vertical footprint.
+### Full circular dial / clock / speedometer
+
+If diameter is `D`:
+
+`INSTRUMENT_BODY_WIDTH_MM = D`
+`INSTRUMENT_BODY_HEIGHT_MM = D`
+
+### Semicircular protractor
+
+If production width is `W=2R`:
+
+`INSTRUMENT_BODY_WIDTH_MM = W`
+`INSTRUMENT_BODY_HEIGHT_MM = R = W/2`
+
+Therefore a 70 mm-wide protractor has a 35 mm semicircle body height before numeric labels, baseline clearance, question number, answer zone and row spacing.
+
+**Forbidden inference:** `five rows × 70 mm protractor width = 350 mm required height`.
+
+That mixes horizontal width with vertical height and is a false feasibility oracle.
+
+The correct protractor item height is:
+
+`ITEM_MIN_HEIGHT_MM >= W/2 + PROTRACTOR_LABEL_BASELINE_CLEARANCE_MM + ANSWER_ZONE_HEIGHT_MM + INTERNAL_VERTICAL_CLEARANCE_MM`
+
+### Vertical linear instrument
+
+For thermometer/container scale body height `H`, use the actual selected body height plus answer/label reserves.
 
 ## Page-policy semantics
 
@@ -144,13 +171,13 @@ Gates:
 ## Instrument-family implications
 
 ### Weight dial
-A claimed 80 mm dial used in five vertical rows cannot be declared one-page-feasible merely because tick spacing passes. Vertical packing must be proved independently.
+A claimed 80 mm circular dial used in five vertical rows cannot be declared one-page-feasible merely because tick spacing passes: the circular body alone requires 400 mm of height.
 
 ### Protractor
-For 0–180° @1°, production width >=70 mm is a genuine metrology minimum. Ten such protractors in five A4 portrait rows normally require pagination unless a numeric packing proof demonstrates otherwise without reducing the 70 mm minimum.
+For 0–180° @1°, production width >=70 mm is a genuine metrology minimum. Its semicircle body height at exactly 70 mm width is 35 mm, not 70 mm. A two-column layout is preferred when the complete numeric packing state passes. `2×5` must be **proved**, not automatically rejected or automatically accepted.
 
 ### Thermometer
-A 60 mm 0–50°C scale has 1.20 mm interval spacing. Five 60 mm vertical instruments already consume 300 mm before header, margins or answer zones; a one-page five-row plan therefore cannot PASS.
+A selected 60 mm 0–50°C scale has 1.20 mm interval spacing. Five such vertical scale bodies consume 300 mm before header, margins or answer zones; that selected 60 mm five-row plan cannot PASS. If 60 mm is not a true minimum, W08 may select a smaller size only after W10 verifies it remains above the metrology/readability minimum.
 
 ### Graduated container
 Container item-box height, scale height and answer zone must all be included. A 50 mm item box × five rows consumes 250 mm before row gaps and page header; feasibility must be numerically proved rather than assumed.
@@ -172,6 +199,7 @@ A hard-coded grid is allowed only after the corresponding numeric packing proof 
 `PROMPT_PHYSICAL_WIDTH_FEASIBILITY_QA`
 `PROMPT_PHYSICAL_HEIGHT_FEASIBILITY_QA`
 `PROMPT_ITEM_BOUNDING_BOX_QA`
+`PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA`
 `PROMPT_ANSWER_ZONE_PRESERVATION_QA`
 `PROMPT_PAGINATION_FALLBACK_QA`
 `PROMPT_PAGE_POLICY_SERIALIZATION_QA`
