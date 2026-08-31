@@ -25,7 +25,7 @@ Upload every `.txt` from `02_UPLOAD_10_WORKER_KNOWLEDGE_TXT`:
 9. `W09_QA_RELEASE.txt`
 10. `W10_METROLOGY_ENGINEER.txt`
 
-W10 is a production worker, not a hotfix. It independently audits measuring instruments, common centers/origins, scale feasibility and shape-aware page evidence.
+W10 is a production worker, not a hotfix. It independently audits measuring instruments, common centers/origins, local-span/reference geometry, scale feasibility and shape-aware page evidence.
 
 ## 3. Five mandatory safety profiles
 
@@ -41,7 +41,9 @@ Whenever a student reads an instrument:
 
 `OWNING WORKER → W07 → W10 → W08 → W09`
 
-W07 audits geometry. W10 independently recomputes metrology/common-center/shape/page evidence. Missing either audit blocks prompt release.
+W07 audits geometry. W10 independently recomputes metrology/local-span/reference/common-center/shape/page evidence. Missing either audit blocks prompt release.
+
+`NO WORKER MAY SELF-CERTIFY ITS OWN HIGH-RISK OUTPUT.`
 
 ## 4. Release artifact eligibility
 
@@ -60,8 +62,9 @@ Install only a ZIP whose exact GitHub Actions source commit passed:
 - actual weight-dial inactive-gap regression `32/32`
 - physical page feasibility regression `48/48`
 - actual instrument geometry regression `64/64`
+- measurement reference artifact regression `64/64`
 - repository full-line audit `81/81`
-- combined `1300/1300 PASS`
+- combined `1364/1364 PASS`
 - package build PASS
 - ZIP integrity PASS
 - artifact upload PASS
@@ -86,23 +89,26 @@ Expected:
 
 ## 6. Critical instrument smoke tests
 
-### Clock
-`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
+### Clock — continuous hour hand
+`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ มีเวลาประมาณ 2:45 ไม่มีเฉลย`
 
-Expected: W02+W07+W10+W08+W09; 60 distinct minute positions; 10:30 = minute180°, hour315°; hands share one pivot.
+Expected: W02+W07+W10+W08+W09; 60 distinct minute positions; for 2:45 minute hand=270° and hour hand=82.5°, exactly 75% from 2 toward 3; short hand must not stay directly on 2; hands share one pivot.
 
-### Ruler
-`ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ ไม่มีเฉลย`
+### Ruler — endpoint projection/reference
+`ป.3 วัดความยาววัตถุด้วยไม้บรรทัด เซนติเมตรและมิลลิเมตร เริ่มที่ 0 จำนวน 10 ข้อ ไม่มีเฉลย`
 
-Expected each 1cm @1mm span =10 intervals/11 positions/9 interior; physical edge not graduation.
+Expected each 1cm @1mm span =10 intervals/11 positions/9 interior; physical edge not graduation; object start aligns exactly with zero graduation; object start/end have thin dashed vertical projection guides to their ruler graduations. For explicit nonzero-start tasks, both guides remain and answer uses `END-START`.
 
-### Weight dial
+### Weight dial — per-kilogram hierarchy
 `ป.3 อ่านตราชั่ง 0–5 กก. ขีดย่อย 0.1 กก. 10 ข้อ ไม่มีเฉลย`
 
 Expected:
 - 0 at top, values increase clockwise;
 - labels `0@0°,1@60°,2@120°,3@180°,4@240°,5@300°`;
 - 50 intervals /51 active positions;
+- exactly 10 intervals in each 1 kg span;
+- existing +0.5 kg position is an intermediate tick longer than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks;
+- no extra tick is created at +0.5 kg;
 - inactive gap `(300°,360°)` with zero radial scale-like marks;
 - needle pivot equals dial center.
 
@@ -131,10 +137,10 @@ Expected 50 intervals/51 positions; 6 major +5 intermediate +40 ordinary minor; 
 
 Expected 12 intervals/13 positions, 240° active, 120° inactive, exact mapping, pivot exactly at dial/reading-ring center, and radial needle.
 
-### Graduated container
+### Graduated container — local-span recount
 `ป.4 อ่านปริมาตรจากภาชนะตวง 0–1000 mL ขีดละ 50 mL 10 ข้อ ไม่มีเฉลย`
 
-Expected 20 intervals/21 positions and explicit level/meniscus convention.
+Expected 20 intervals/21 positions globally; major labels every 100 mL; every adjacent 100 mL span has exactly 2 equal intervals and exactly one interior +50 mL tick; no extra short strokes/pseudo-ticks; explicit level/meniscus convention.
 
 ### Graph axis
 `ป.4 อ่านกราฟแท่งที่แกนตั้งเพิ่มทีละ 5 จำนวน 10 ข้อ`
@@ -163,7 +169,7 @@ and:
 
 `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-Review explicitly checks exact counts, labels/order, common center/origin, radial collinearity, shape integrity, target alignment and inactive regions. `Looks correct` is insufficient.
+Review explicitly checks exact global and local-span counts, endpoint/reference projections, labels/order, common center/origin, radial collinearity, continuous clock-hand interpolation, shape integrity, target alignment and inactive regions. `Looks correct` is insufficient.
 
 ## 9. Prompt vs artifact QA
 
@@ -174,4 +180,4 @@ Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-One wrong learner-read scale, label order, pivot/origin, or distorted instrument means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
+One wrong learner-read scale, local subdivision, reference projection, hour-hand interpolation, label order, pivot/origin, or distorted instrument means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
