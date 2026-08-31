@@ -39,7 +39,18 @@ Mandatory learner-read chain:
 
 `OWNING DOMAIN → W07 GEOMETRY AUDIT → W10 INDEPENDENT METROLOGY AUDIT → W08 LAYOUT/RENDER → W09 RELEASE`
 
+`NO WORKER MAY SELF-CERTIFY ITS OWN HIGH-RISK OUTPUT.`
+
 ## Correct canonical instrument oracles
+
+### Analog clock
+
+For `h:m`:
+
+`minute_angle=6*m`
+`hour_angle=30*(h mod 12)+0.5*m`
+
+Nonzero minutes require continuous hour-hand displacement. Quarter-hour checkpoints: :15=25%, :30=50%, :45=75% of the way to the next hour. For 14:45/2:45 the hour hand is 82.5° clockwise from 12 and must not remain on numeral 2.
 
 ### Weight dial 0–5 kg @0.1 kg
 
@@ -52,7 +63,10 @@ Mandatory learner-read chain:
 - `LABEL_ANGLES={0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`;
 - `CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`;
 - `active_tick_angle(i)=(6*i) mod 360`;
-- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`.
+- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`;
+- `INTERVALS_PER_KG=10`;
+- `INTERIOR_POSITIONS_PER_KG_SPAN=9`;
+- existing +0.5 kg position is an intermediate tick longer than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks; it never adds a graduation.
 
 The superseded rotated label map is forbidden in current authoritative SSOT.
 
@@ -69,7 +83,10 @@ The superseded rotated label map is forbidden in current authoritative SSOT.
 
 - 10 intervals /11 endpoint-inclusive positions /9 interior positions;
 - physical ruler edge is not an additional graduation;
-- 5 mm hierarchy mark reuses an existing position.
+- 5 mm hierarchy mark reuses an existing position;
+- object-on-ruler tasks require exact endpoint-to-graduation identity plus start/end dashed projection guides;
+- ZERO_START_MODE requires `OBJECT_START_X == ZERO_GRADUATION_X`;
+- NONZERO_START_MODE requires `TARGET_LENGTH=END_VALUE-START_VALUE` with both projections preserved.
 
 ### Thermometer 0–50°C @1°C
 
@@ -80,6 +97,15 @@ The superseded rotated label map is forbidden in current authoritative SSOT.
 - each complete 10°C span =10 intervals /9 interior positions;
 - liquid endpoint equals target graduation centerline;
 - a selected 60 mm scale has exactly 1.20 mm tick-center spacing.
+
+### Graduated container 0–1000 mL @50 mL
+
+- global topology =20 intervals /21 positions;
+- major interval=100 mL;
+- every adjacent 100 mL span = exactly 2 intervals /3 endpoint-inclusive positions;
+- exactly one interior position at +50 mL;
+- no extra minor/pseudo-tick may exist inside a 100 mL span;
+- the +50 mL tick is shorter/weaker than the major ticks and normally unlabeled.
 
 ### Protractor 0–180° @1°
 
@@ -116,6 +142,8 @@ Examples:
 - `OUTPUT_MODE=PROMPT_PACKAGE` is distinct from `RENDER_PATH`;
 - exact learner-read geometry uses deterministic geometry;
 - all radial/angular instruments require common-center/common-origin evidence;
+- every declared local subdivision grammar requires an independent local-span recount;
+- ruler object measurement requires endpoint/reference projection evidence;
 - all scale labels require label-to-tick association and monotonic order where applicable;
 - renderer prevention loop:
   `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`;
@@ -125,10 +153,14 @@ Examples:
 ## Permanent actual defects retained
 
 - ruler extra graduation;
+- ruler object starting from physical border instead of zero graduation / missing endpoint projections;
 - weight-dial inactive-gap radial marks;
 - weight-dial label-order/coordinate drift;
+- weight-dial missing 0.5 kg intermediate hierarchy;
 - speedometer off-center pivot;
+- clock hour hand pinned to the starting numeral at nonzero minute, including 14:45;
 - thermometer incorrect subdivision/hierarchy;
+- graduated container extra subdivisions between adjacent 100 mL labels;
 - distorted/misregistered protractor;
 - physical page feasibility contradictions.
 
@@ -136,6 +168,7 @@ See:
 - `ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md`
 - `ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md`
 - `ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md`
+- `ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md`
 - `CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md`
 
 ## Executable release gate
@@ -154,11 +187,12 @@ All prior tests remain; counts only increase.
 10. actual weight-dial inactive-gap regression: 32
 11. physical page feasibility regression: 48
 12. actual instrument geometry regression: 64
-13. repository full-line audit: 81
+13. measurement reference artifact regression: 64
+14. repository full-line audit: 81
 
 Combined mandatory gate:
 
-`1300/1300 PASS`
+`1364/1364 PASS`
 
 The repository full-line audit scans every UTF-8 text/code line in the Gem SSOT plus its GitHub workflow for encoding/control/merge-marker hazards and applies 81 semantic coherence assertions. It is additive to, not a replacement for, domain regression suites.
 
@@ -174,7 +208,7 @@ Must contain:
 - all five shared profiles embedded in main and worker bundles;
 - W10 metrology worker;
 - actual defect evidence;
-- reports for all 13 regression suites including 64-case actual instrument geometry and 81-case repository full-line audit;
+- reports for all 14 regression suites including 64-case measurement-reference regression and 81-case repository full-line audit;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
@@ -183,7 +217,7 @@ Use the exact GitHub Actions artifact only after all gates pass.
 
 ## Prompt / artifact boundary
 
-Passing `1300/1300 PASS` means:
+Passing `1364/1364 PASS` means:
 
 `PROMPT_RELEASE=APPROVED`
 
