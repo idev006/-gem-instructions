@@ -16,6 +16,7 @@ Owning-worker template, topology, active range, intervals, target mapping, minim
 - target alignment-spec audit
 - no-missing/no-extra graduation specification
 - scale-line integrity audit
+- template-lock audit
 - canonical-template lock audit
 - geometry-vs-decoration separation
 - protractor baseline/scale-direction audit
