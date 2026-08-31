@@ -1,10 +1,10 @@
 # Domain Registry — Activity-Based Elementary Worksheet Generator
 
-Version: 2.6.0-LTS
+Version: 2.6.2-LTS
 Status: Canonical SSOT for domain routing and overall maturity
 Compatible Gem baseline: 2.6.x
 
-This file is the single source of truth for domain routing and **overall domain maturity**. Specialist Workers own academic rules; this registry owns route names and maturity. If a worker/engine header disagrees with this registry, this registry wins and the mismatch is a governance defect.
+This file is the single source of truth for domain routing and overall domain maturity. Specialist workers own academic rules; this registry owns route names and maturity. If a worker/engine header disagrees with this registry, this registry wins and the mismatch is a governance defect.
 
 | Domain | Question family | Owning worker | Visual auditor | Maturity |
 |---|---|---|---|---|
@@ -14,6 +14,7 @@ This file is the single source of truth for domain routing and **overall domain 
 | MEASUREMENT_WEIGHT | weight arithmetic/conversion/dial reading | W03 | W07 for dial | PRODUCTION_CANDIDATE |
 | MEASUREMENT_LENGTH | ruler reading/length arithmetic/conversion | W04 | W07 for ruler | PRODUCTION_CANDIDATE |
 | MEASUREMENT_DISTANCE | route/round-trip/multi-segment distance | W04 | optional | PRODUCTION_CANDIDATE |
+| MEASUREMENT_SPEEDOMETER | direct vehicle speedometer reading in km/h | W04 | W07 | PRODUCTION_CANDIDATE |
 | MEASUREMENT_ANGLE | angle classification/protractor reading/construction prompts | W04 | W07 for protractor | PRODUCTION_CANDIDATE |
 | MEASUREMENT_PERIMETER_AREA | perimeter/area/circle measurement and squared-unit conversion | W04 | optional; W07 when learner-read geometry is encoded | PRODUCTION_CANDIDATE |
 | MEASUREMENT_TEMPERATURE | thermometer reading/temperature comparison/change | W05 | W07 for thermometer | PRODUCTION_CANDIDATE |
@@ -31,9 +32,10 @@ This file is the single source of truth for domain routing and **overall domain 
 - `อ่านตราชั่ง`, `kg/ขีด`, `แปลง kg/g` → MEASUREMENT_WEIGHT
 - `อ่านไม้บรรทัด`, `cm/mm`, `บวกความยาว`, `แปลง mm/cm/m/km` → MEASUREMENT_LENGTH
 - `ระยะทางไปกลับ`, `ระยะทางรวมหลายช่วง`, `เปรียบเทียบเส้นทาง` → MEASUREMENT_DISTANCE
+- `อ่านหน้าปัดความเร็วรถ`, `อ่านมาตรวัดความเร็ว`, `speedometer reading` → MEASUREMENT_SPEEDOMETER
 - `อ่านมุมจากโพรแทรกเตอร์`, `จำแนกมุม` → MEASUREMENT_ANGLE
 - `รอบรูป`, `พื้นที่`, `พื้นที่วงกลม`, `แปลงหน่วยพื้นที่` → MEASUREMENT_PERIMETER_AREA
-- `เทอร์โมมิเตอร์` → MEASUREMENT_TEMPERATURE
+- `เทอร์โมมิเตอร์`, `อ่านอุณหภูมิ` → MEASUREMENT_TEMPERATURE
 - `อ่านระดับน้ำ`, `L/mL`, `เมนิสคัส` → MEASUREMENT_CAPACITY
 - `ปริมาตรทรงสี่เหลี่ยมมุมฉาก`, `แปลง cm³/dm³/m³` → MEASUREMENT_VOLUME
 - `ซื้อของ`, `เงินทอน` → MONEY
@@ -44,9 +46,21 @@ This file is the single source of truth for domain routing and **overall domain 
 
 Formal P1–P6 capability/progression guidance lives in `MEASUREMENT_COVERAGE_P1_P6.md`.
 
-The measurement family includes direct instrument reading and deterministic calculation/conversion. Do not route specialized measurement problems to generic content when W02–W05 owns the rule.
+The measurement family includes direct instrument reading and deterministic calculation/conversion. Do not route specialized measurement problems to generic content when W02–W06 owns the rule.
 
-Speed/rate is not part of the baseline measurement ownership unless explicitly requested and covered by a future specialized rule. Do not silently infer speed from distance/time wording.
+Direct speedometer reading is supported by `SPEEDOMETER_READING_ENGINE.md`. This does **not** automatically enable speed/rate calculation from distance/time. Do not silently infer `speed=distance/time` from a speedometer-reading request.
+
+## Learner-read instrument architecture
+
+Every learner-read instrument/axis must inherit:
+
+- `domains/INSTRUMENT_READING_ENGINE.md`
+- `policies/SCALE_LINE_INTEGRITY_PROFILE.md` when graduations/ticks/axis intervals are read
+- `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+
+Required route includes W07 + W08 + W09.
+
+The renderer-side self-review loop is a prevention layer only; actual pixel correctness remains artifact QA.
 
 ## Routing validation
 
@@ -56,36 +70,31 @@ Before prompt release:
 2. owning worker is installed and compatible;
 3. W07 is selected when learner-read geometry carries academic data;
 4. W08/W09 are selected;
-5. `KB_ROUTE_QA=PASS`;
-6. `KB_COMPATIBILITY_QA=PASS`.
+5. mandatory shared instrument profiles are available when applicable;
+6. `KB_ROUTE_QA=PASS`;
+7. `KB_COMPATIBILITY_QA=PASS`.
 
 ## Maturity rule
 
 `PRODUCTION_HARDENED` requires deterministic academic rules, domain QA, regression evidence and release evidence documented in `qa/DOMAIN_RELEASE_MATRIX.md`.
 
-`PRODUCTION_CANDIDATE` has defined deterministic rules/QA but has not yet met all release-evidence thresholds.
+`PRODUCTION_CANDIDATE` has deterministic rules/QA but has not yet met all artifact-evidence thresholds.
 
 `SUPPORTED_GENERIC` must not claim specialized deterministic guarantees it does not own.
 
-Prompt QA maturity and artifact maturity are separate. A strong prompt-generation rule does not by itself promote a domain.
-
-## Academic maturity vs overall maturity
-
-A domain may have `ACADEMIC_RULES=DETERMINISTIC_MATURE` while overall `DOMAIN_MATURITY=PRODUCTION_CANDIDATE` because rendered-artifact evidence is incomplete.
-
-## Path-specific evidence
-
-Evidence must identify the tested downstream path (`DOCUMENT_FIRST`, `HYBRID`, `DETERMINISTIC_VECTOR`, `IMAGE_ONLY`). Success on one path does not automatically harden all paths.
+Prompt maturity and artifact maturity are separate. A strong prompt rule or renderer self-review instruction does not by itself prove classroom-ready pixels.
 
 ## Actual-render hardening
 
 Known high-risk families include:
 
-- clock hour-hand interpolation
-- canonical dial full-circle substitution
-- ruler graduation/start-reference errors
+- clock hour-hand interpolation / minute-mark count
+- canonical dial full-circle substitution / gap ticks
+- ruler extra/missing graduation, border-as-tick and start-reference errors
+- speedometer active-arc/needle/extra-tick errors
 - protractor baseline/inner-outer scale ambiguity
-- thermometer between-tick endpoints
+- thermometer between-tick endpoints, wrong graduation count/direction
 - capacity/meniscus read-point ambiguity and target-number leakage
+- graph-axis scale distortion
 
-These failures are converted into prompt and artifact regression tests; they do not automatically change maturity status.
+These failures are converted into permanent prompt and artifact regressions. One wrong learner-read scale blocks classroom release.
