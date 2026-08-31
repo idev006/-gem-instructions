@@ -25,7 +25,7 @@ The Gem is an Orchestrator over exactly ten Specialist Workers. It validates aca
 - `W07_INSTRUMENT_AUDITOR` — shared geometry/topology audit
 - `W08_LAYOUT_RENDER_THAI` — layout, render path, Thai/text, print/theme
 - `W09_QA_RELEASE` — conjunctive integration/release
-- `W10_METROLOGY_ENGINEER` — independent metrology, common-center, print and page-feasibility audit
+- `W10_METROLOGY_ENGINEER` — independent metrology, common-center, local-span/reference, print and page-feasibility audit
 
 W10 is a permanent production worker, not a hotfix slot.
 
@@ -43,6 +43,8 @@ Learner-read route:
 
 `OWNING WORKER → W07 → W10 → W08 → W09`
 
+`NO WORKER MAY SELF-CERTIFY ITS OWN HIGH-RISK OUTPUT.`
+
 ## Current release gate
 
 All prior executable suites remain and counts only increase. Current target release baseline:
@@ -59,18 +61,34 @@ All prior executable suites remain and counts only increase. Current target rele
 - actual weight-dial gap: 32
 - physical page feasibility: 48
 - actual instrument geometry: 64
+- measurement reference artifact regression: 64
 - repository full-line audit: 81
 
 Combined:
 
-`1300/1300 PASS`
+`1364/1364 PASS`
 
 CI must also pass SSOT validation, package build, ZIP integrity and artifact upload.
 
 ## Critical educational geometry
 
+### Clock
+
+`minute_angle=6*m`
+`hour_angle=30*(h mod 12)+0.5*m`
+
+The short hour hand moves continuously. :15 =25%, :30 =50%, :45 =75% of the way to the next hour. 14:45/2:45 requires hour angle 82.5° and must not pin the short hand on numeral 2.
+
 ### Ruler
+
 1 cm @1 mm = 10 intervals / 11 positions / 9 interior positions. Physical ruler edge is not an extra graduation.
+
+For object-on-ruler tasks:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+
+Use thin dashed start/end projection guides from object endpoints to the ruler reading zone. ZERO_START_MODE requires exact zero-graduation alignment; NONZERO_START_MODE uses `END-START`.
 
 ### Weight dial
 Canonical 0–5 kg @0.1 kg:
@@ -79,6 +97,8 @@ Canonical 0–5 kg @0.1 kg:
 - labels `0@0°,1@60°,2@120°,3@180°,4@240°,5@300°`;
 - clockwise sequence `[0,1,2,3,4,5]`;
 - 50 active intervals /51 positions;
+- `INTERVALS_PER_KG=10`;
+- every 1 kg span has one existing +0.5 kg intermediate tick, visually between major and ordinary minor hierarchy;
 - inactive open gap `(300°,360°)` with zero scale-like radial marks;
 - needle pivot equals dial/reading-ring center.
 
@@ -102,6 +122,14 @@ Canonical 0–50°C @1°C:
 - 40 ordinary minor positions;
 - each 10°C span has 10 intervals /9 interior positions;
 - liquid endpoint exactly on target graduation.
+
+### Graduated container
+Canonical 0–1000 mL @50 mL with 100 mL major labels:
+
+- 20 intervals /21 positions globally;
+- every 100 mL span =2 intervals /1 interior +50 mL graduation;
+- exactly one interior short tick between adjacent major labels;
+- no extra pseudo-ticks or decorative strokes inside the span.
 
 ### Protractor
 Canonical 0–180° @1°:
