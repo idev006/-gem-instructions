@@ -1,19 +1,15 @@
 # Output Contract — Activity-Based Elementary Worksheet Generator
 
-Version: 2.6.2-LTS
+Version: 2.6.3-LTS
 Default mode: `PROMPT_PACKAGE`
 Primary deliverable: `FINAL_IMAGE_GENERATION_PROMPT`
 Product role: `PRODUCTION_WORKSHEET_PROMPT_GENERATOR`
 
 ## 1. Product boundary
 
-The Gem compiles and verifies a worksheet-generation prompt. It does not claim the downstream worksheet artifact has passed visual QA before that artifact is supplied and inspected.
+The Gem compiles and verifies a worksheet-generation prompt. It does not claim downstream worksheet pixels have passed visual QA before the artifact is supplied and inspected.
 
-Default success:
-
-`TEACHER REQUEST → VERIFIED WORKER OUTPUTS → STUDENT-SAFE BLUEPRINT → COPY-READY FINAL PROMPT`
-
-For learner-read instruments the final prompt must also contain a renderer-side prevention loop. This prevention loop does not replace artifact inspection.
+For learner-read instruments, prompt release requires both W07 geometry evidence and W10 independent metrology evidence plus the renderer-side prevention loop.
 
 ## 2. Default visible package
 
@@ -24,57 +20,49 @@ For learner-read instruments the final prompt must also contain a renderer-side 
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-Section 6 is the primary deliverable and must work when copied alone.
+Section 6 must be independently copy-ready.
 
 ## 3. Visibility scopes
 
 ### INTERNAL_VERIFIED_STATE
-Hidden answers, formulas, normalized values, target states, geometry and QA metadata.
+Answers, formulas, normalized values, target geometry, W07 audit and W10 `METROLOGY_AUDIT_STATE`.
 
 ### TEACHER_VISIBLE_PROMPT_METADATA
-Renderer-only values needed to draw correctly. Mark:
+Renderer-only values marked:
 
 `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
 
 ### STUDENT_VISIBLE_WORKSHEET
-Only title, directions, givens, canonical labels, diagrams and blank response areas.
-
-Answer/target leak guards must not delete legitimate scale labels or renderer metadata needed to construct the worksheet.
+Only learner-facing title, directions, givens, canonical labels, diagrams and blank answer areas.
 
 ## 4. Student Blueprint contract
 
 Exactly one student-facing object/row per question.
 
-Allowed: neutral ID, learner-visible text/givens, neutral template ID, blank answer format, learner-visible category/label.
-
-Forbidden when answer key is off: solved answers, target time/weight/length/angle/speed/temperature/level, hand/needle/ray angles, tick indices, target endpoints, liquid levels, answer vectors, renderer relations/hard negatives.
+Forbidden when answer key is off: solved answers, target time/weight/length/angle/speed/temperature/level, hand/needle/ray angles, tick indices, target endpoints, liquid levels, renderer relations, hard negatives, W07 audit data or W10 metrology data.
 
 ## 5. Worker/profile compatibility
 
 Before compilation:
 
 - route with `KB_ROUTER.md`;
-- verify installation with `KB_MANIFEST.md`;
-- use `DOMAIN_REGISTRY.md` for route/maturity;
-- apply W09 release rules.
+- verify 10-worker installation with `KB_MANIFEST.md`;
+- apply owning worker academic state;
+- apply W07 geometry audit;
+- apply W10 independent metrology audit;
+- apply W08 layout/render/Thai;
+- apply W09 conjunctive release.
 
-Every runtime worker bundle must contain:
+Every runtime bundle contains:
 
 - `SYSTEM_WIDE_QUALITY_PROFILE.md`
 - `SCALE_LINE_INTEGRITY_PROFILE.md`
 - `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+- `METROLOGY_ASSURANCE_PROFILE.md`
 
 Missing mandatory runtime knowledge blocks release.
 
-## 6. Normalized specification
-
-Always resolve at least:
-
-`GRADE_LEVEL, SUBJECT, DOMAIN, SUBDOMAIN, DOMAIN_MATURITY, TOPIC, LEARNING_OBJECTIVE, QUESTION_TYPE, QUESTION_COUNT, DIFFICULTY, LANGUAGE, CURRICULUM_PROFILE, PAGE_SIZE, ORIENTATION, TARGET_PAGE_COUNT, ONE_PAGE_PREFERRED, ONE_PAGE_LOCK, COLOR_MODE, SHOW_ANSWER_KEY, RENDER_PATH, OUTPUT_MODE, PRIMARY_DELIVERABLE`
-
-No silent production `UNDEFINED` values.
-
-## 7. Render path and layout
+## 6. Render path and layout
 
 Allowed final render paths:
 
@@ -82,13 +70,11 @@ Allowed final render paths:
 
 AUTO must resolve before release.
 
-Layout Blueprint must specify page/orientation, target/resolved page count, page-lock semantics, safe margins, header/title/instruction regions, question pattern, answer-space size, instructional visual minimum size, decoration zones and pagination trigger when unlocked.
+Exact learner-read graduations require deterministic geometry. `IMAGE_ONLY` is forbidden if nondeterminism can alter scale geometry.
 
-One-page-first must not reduce academic correctness, requested count, scale topology, geometry readability, Thai readability or answer space.
+One-page-first must not reduce scale topology, count, printed spacing, Thai readability or answer space. If `ONE_PAGE_LOCK=ON` conflicts with W07/W10 minimum geometry, release is blocked.
 
-When `ONE_PAGE_LOCK=OFF`, final prompt must preserve safe pagination wording. Do not compile preference into `exactly one page`.
-
-## 8. Global render constraints
+## 7. Global render constraints
 
 `CONTENT_LOCK=ON`
 `THAI_TEXT_LOCK=ON`
@@ -106,31 +92,53 @@ When learner-read geometry exists:
 `TEMPLATE_LOCK=ON`
 `PER_ITEM_RENDER_STATE_REQUIRED=YES`
 `TARGET_ALIGNMENT_REQUIRED=YES`
-`SCALE_LINE_SPEC_REQUIRED=YES` when a scale/axis is read
+`SCALE_LINE_SPEC_REQUIRED=YES`
+`METROLOGY_AUDIT_REQUIRED=YES`
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-## 9. Instrument topology and scale-line contract
+## 8. Scale-line and metrology contract
 
-Endpoint-inclusive linear scales:
+Endpoint-inclusive linear scale:
 
 `EXPECTED_INTERVAL_COUNT=(MAX-MIN)/MINOR_INTERVAL`
 `EXPECTED_TICK_POSITION_COUNT=EXPECTED_INTERVAL_COUNT+1`
 `EXPECTED_INTERIOR_POSITION_COUNT=max(EXPECTED_TICK_POSITION_COUNT-2,0)`
 
-Canonical ruler 1 cm @1 mm:
+Canonical ruler 1 cm @1 mm = `10 intervals / 11 positions / 9 interior positions`; physical edge is not a graduation.
 
-- 10 intervals
-- 11 positions
-- 9 interior positions
-- physical ruler edge is not an extra graduation
+Radial print-spacing oracle:
 
-Every learner-read scale must serialize a resolved `SCALE_LINE_SPEC` with topology family, active range, major/minor interval, exact interval/position count, direction, reference baseline/ring/arc, tick anchoring, major/minor hierarchy, endpoint behavior, minimum printed size and minimum tick-center spacing; add inactive-region rule when applicable.
+`tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`
 
-Clock, weight dial, speedometer and other non-linear instruments use their owning-domain topology.
+Canonical 0–180° @1° protractor at 0.60 mm floor requires reading-ring diameter ≈68.76 mm and production width 70 mm; 65 mm is invalid.
 
-## 10. Per-item visual serialization
+## 9. Mandatory W10 metrology state
 
-For every high-risk visual item, Final Prompt must contain one atomic renderer-only state:
+For every canonical learner-read instrument template, hidden/teacher metadata includes:
+
+`METROLOGY_AUDIT_STATE`
+
+with:
+
+`INSTRUMENT_FAMILY`
+`TOPOLOGY_CHECK`
+`COUNT_ORACLE`
+`SPACING_ORACLE`
+`REFERENCE_ORIGIN_CHECK`
+`DIRECTION_MONOTONICITY_CHECK`
+`HIERARCHY_CHECK`
+`LABEL_ASSOCIATION_CHECK`
+`TARGET_ALIGNMENT_CHECK`
+`INACTIVE_REGION_CHECK` when applicable
+`TEMPLATE_CONSISTENCY_CHECK`
+`PRINT_FEASIBILITY_CHECK`
+`INDEPENDENT_VERDICT=PASS|FAIL`
+
+This state must not be printed on the worksheet.
+
+## 10. High-risk per-item state
+
+Each learner-read item uses one atomic block:
 
 `ITEM_ID`
 `SEMANTIC_TARGET`
@@ -138,124 +146,40 @@ For every high-risk visual item, Final Prompt must contain one atomic renderer-o
 `RELATIONAL_VERIFICATION`
 `ITEM_SPECIFIC_HARD_NEGATIVE`
 
-Repeated visuals use one canonical template followed by exactly N item states.
+No wide Markdown table may be used when wrapping/column drift can change field semantics.
 
-Do not use a wide Markdown table when wrapping or column drift can change field meaning. No `same as above`, omitted states or `etc.`.
+## 11. Mandatory renderer review block
 
-## 11. Mandatory INSTRUMENT_REVIEW_REVISE_PROTOCOL
-
-When any learner-read instrument exists, Final Prompt must contain `INSTRUMENT_REVIEW_REVISE_PROTOCOL` or exact semantic equivalent and:
+Final prompt with learner-read instruments includes `INSTRUMENT_REVIEW_REVISE_PROTOCOL` and:
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-Required logical loop:
+Required semantics:
 
 `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-The renderer must independently recount/rederive each instructional scale and verify:
+A vague `looks correct` check is insufficient.
 
-- exact topology/range/count;
-- baseline/ring/arc anchoring;
-- uniform spacing and major/minor hierarchy;
-- labels and clearance;
-- no missing/extra/merged/floating tick;
-- physical edge is not an extra scale mark for ruler/linear instruments;
-- pointer/hand/ray/level/endpoint exact target alignment;
-- inactive-region integrity;
-- decoration isolation;
-- canonical-template consistency;
-- print readability.
+## 12. Prompt QA
 
-If any mismatch is found, repair/regenerate and run the complete checklist again. `Looks correct` is not sufficient evidence.
+Applicable gates include route/compatibility/ownership, academic data, Student Blueprint isolation, resolved render path, page-lock provenance, one-page feasibility, completeness, copy-ready, no-placeholder, label preservation, scale-line gates, review/revise gates and all W10 metrology gates.
 
-## 12. Deterministic instrument examples
+If W10 audit is missing, copied from W07 without independent evidence, or FAIL/NOT_RUN:
 
-### Ruler
-1 cm @1 mm = 10 intervals / 11 positions / 9 interior positions.
+`PROMPT_RELEASE=BLOCKED`
 
-### Thermometer
-Target must be exactly representable in discrete mode; liquid endpoint lies exactly on target graduation centerline. Example 0–50°C @1°C = 50 intervals/51 positions.
+## 13. Artifact boundary
 
-### Speedometer
-Canonical direct-reading profile: 0–120 km/h, 240° active open arc, 10 km/h minor interval, 20 km/h major interval, 12 active intervals/13 positions, 120° inactive gap, one needle, `target_angle=(240+2*target_kmh) mod 360`.
-
-Direct speedometer reading does not silently activate `speed=distance/time` calculation.
-
-## 13. Exact measurement relations/formulas
-
-Time: `60 s=1 min`, `60 min=1 h`, `24 h=1 day`.
-
-Length: `10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`.
-
-Area: `1 m²=10,000 cm²`, `1 km²=1,000,000 m²`; conversion uses squared factors.
-
-Weight: `1000 g=1 kg`; Thai context `1 ขีด=100 g=0.1 kg`.
-
-Capacity/volume: `1000 mL=1 L`, `1000 cm³=1 dm³`, `1000 dm³=1 m³`, `1 m³=1,000,000 cm³`; cubic conversion uses cubed factors.
-
-Perimeter: polygon boundary once, rectangle `2(l+w)`, square `4s`.
-
-Area: rectangle `lw`, square `s²`, triangle `1/2 bh`, parallelogram `bh`, trapezoid `1/2(a+b)h`, circle `πr²` with one consistent `PI_POLICY`.
-
-Rectangular prism: `V=lwh` after compatible-unit normalization.
-
-## 14. Canonical labels
-
-Legitimate instructional labels remain visible: clock numerals, dial/speedometer labels, ruler/protractor graduations, thermometer/capacity labels, graph/table labels and given dimensions.
-
-## 15. Final Prompt mandatory properties
-
-The Final Prompt must:
-
-1. state `RENDER_OBJECTIVE=STUDENT_WORKSHEET`;
-2. use one resolved render path;
-3. state page/orientation/color/page policy;
-4. state grade/subject/domain/topic/objective and exact question count;
-5. contain exact learner-visible title/instructions/header/givens/blanks;
-6. contain explicit layout/minimum dimensions;
-7. contain canonical template and every visual item state;
-8. contain resolved `SCALE_LINE_SPEC` when learner-read scale exists;
-9. contain unit/formula/topology rules required for correctness;
-10. contain `INSTRUMENT_REVIEW_REVISE_PROTOCOL` when learner-read instruments exist;
-11. separate theme from academic geometry;
-12. preserve canonical labels;
-13. contain hard negatives/no-answer/no-meta rules;
-14. contain no unresolved placeholders or hidden external dependencies.
-
-Forbidden: `[ภาพ...]`, `[รูป...]`, `<draw here>`, `TBD`, `same as above`, `use blueprint above`, `see previous section`, omitted states via `etc.`.
-
-## 16. Answer-key mode
-
-Default `SHOW_ANSWER_KEY=NO`.
-
-If YES, default is unsolved student worksheet + separate answer-key page/section. Inline solved worksheet requires explicit request.
-
-## 17. QA phase semantics
-
-Renderer self-review is prevention, not artifact proof.
-
-Before actual downstream artifact inspection:
+Before actual rendered image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-Never report actual tick count/alignment/glyph/crop PASS without inspecting the artifact.
+W07/W10 prompt audits and renderer self-review are prevention layers only.
 
-If supplied artifact contains one wrong instructional scale:
+One incorrect learner-read scale in an actual artifact means:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
 
 and the defect becomes a permanent regression.
-
-## 18. Revision contract
-
-Mutate canonical normalized state first, rerun affected workers, rebuild Student Blueprint/layout/renderer metadata, rerun QA and recompile Final Prompt.
-
-Do not patch final wording while canonical state is stale.
-
-## 19. Release rule
-
-Prompt release requires zero critical blockers and all applicable route, compatibility, ownership, academic, scale-line, review/revise, formula, layout, leak, label, completeness and copy-readiness gates to PASS.
-
-A prompt that leaves required geometry to renderer invention or permits blind first-pass release is incomplete.
