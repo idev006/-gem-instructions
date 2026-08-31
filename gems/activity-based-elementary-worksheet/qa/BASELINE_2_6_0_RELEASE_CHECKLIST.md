@@ -24,6 +24,7 @@ Applies to: `activity-based-elementary-worksheet` baseline 2.6.x
 - `tools/full_dry_run_suite.py`
 - `tools/full_skill_matrix_suite.py`
 - `tools/runtime_uat_regression_suite.py`
+- `tools/semantic_oracle_regression_suite.py`
 - `examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 
 ## Worker audit
@@ -167,12 +168,15 @@ A build candidate is eligible only when all current suites pass:
 1. `tools/full_dry_run_suite.py` → `449/449 PASS`
 2. `tools/full_skill_matrix_suite.py` → `360/360 PASS`
 3. `tools/runtime_uat_regression_suite.py` → `12/12 PASS`
+4. `tools/semantic_oracle_regression_suite.py` → `20/20 PASS`
+
+The semantic-oracle suite uses fixed known-answer expectations so the release gate is not composed only of contract-token checks or formula-vs-itself identities.
 
 Combined minimum:
 
-`821/821 PASS`
+`841/841 PASS`
 
-A real UAT defect must be represented by a permanent regression before the next accepted release artifact. Never lower the case count to make a release pass.
+A real UAT or QA-architecture defect must be represented by a permanent regression before the next accepted release artifact. Never lower the case count to make a release pass.
 
 ## High-risk smoke tests
 
@@ -216,10 +220,11 @@ Compact package must contain:
 - core dry-run report
 - full skill-matrix report
 - runtime UAT regression report
+- semantic-oracle regression report
 - checksum manifest
 
 Knowledge slot 10 remains free unless an approved narrow hotfix is shipped.
 
 ## Release decision
 
-Baseline 2.6.0 prompt-generation release may be marked READY only when static consistency, worker compatibility, all `821` current regression cases, package integrity and SSOT/package coherence pass with zero critical blockers.
+Baseline 2.6.0 prompt-generation release may be marked READY only when static consistency, worker compatibility, all `841` current regression cases, package integrity and SSOT/package coherence pass with zero critical blockers.
