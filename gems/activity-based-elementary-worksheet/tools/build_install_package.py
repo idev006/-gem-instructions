@@ -31,6 +31,7 @@ WORKER_BUNDLES: dict[str, list[str]] = {
         "workers/W02_TIME_CLOCK.md",
         "domains/TIME_ENGINE.md",
         "domains/CLOCK_READING_ENGINE.md",
+        "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md",
     ],
     "W03_WEIGHT_SCALE.txt": [
         "workers/W03_WEIGHT_SCALE.md",
@@ -69,6 +70,7 @@ WORKER_BUNDLES: dict[str, list[str]] = {
         "domains/MEASUREMENT_COVERAGE_P1_P6.md",
         "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md",
         "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
+        "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md",
         "qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md",
         "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md",
         "qa/DOMAIN_RELEASE_MATRIX.md",
@@ -97,7 +99,6 @@ def sha256(path: Path) -> str:
 
 
 def main() -> int:
-    # Validate canonical SSOT first.
     validator = ROOT / "tools" / "validate_ssot.py"
     result = subprocess.run([sys.executable, str(validator)], cwd=ROOT.parent.parent, text=True, capture_output=True)
     if result.returncode != 0:
@@ -135,6 +136,9 @@ def main() -> int:
     (guide_dir / "MEASUREMENT_COMMAND_CATALOG_P1_P6.txt").write_text(
         read("examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md"), encoding="utf-8"
     )
+    (guide_dir / "CLOCK_DAY_NIGHT_SINGLE_FACE_COMMANDS.txt").write_text(
+        read("examples/CLOCK_DAY_NIGHT_SINGLE_FACE_COMMANDS.md"), encoding="utf-8"
+    )
     (guide_dir / "SSOT_VALIDATION_REPORT.txt").write_text(result.stdout, encoding="utf-8")
 
     manifest = []
@@ -160,8 +164,8 @@ def main() -> int:
             raise RuntimeError(f"ZIP integrity failure: {bad}")
 
     print(result.stdout.strip())
-    print(f"PACKAGE BUILD: PASS")
-    print(f"Knowledge files: 9")
+    print("PACKAGE BUILD: PASS")
+    print("Knowledge files: 9")
     print(f"ZIP: {ZIP_PATH}")
     print(f"ZIP SHA256: {sha256(ZIP_PATH)}")
     return 0
