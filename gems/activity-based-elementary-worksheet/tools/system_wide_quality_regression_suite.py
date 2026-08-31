@@ -58,9 +58,9 @@ for token in profile_tokens:
 checks = [
     ("builder-shared-profile-path", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md" in builder),
     ("builder-shared-profile-main", "MANDATORY SYSTEM-WIDE QUALITY PROFILE" in builder),
-    ("builder-shared-profile-workers", "SHARED_PROFILE" in builder and "effective_sources = [SHARED_PROFILE, *sources]" in builder),
+    ("builder-shared-profile-workers", "SHARED_PROFILES" in builder and "effective_sources = [*SHARED_PROFILES, *sources]" in builder),
     ("builder-system-gate", "system_wide_quality_regression_suite.py" in builder),
-    ("builder-871-total", "871/871 PASS" in builder),
+    ("builder-current-total", "911/911 PASS" in builder),
     ("workflow-system-gate", "System-wide quality regression" in workflow),
     ("workflow-30-cases", "30 cases" in workflow),
     ("profile-atomic-block", "Atomic renderer-state serialization" in profile),
