@@ -70,8 +70,18 @@ for name,needle in [
 ('no-old-weight-formula','active_tick_angle(i)=(240+6*i)'),
 ('no-protractor-width-as-height','five rows of 70 mm protractors require at least 350 mm'),
 ('no-four-mandatory-profiles','four mandatory shared profiles'),
-('no-output-mode-render-path-confusion','output_mode=deterministic_vector'),
 ]: add(name,needle not in auth,needle)
+
+# OUTPUT_MODE vs RENDER_PATH is context-sensitive: a forbidden example is allowed only
+# when the same line explicitly marks it as invalid/prohibited. Positive misuse is not.
+bad_output_mode_lines=[]
+negative_markers=('never','invalid','forbidden','must not','do not','not ','category error','reject','wrong','≠')
+for rel in current_paths:
+    for line_no,line in enumerate(read(rel).splitlines(),1):
+        low=line.lower()
+        if 'output_mode=deterministic_vector' in low and not any(m in low for m in negative_markers):
+            bad_output_mode_lines.append(f'{rel}:{line_no}:{line.strip()}')
+add('no-output-mode-render-path-confusion',not bad_output_mode_lines,'; '.join(bad_output_mode_lines[:5]))
 
 # Positive cross-file invariants.
 core=read('GEM_INSTRUCTIONS_PRODUCTION.md'); arch=read('ARCHITECTURE.md'); out=read('OUTPUT_CONTRACT.md')
@@ -98,7 +108,7 @@ positives=[
 ('weight-top-zero','LABEL_ANGLES={0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}' in scale),
 ('speed-common-center','NEEDLE_PIVOT=DIAL_CENTER' in speed),
 ('thermo-hierarchy','6 major' in temp and '5 intermediate' in temp and '40 minor' in temp),
-('protractor-perfect','perfect upper semicircle' in w04.lower()),
+('protractor-perfect','perfect' in w04.lower() and 'undistorted upper semicircle' in w04.lower() and 'every graduation is radial from the same center' in w04.lower()),
 ('protractor-body-height','PROTRACTOR_BODY_HEIGHT_MM = PROTRACTOR_BODY_WIDTH_MM/2' in w04),
 ('physical-shape-aware','PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA' in phys),
 ]
