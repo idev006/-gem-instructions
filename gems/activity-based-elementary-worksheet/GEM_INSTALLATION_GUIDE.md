@@ -1,54 +1,69 @@
 # Gem Installation Guide — activity-based-elementary-worksheet
 
-Version: 2.6.0-LTS
+Version: 2.6.3-LTS
 Target Gem baseline: 2.6.x
-Installation profile: Orchestrator + 9 Specialist Workers
+Installation profile: Orchestrator + 10 Specialist Workers
 
 ## 1. Main Instructions
 
-Use the complete contents of:
+Use the complete generated `01_MAIN_INSTRUCTIONS/GEM_ORCHESTRATOR_INSTRUCTIONS.txt` from the CI installation ZIP in the Gem Instructions field.
 
-`GEM_INSTRUCTIONS_PRODUCTION.md`
+Do not replace it with a shortened formula dump. The generated Instructions include the Orchestrator and all mandatory shared safety profiles.
 
-in the Gem **Instructions** field.
+## 2. Knowledge upload — exactly 10 base files
 
-The main file is the Orchestrator: route, visibility, integration, output contract and release policy. Do not replace it with a shortened formula dump.
+Upload every `.txt` from `02_UPLOAD_10_WORKER_KNOWLEDGE_TXT`:
 
-The Orchestrator also contains runtime-critical profiles that must be visible at instruction level, including Thai Grade 3 analog-clock AUTO behavior.
+1. `W01_ACADEMIC_CONTENT.txt`
+2. `W02_TIME_CLOCK.txt`
+3. `W03_WEIGHT_SCALE.txt`
+4. `W04_LENGTH_DISTANCE.txt`
+5. `W05_TEMPERATURE_CAPACITY_VOLUME.txt`
+6. `W06_MONEY_CALENDAR_DATA.txt`
+7. `W07_INSTRUMENT_AUDITOR.txt`
+8. `W08_LAYOUT_RENDER_THAI.txt`
+9. `W09_QA_RELEASE.txt`
+10. `W10_METROLOGY_ENGINEER.txt`
 
-## 2. Knowledge upload — exactly 9 base files
+W10 is a production worker, not a hotfix. It independently audits measuring instruments and scale feasibility.
 
-Upload compact `.txt` forms generated from:
+## 3. Mandatory safety architecture
 
-1. `workers/W01_ACADEMIC_CONTENT.md`
-2. `workers/W02_TIME_CLOCK.md`
-3. `workers/W03_WEIGHT_SCALE.md`
-4. `workers/W04_LENGTH_DISTANCE.md`
-5. `workers/W05_TEMPERATURE_CAPACITY_VOLUME.md`
-6. `workers/W06_MONEY_CALENDAR_DATA.md`
-7. `workers/W07_INSTRUMENT_AUDITOR.md`
-8. `workers/W08_LAYOUT_RENDER_THAI.md`
-9. `workers/W09_QA_RELEASE.md`
+All 10 worker bundles embed:
 
-Knowledge slot 10 remains empty by default and is reserved for `W10_HOTFIX_OVERRIDE`.
+- `SYSTEM_WIDE_QUALITY_PROFILE.md`
+- `SCALE_LINE_INTEGRITY_PROFILE.md`
+- `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+- `METROLOGY_ASSURANCE_PROFILE.md`
 
-Do not separately upload all core/domain/QA repository files when using the compact package; the installable worker files consolidate operational rules.
+Whenever a student reads an instrument:
 
-## 3. Release artifact eligibility
+`OWNING WORKER → W07 → W10 → W08 → W09`
 
-Use an installation ZIP only when its source commit passed all current executable gates:
+W07 audits geometry. W10 independently recomputes metrology evidence. Missing either audit blocks prompt release.
+
+## 4. Release artifact eligibility
+
+Install only a ZIP whose exact GitHub Actions source commit passed:
 
 - SSOT validation
 - core dry-run `449/449`
 - declared-skill matrix `360/360`
-- runtime UAT regression `12/12`
-- combined minimum `821/821 PASS`
-- package build
-- ZIP integrity verification
+- runtime UAT `12/12`
+- semantic oracle `20/20`
+- system-wide quality `30/30`
+- scale-line integrity `40/40`
+- instrument review/speedometer `60/60`
+- protractor scale safety `24/24`
+- full metrology audit `80/80`
+- combined `1075/1075 PASS`
+- package build PASS
+- ZIP integrity PASS
+- artifact upload PASS
 
-If any gate fails or is not run, do not install that artifact as a release candidate.
+Do not locally rebuild and call it the CI artifact.
 
-## 4. Health check after installation
+## 5. Health check after installation
 
 Send:
 
@@ -56,150 +71,87 @@ Send:
 
 Expected:
 
-- baseline 2.6.x
-- W01..W09 present
-- worker schema versions = 1
-- W10 absent unless approved hotfix installed
-- measurement capability family recognized
+- release family 2.6.3-LTS / compatible baseline 2.6.x
+- W01..W10 present
+- worker schema version 1
+- four mandatory shared profiles present
+- `W10_METROLOGY_ENGINEER` active
 - `KB_COMPATIBILITY_QA=PASS`
 - `INSTALLATION_HEALTH=PASS`
 
-The health check should not generate a worksheet unless requested separately.
+## 6. Critical instrument smoke tests
 
-## 5. Smoke tests
-
-### A — elapsed time
-`ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ไม่มีเฉลย`
-
-Expected W02+W08+W09; deterministic time relations; one resolved render path.
-
-### B — time units / seconds
-`ป.4 แปลงชั่วโมง นาที วินาที 10 ข้อ ไม่มีเฉลย`
-
-Expected exact 60/60/24 relations. A seconds hand must not appear unless analog-second reading is explicitly requested.
-
-### C — Thai P3 clock half-hour runtime profile
+### Clock
 `ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
 
-Expected canonical behavior:
+Expected learner-read route includes W02 + W07 + W10 + W08 + W09. Full minute face = 60 distinct positions. 10:30 = minute 180°, hour 315°.
 
-- `CLOCK_READING_MODE=DAY_NIGHT_PAIR`
-- exactly one analog clock per question
-- exactly two student answer fields per question: `กลางวัน ........ น.` and `กลางคืน ........ น.`
-- strict half-hour targets are `hh:30` only; no `:00` unless explicitly requested as a mixed worksheet
-- one shared hand state supports both day/night interpretations
-- renderer metadata includes exact numeric angles for every clock item
-- 10:30 regression: minute 180°, hour 315°, midpoint 10–11, never directly on 10
-- Student Blueprint contains no target times, answer values or angles
-- `ONE_PAGE_LOCK=OFF` unless the request explicitly says exactly one page
-- canonical clock topology is not reduced merely to force page fit
-
-An output with one answer line, implicit page lock, missing numeric angles or downgraded clock topology is a runtime UAT regression and must not be accepted.
-
-### D — ruler
+### Ruler
 `ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ ไม่มีเฉลย`
 
-Expected 1 cm @1 mm = 10 intervals / 11 positions; zero graduation distinct from physical edge.
+Expected: each 1 cm @1 mm span = 10 intervals / 11 positions / 9 interior positions; physical edge is not a graduation.
 
-### E — nonzero ruler start
+### Nonzero ruler start
 `ป.4 วัดความยาวจากไม้บรรทัดโดยวัตถุไม่ได้เริ่มที่ 0 จำนวน 10 ข้อ`
 
 Expected `length=end-start`.
 
-### F — distance
-`ป.4 คำนวณระยะทางรวมและระยะทางไปกลับ หน่วยเมตรและกิโลเมตร 10 ข้อ`
+### Weight dial
+`ป.3 อ่านตราชั่ง 0–5 กก. ขีดย่อย 0.1 กก. 10 ข้อ ไม่มีเฉลย`
 
-Expected normalization before arithmetic; doubling only when same route explicit; no silent speed/rate.
+Expected canonical 50 active intervals / 51 active positions and no value ticks in the inactive gap.
 
-### G — protractor
+### Protractor
 `ป.4 อ่านมุมจากโพรแทรกเตอร์ 0–180° ขีดละ 1° 10 ข้อ ไม่มีเฉลย`
 
-Expected 180 intervals/181 positions, exact center/vertex, one baseline ray on selected 0°, target ray on exact graduation, active inner/outer scale direction explicit.
+Expected:
+- 180 intervals / 181 positions;
+- exact origin/baseline/direction;
+- deterministic instrument geometry;
+- `tick_center_spacing_mm = reading_radius_mm × radians(1°)`;
+- at 0.60 mm spacing floor, production width >=70 mm;
+- 65 mm is rejected;
+- one clearly active reading scale unless dual-scale reading is explicitly taught.
 
-### H — perimeter/area
-`ป.4 คำนวณรอบรูปและพื้นที่สี่เหลี่ยมผืนผ้า/สี่เหลี่ยมจัตุรัส 10 ข้อ ไม่มีเฉลย`
+### Thermometer
+`ป.4 อ่านเทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C 10 ข้อ ไม่มีเฉลย`
 
-Expected correct formula and square units.
+Expected 50 intervals / 51 positions; liquid endpoint exactly on target graduation.
 
-### I — area conversion
-`ป.5 แปลงตารางเมตรและตารางเซนติเมตร 10 ข้อ ไม่มีเฉลย`
+### Speedometer
+`ป.4 อ่านหน้าปัดความเร็วรถ 0–120 km/h ขีดละ 10 km/h 10 ข้อ ไม่มีเฉลย`
 
-Expected `1 m²=10,000 cm²`; reject linear ×100 conversion.
+Expected 12 intervals / 13 positions, 240° active arc, 120° inactive gap and exact needle mapping.
 
-### J — circle π policy
-`ป.6 พื้นที่และความยาวรอบวงกลม 10 ข้อ ใช้ π=3.14 ทุกข้อ ไม่มีเฉลย`
+### Graduated container
+`ป.4 อ่านปริมาตรจากภาชนะตวง 0–1000 mL ขีดละ 50 mL 10 ข้อ ไม่มีเฉลย`
 
-Expected one consistent π policy throughout.
+Expected 20 intervals / 21 positions and explicit level/meniscus convention.
 
-### K — canonical scale
-`ป.3 อ่านตราชั่ง 0–5 กก. ขีดละ 0.1 กก. 10 ข้อ ไม่มีเฉลย`
+### Graph axis
+`ป.4 อ่านกราฟแท่งที่แกนตั้งเพิ่มทีละ 5 จำนวน 10 ข้อ`
 
-Expected 300° active +60° inactive gap, 50 intervals/51 positions, no gap ticks, no 360° substitution, labels 0–5 preserved.
+Expected equal numeric increments map to equal physical spacing and bar endpoints map exactly to canonical data.
 
-### L — weight conversion
-`ป.4 แปลงและคำนวณกิโลกรัมกับกรัม 10 ข้อ`
+## 7. Renderer review behavior
 
-Expected `1000 g=1 kg` and unit normalization.
+For every learner-read instrument, the final prompt must include:
 
-### M — thermometer
-`ป.5 อ่านเทอร์โมมิเตอร์ 20–120°F ขีดย่อย 2°F 10 ข้อ`
+`NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-Expected targets only 20+2k and exact graduation alignment specification.
+and a review/revise loop:
 
-### N — capacity
-`ป.4 คำนวณและแปลงลิตรกับมิลลิลิตร 10 ข้อ`
+`GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-Expected `1000 mL=1 L` and normalization before arithmetic.
+A vague `looks correct` review is not sufficient.
 
-### O — meniscus
-Request explicit bottom/top convention. Expected unambiguous curve/read point and no target-number annotation.
+## 8. Prompt vs artifact QA
 
-### P — rectangular-prism volume
-`ป.5 ปริมาตรทรงสี่เหลี่ยมมุมฉาก 10 ข้อ`
+Passing all prompt/package gates does not prove rendered pixels.
 
-Expected compatible dimension units before `V=l×w×h`.
-
-### Q — cubic conversion
-`ป.6 แปลง cm³ dm³ และ m³ 10 ข้อ ไม่มีเฉลย`
-
-Expected `1000 cm³=1 dm³`, `1000 dm³=1 m³`, `1 m³=1,000,000 cm³`; reject linear-factor conversion.
-
-### R — arithmetic/color-by-code/Thai
-Test W01 so measurement expansion does not regress general worksheet behavior.
-
-## 6. Prompt/artifact boundary
-
-After Gem generates a prompt and before any downstream image is inspected:
-
-`PROMPT_RELEASE=APPROVED` may be valid.
-
-But it must still report:
+Before actual image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-Prompt QA does not guarantee third-party pixels.
-
-## 7. Update policy
-
-Baseline 2.6.x is LTS-style.
-
-For a narrow future defect, prefer one slot-10 hotfix with:
-
-`HOTFIX_ID`
-`APPLIES_TO_BASELINE=2.6.x`
-`TARGET_WORKER`
-`SCOPE`
-`REPLACED_RULE`
-`NEW_RULE`
-`REGRESSION_TEST`
-
-A real UAT defect should first be repaired in canonical SSOT according to ownership and then converted to a permanent automated regression test. Do not patch only final prose.
-
-Full reinstall should be reserved for worker-schema, architecture/routing, visibility/output-contract, runtime-instruction profile, or multi-domain critical changes.
-
-## 8. Source of truth
-
-GitHub repository `idev006/-gem-instructions`, folder `gems/activity-based-elementary-worksheet`, is the project SSOT.
-
-Installation ZIPs must be generated from this SSOT and from a successful CI run. A ZIP must not become a competing specification newer than GitHub.
+One wrong learner-read scale in an actual worksheet means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
