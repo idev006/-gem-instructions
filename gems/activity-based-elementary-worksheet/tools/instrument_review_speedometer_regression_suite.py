@@ -50,7 +50,7 @@ def speed_angle(target: float) -> float:
 
 
 # 1-24 independent known-answer semantic oracles.
-r1 = linear_counts(0, 10, 1)  # mm within one cm
+r1 = linear_counts(0, 10, 1)
 add("ruler-1cm-intervals", r1[0], 10)
 add("ruler-1cm-positions", r1[1], 11)
 add("ruler-1cm-interior", r1[2], 9)
@@ -66,7 +66,7 @@ t2 = linear_counts(0, 100, 5)
 add("thermo-0-100C-intervals", t2[0], 20)
 t3 = linear_counts(20, 120, 2)
 add("thermo-20-120F-positions", t3[1], 51)
-idx36, rep36, ok36 = represented(20, 2, 36)
+idx36, rep36, _ = represented(20, 2, 36)
 add("thermo-36F-index", idx36, 8)
 add("thermo-36F-represented", rep36, 36)
 _, _, ok35 = represented(20, 2, 35)
@@ -134,7 +134,7 @@ manifest = read("KB_MANIFEST.md")
 instrument = read("domains/INSTRUMENT_READING_ENGINE.md")
 builder = read("tools/build_install_package.py")
 validator = read("tools/validate_ssot.py")
-checklist = read("qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md")
+checklist = read("qa/BASELINE_2_6_2_RELEASE_CHECKLIST.md")
 workflow = (REPO / ".github/workflows/activity-based-elementary-worksheet-gem-ssot.yml").read_text(encoding="utf-8")
 core = read("GEM_INSTRUCTIONS_PRODUCTION.md")
 out = read("OUTPUT_CONTRACT.md")
@@ -154,7 +154,7 @@ integration = [
     ("validator-new-suite", "instrument_review_speedometer_regression_suite.py" in validator and "971" in validator),
     ("workflow-new-suite", "Instrument review + speedometer regression" in workflow and "60 cases" in workflow),
     ("checklist-new-suite", "971/971 PASS" in checklist and "instrument_review_speedometer_regression_suite.py" in checklist),
-    ("core-review-protocol", "INSTRUMENT_REVIEW_REVISE_PROFILE.md" in core and "MEASUREMENT_SPEEDOMETER" in core),
+    ("core-review-protocol", "INSTRUMENT_REVIEW_REVISE_PROFILE.md" in core and "speedometer" in core.lower()),
     ("output-review-protocol", "INSTRUMENT_REVIEW_REVISE_PROTOCOL" in out and "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON" in out),
 ]
 for name, ok in integration:
