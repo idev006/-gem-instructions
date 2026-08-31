@@ -97,6 +97,43 @@ Mandatory W10 audit applies to:
 - graph axis;
 - any future learner-read graduated instrument.
 
+## Weight-dial inactive-gap independent oracle
+
+For the canonical 0–5 kg / 0.1 kg dial, W10 must derive the active/gap geometry independently from range and sweep before reading W07's verdict.
+
+Independent derivation:
+
+- active intervals = `(5-0)/0.1 = 50`;
+- active positions = `50+1 = 51`;
+- active sweep = `50 × 6° = 300°`;
+- inactive sweep = `360° - 300° = 60°`;
+- with canonical start 240°, active endpoint = `(240° + 300°) mod 360° = 180°`;
+- therefore open inactive arc is from 180° to 240°;
+- expected radial scale-like marks strictly inside that arc = **0**.
+
+Canonical active tick set:
+
+`A={ (240+6*i) mod 360 | i∈[0,50] }`
+
+W10 must verify that every intended graduation belongs to `A` and that no intended or decorative radial mark belongs to the open gap `(180°,240°)`.
+
+The outer circle is not a radial graduation and is allowed to continue through the gap.
+
+Canonical label-angle oracle:
+
+`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+
+If a rendered/template state places the labels at a different rotation while retaining the canonical target-angle mapping, W10 returns FAIL because the displayed values and pointer geometry no longer share one coordinate system.
+
+Required W10 evidence fields for this family:
+
+`ACTIVE_TICK_SET_CHECK`
+`INACTIVE_GAP_ANGLE_CHECK`
+`INACTIVE_GAP_RADIAL_MARK_COUNT`
+`CANONICAL_LABEL_ANGLE_CHECK`
+
+`INACTIVE_GAP_RADIAL_MARK_COUNT` must equal `0`.
+
 ## Required audit-state schema
 
 `INSTRUMENT_FAMILY`
@@ -131,6 +168,9 @@ Mandatory W10 audit applies to:
 `PROMPT_METROLOGY_RENDER_PATH_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
+`PROMPT_METROLOGY_DIAL_ACTIVE_TICK_SET_QA` when applicable
+`PROMPT_METROLOGY_DIAL_GAP_RADIAL_MARK_ZERO_QA` when applicable
+`PROMPT_METROLOGY_DIAL_LABEL_ANGLE_QA` when applicable
 
 Any applicable FAIL or NOT_RUN is returned to W09 as a release blocker.
 
@@ -141,7 +181,9 @@ W10 prompt audit does not prove pixels.
 Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 
-If a rendered instrument is supplied, independently inspect visible tick count, spacing, anchoring, labels, reference, target alignment and print readability. One wrong instructional scale means:
+If a rendered instrument is supplied, independently inspect visible tick count, spacing, anchoring, labels, reference, target alignment and print readability. For open-arc dials, count radial marks in the inactive region independently; any count above zero is a critical topology defect.
+
+One wrong instructional scale means:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
