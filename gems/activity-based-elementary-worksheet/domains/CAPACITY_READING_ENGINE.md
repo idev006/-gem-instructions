@@ -1,6 +1,6 @@
 # CAPACITY_READING_ENGINE — Capacity / Volume / Meniscus Rules
 
-Version: 1.3.0
+Version: 1.4.0
 Status: PRODUCTION_CANDIDATE
 Owning worker: `W05_TEMPERATURE_CAPACITY_VOLUME`
 Requires `INSTRUMENT_READING_ENGINE.md` only when a learner reads a graduated container.
@@ -80,6 +80,25 @@ Examples:
 - 0–1000 mL @50 mL → 20 / 21
 - 500–1500 mL @100 mL → 10 / 11; do not invent zero outside active scale
 
+### Canonical 0–1000 mL @50 mL local-span oracle
+
+When `MINOR_DIVISION=50 mL` and `MAJOR_DIVISION=100 mL`, the global count is necessary but not sufficient. Every adjacent 100 mL major span must independently satisfy:
+
+`INTERVALS_PER_100ML=2`
+`POSITIONS_PER_100ML_ENDPOINT_INCLUSIVE=3`
+`INTERIOR_POSITIONS_PER_100ML_SPAN=1`
+`INTERIOR_VALUE_OFFSET=50 mL`
+
+For each span `[k,k+100]` where k is a multiple of 100 mL:
+
+- endpoints k and k+100 are major positions;
+- exactly one interior position exists at k+50;
+- the k+50 tick is shorter/weaker than the major ticks and normally unlabeled;
+- no additional minor tick, pseudo-tick, decorative hatch, or duplicate mark may appear inside the span;
+- tick hierarchy changes stroke appearance only; it never changes the physical position count.
+
+Example: 300→400 mL must be exactly `300 | 350 | 400`, i.e. two equal intervals and one interior graduation. A visual scale with four or five minor strokes between 300 and 400 is academically wrong even if the major labels are correct.
+
 ## 7. Target mapping
 
 `tick_index = round((target-SCALE_MIN)/d)`
@@ -110,6 +129,10 @@ Instructional explanation should normally appear once in instruction/example spa
 For each visual item serialize internally:
 
 `TARGET VALUE + TICK INDEX + LEVEL RATIO + MENISCUS MODE/READ POINT + EXACT RELATION + HARD NEGATIVE`
+
+For the canonical 50 mL profile also serialize:
+
+`INTERVALS_PER_100ML=2 + INTERIOR_POSITIONS_PER_100ML_SPAN=1 + LOCAL_SPAN_RECOUNT_REQUIRED=YES`
 
 Mark `RENDER_ONLY_NOT_FOR_WORKSHEET`.
 
@@ -160,6 +183,9 @@ Prompt-phase gates:
 `PROMPT_MENISCUS_READ_POINT_QA`
 `PROMPT_NO_COMPETING_LEVEL_QA`
 `PROMPT_CAPACITY_LABEL_PRESERVATION_QA`
+`PROMPT_CAPACITY_PER_100ML_SUBDIVISION_QA`
+`PROMPT_CAPACITY_LOCAL_SPAN_RECOUNT_QA`
+`PROMPT_CAPACITY_MAJOR_MINOR_HIERARCHY_QA`
 `PROMPT_VOLUME_FORMULA_QA`
 `PROMPT_VOLUME_UNIT_COMPATIBILITY_QA`
 `PROMPT_VOLUME_DECOMPOSITION_QA` when composite volume is used
@@ -167,4 +193,4 @@ Prompt-phase gates:
 
 Artifact alignment/curvature/tick visual checks remain NOT TESTED until the rendered worksheet is inspected.
 
-Wrong conversion, wrong volume formula, double-counted composite volume, wrong meniscus read point, ambiguous level, nonrepresentable target, or target-number leakage blocks prompt release.
+Wrong conversion, wrong volume formula, double-counted composite volume, wrong meniscus read point, ambiguous level, wrong local-span subdivision count, extra/missing 50 mL graduation, nonrepresentable target, or target-number leakage blocks prompt release.
