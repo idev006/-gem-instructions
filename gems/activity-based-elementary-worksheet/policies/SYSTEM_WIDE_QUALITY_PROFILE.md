@@ -140,3 +140,20 @@ A defect found in UAT must be traced to its owning rule/worker/integration gate.
 Do not repair only the emitted final prompt when the defect originates in architecture, normalization, ownership, serialization or release logic.
 
 Gate: `SYSTEM_REGRESSION_DISCIPLINE_QA`.
+
+## 14. Mandatory learner-read scale-line integrity
+
+Whenever any routed skill contains a learner-read clock face, dial, ruler, thermometer, graduated container, protractor, or graph axis, the complete `policies/SCALE_LINE_INTEGRITY_PROFILE.md` applies in addition to the owning domain rules.
+
+This requirement is cross-worker:
+
+- owning academic worker defines scale values/topology and target state;
+- W07 audits scale-line integrity;
+- W08 preserves minimum printed size, tick separation, label clearance and decoration isolation during layout;
+- W09 treats every applicable scale-line gate as release-blocking.
+
+The final prompt must serialize a resolved `SCALE_LINE_SPEC` for each canonical learner-read scale template. Vague instructions such as `draw clear ticks` or `standard scale marks` are insufficient.
+
+No layout/theme optimization may merge, omit, thin below print-safe minimum, detach, reverse, compress, or visually obscure required scale graduations.
+
+Gate family: `PROMPT_SCALE_LINE_SPEC_QA` plus all applicable gates defined in `SCALE_LINE_INTEGRITY_PROFILE.md`.
