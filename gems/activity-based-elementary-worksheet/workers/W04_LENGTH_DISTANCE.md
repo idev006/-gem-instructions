@@ -128,7 +128,9 @@ Topology is `CYCLIC_FULL_CIRCLE`.
 `interval_count=360/d`
 `distinct_tick_position_count=360/d`
 
-0° and 360° are the same physical position; never duplicate the 360° graduation.
+At 1° resolution: 360 equal intervals / 360 distinct positions.
+
+The 0° and 360° directions are the same physical position; no duplicated 0°/360° physical mark is allowed.
 
 Target is normalized to `[0,360)` for renderer geometry. Direction must be explicit.
 
