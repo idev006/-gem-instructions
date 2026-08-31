@@ -61,12 +61,12 @@ All prior executable suites remain and counts only increase. Current target rele
 - actual weight-dial gap: 32
 - physical page feasibility: 48
 - actual instrument geometry: 64
-- measurement reference artifact regression: 64
+- measurement reference artifact regression: 66
 - repository full-line audit: 81
 
 Combined:
 
-`1364/1364 PASS`
+`1366/1366 PASS`
 
 CI must also pass SSOT validation, package build, ZIP integrity and artifact upload.
 
