@@ -2,11 +2,10 @@
 """Static SSOT validator for activity-based-elementary-worksheet 2.6.x.
 
 Structural/document-contract validation only. Executable validation is performed
-by the additive 971-case release gate. None of these prompt-system checks claims
+by the additive 995-case release gate. None of these prompt-system checks claims
 that downstream worksheet pixels have passed artifact QA.
 """
 from __future__ import annotations
-
 from pathlib import Path
 import re
 import sys
@@ -41,8 +40,8 @@ REQUIRED_FILES = [
     "tools/full_dry_run_suite.py", "tools/full_skill_matrix_suite.py",
     "tools/runtime_uat_regression_suite.py", "tools/semantic_oracle_regression_suite.py",
     "tools/system_wide_quality_regression_suite.py", "tools/scale_line_integrity_regression_suite.py",
-    "tools/instrument_review_speedometer_regression_suite.py", "tools/build_install_package.py",
-    *WORKERS.values(),
+    "tools/instrument_review_speedometer_regression_suite.py", "tools/protractor_scale_safety_regression_suite.py",
+    "tools/build_install_package.py", *WORKERS.values(),
 ]
 
 EXPECTED_DOMAINS = {
@@ -87,8 +86,10 @@ CHECKS = {
         "SCALE_LINE_INTEGRITY_PROFILE.md",
     ],
     "policies/SCALE_LINE_INTEGRITY_PROFILE.md": [
-        "SCALE_LINE_SPEC", "MIN_TICK_CENTER_SPACING_MM", "0.60 mm", "0.25 mm", "0.35 mm",
+        "Version: 1.2.0", "SCALE_LINE_SPEC", "MIN_TICK_CENTER_SPACING_MM", "0.60 mm", "0.25 mm", "0.35 mm",
         "PROMPT_SCALE_TICK_ANCHOR_QA", "PROMPT_SCALE_LINE_SERIALIZATION_QA",
+        "PRODUCTION_MIN_PROTRACTOR_WIDTH_MM = 70 mm", "65 mm diameter protractor fails",
+        "PROMPT_SCALE_PRINT_SPACING_ORACLE_QA", "PROMPT_PROTRACTOR_RENDER_PATH_QA",
     ],
     "policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md": [
         "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON",
@@ -108,7 +109,8 @@ CHECKS = {
     "workers/W04_LENGTH_DISTANCE.md": [
         "direct speedometer reading", "INTERVALS_PER_CM=10", "POSITIONS_PER_CM_SPAN=11",
         "INTERIOR_POSITIONS_PER_CM_SPAN=9", "PHYSICAL_EDGE_IS_GRADUATION=NO",
-        "PROMPT_SPEEDOMETER_ANGLE_MAPPING_QA",
+        "PROMPT_SPEEDOMETER_ANGLE_MAPPING_QA", "PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70",
+        "PROMPT_PROTRACTOR_PRINT_SPACING_QA", "PROMPT_PROTRACTOR_RENDER_PATH_QA",
     ],
     "workers/W05_TEMPERATURE_CAPACITY_VOLUME.md": [
         "0–50°C @1°C", "50 intervals / 51 positions", "PROMPT_THERMOMETER_INTERVAL_COUNT_QA",
@@ -119,12 +121,14 @@ CHECKS = {
     ],
     "workers/W08_LAYOUT_RENDER_THAI.md": [
         "INSTRUMENT_REVIEW_REVISE_PROTOCOL", "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON",
-        "10 intervals / 11 positions / 9 interior positions",
+        "10 intervals / 11 positions / 9 interior positions", "PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70",
+        "PROMPT_PROTRACTOR_RENDER_PATH_QA",
     ],
     "workers/W09_QA_RELEASE.md": [
         "PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA", "ARTIFACT_QA=FAIL",
         "PROMPT_RULER_SUBDIVISION_COUNT_QA", "PROMPT_SPEEDOMETER_TOPOLOGY_QA",
-        "PROMPT_THERMOMETER_INTERVAL_COUNT_QA",
+        "PROMPT_THERMOMETER_INTERVAL_COUNT_QA", "PROMPT_PROTRACTOR_PRINT_SPACING_QA",
+        "PROMPT_SCALE_PRINT_SPACING_ORACLE_QA",
     ],
     "qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md": [
         "CRITICAL_ACADEMIC", "exactly 10 equal intervals", "exactly 11 physical graduation positions",
@@ -133,7 +137,7 @@ CHECKS = {
     "tools/build_install_package.py": [
         "activity-based-elementary-worksheet_Gem_v2.6.2_LTS_9WORKERS_TXT",
         "INSTRUMENT_REVIEW_REVISE_PROFILE.md", "SPEEDOMETER_READING_ENGINE.md",
-        "instrument_review_speedometer_regression_suite.py", "971/971 PASS",
+        "instrument_review_speedometer_regression_suite.py", "protractor_scale_safety_regression_suite.py", "995/995 PASS",
     ],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
     "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES)==360,len(CASES)"],
@@ -145,9 +149,13 @@ CHECKS = {
         "Expected case count: exactly 60", "assert len(CASES) == 60", "speedometer-60-angle",
         "thermo-35F-invalid", "ruler-1cm-interior",
     ],
+    "tools/protractor_scale_safety_regression_suite.py": [
+        "Expected case count: exactly 24", "assert len(CASES) == 24", "spacing-65mm-below-floor",
+        "spacing-70mm-passes-floor", "minimum-diameter-oracle",
+    ],
     "qa/BASELINE_2_6_2_RELEASE_CHECKLIST.md": [
-        "971/971 PASS", "instrument_review_speedometer_regression_suite.py",
-        "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON",
+        "995/995 PASS", "instrument_review_speedometer_regression_suite.py", "protractor_scale_safety_regression_suite.py",
+        "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON", "PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70",
         "ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md",
     ],
 }
@@ -162,14 +170,11 @@ EXACT_RELATIONS = [
     ("domains/MEASUREMENT_COVERAGE_P1_P6.md", "1 m³ = 1,000,000 cm³"),
 ]
 
-
 def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
-
 def main() -> int:
     errors: list[str] = []
-
     for rel in REQUIRED_FILES:
         if not (ROOT / rel).is_file():
             errors.append(f"missing required file: {rel}")
@@ -194,20 +199,16 @@ def main() -> int:
     registry = read("domains/DOMAIN_REGISTRY.md")
     matrix = read("qa/DOMAIN_RELEASE_MATRIX.md")
     for domain in sorted(EXPECTED_DOMAINS):
-        if f"| {domain} |" not in registry:
-            errors.append(f"registry missing {domain}")
-        if f"| {domain} |" not in matrix:
-            errors.append(f"release matrix missing {domain}")
+        if f"| {domain} |" not in registry: errors.append(f"registry missing {domain}")
+        if f"| {domain} |" not in matrix: errors.append(f"release matrix missing {domain}")
 
     for rel, tokens in CHECKS.items():
         txt = read(rel)
         for expected in tokens:
-            if expected not in txt:
-                errors.append(f"{rel}: missing token: {expected}")
+            if expected not in txt: errors.append(f"{rel}: missing token: {expected}")
 
     for rel, relation in EXACT_RELATIONS:
-        if relation not in read(rel):
-            errors.append(f"{rel}: missing exact relation: {relation}")
+        if relation not in read(rel): errors.append(f"{rel}: missing exact relation: {relation}")
 
     policy = read("policies/PARAMETER_POLICY.md")
     if "CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR" in policy and "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR" not in policy:
@@ -217,15 +218,13 @@ def main() -> int:
     if "PROTRACTOR_RANGE=0_180|0_360" in policy and "CYCLIC_FULL_CIRCLE" not in read("workers/W04_LENGTH_DISTANCE.md"):
         errors.append("0_360 protractor exposed without deterministic full-circle topology")
 
-    # The package builder must ship every mandatory shared profile to every worker.
     builder = read("tools/build_install_package.py")
     for profile in (
         "policies/SYSTEM_WIDE_QUALITY_PROFILE.md",
         "policies/SCALE_LINE_INTEGRITY_PROFILE.md",
         "policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md",
     ):
-        if profile not in builder:
-            errors.append(f"builder missing mandatory shared profile: {profile}")
+        if profile not in builder: errors.append(f"builder missing mandatory shared profile: {profile}")
 
     stale = re.compile(r"(?:baseline|Version:|Compatible Gem baseline:)[^\n]*(?:2\.3\.|2\.4\.|2\.5\.)", re.I)
     runtime_files = [
@@ -237,13 +236,11 @@ def main() -> int:
         "domains/SPEEDOMETER_READING_ENGINE.md", *WORKERS.values(),
     ]
     for rel in runtime_files:
-        if stale.search(read(rel)):
-            errors.append(f"{rel}: stale runtime baseline reference")
+        if stale.search(read(rel)): errors.append(f"{rel}: stale runtime baseline reference")
 
     if errors:
         print(f"SSOT VALIDATION: FAIL ({len(errors)} issue(s))")
-        for e in errors:
-            print("FAIL", e)
+        for e in errors: print("FAIL", e)
         return 1
 
     print("SSOT VALIDATION: PASS")
@@ -252,6 +249,7 @@ def main() -> int:
     print("mandatory runtime profiles: system-wide + scale-line + instrument review-revise")
     print("speedometer deterministic engine: present")
     print("actual ruler extra-tick regression: present")
+    print("protractor scale safety regression: present")
     print("core dry-run: 449-case executable present")
     print("declared-skill matrix: 360-case executable present")
     print("runtime UAT regression: 12-case executable present")
@@ -259,10 +257,10 @@ def main() -> int:
     print("system-wide quality regression: 30-case executable present")
     print("scale-line integrity regression: 40-case executable present")
     print("instrument review/speedometer regression: 60-case executable present")
-    print("combined minimum release gate: 971 cases")
+    print("protractor scale safety regression: 24-case executable present")
+    print("combined minimum release gate: 995 cases")
     print("artifact QA: NOT_YET_TESTED")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
