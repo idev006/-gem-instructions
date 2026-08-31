@@ -94,7 +94,7 @@ checks=[
 ('int-speed-pivot','NEEDLE_PIVOT=DIAL_CENTER' in speed and 'PROMPT_SPEEDOMETER_PIVOT_CENTER_QA' in w04),
 ('int-thermo-hierarchy','6 major' in temp and '5 intermediate' in temp and '40 minor' in temp),
 ('int-w05-thermo','PROMPT_THERMOMETER_HIERARCHY_COUNT_QA' in w05),
-('int-protractor-common-center','ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER' in w04),
+('int-protractor-common-center','ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == PROTRACTOR_CENTER' in w04 and 'Every graduation is radial from the same center' in w04),
 ('int-protractor-shape','perfect upper semicircle' in w07.lower() and 'PROMPT_PROTRACTOR_SHAPE_INTEGRITY_QA' in w07),
 ('int-w10-center','PROMPT_METROLOGY_COMMON_CENTER_QA' in w10 and 'PROMPT_METROLOGY_SHAPE_INTEGRITY_QA' in w10),
 ('int-w08-shape-page','PROTRACTOR_BODY_HEIGHT_MM=35' in w08 and 'PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA' in w08),
