@@ -6,7 +6,7 @@
 
 ## ACCEPTS
 
-Grade, question type/count, time format, precision, start range, duration bounds, interval, midnight-crossing flag, clock mode, target times, answer format.
+Grade, question type/count, time format, precision, start range, duration bounds, interval, midnight-crossing flag, clock mode, target times, answer format, day/night labels, dual-answer mode.
 
 ## OWNS
 
@@ -16,11 +16,12 @@ Grade, question type/count, time format, precision, start range, duration bounds
 - time comparison/schedules
 - analog clock hour/minute geometry
 - day/night paired reading
+- **single-clock / two-answer day-night interpretation**
 - time/clock-specific QA
 
 ## RETURNS
 
-Verified canonical time relations, student-visible givens/blanks, clock template requirements, renderer-only clock states, hard negatives, domain QA requirements.
+Verified canonical time relations, student-visible givens/blanks, clock template requirements, renderer-only clock states, day/night answer-pair state, hard negatives, domain QA requirements.
 
 ## MUST_NOT_DECIDE
 
@@ -89,7 +90,7 @@ If seconds are explicitly visualized:
 
 `second_angle=6*s`
 
-Hour hand still follows continuous time; for second-sensitive precision its theoretical position may include the seconds fraction, but elementary clock-reading prompts may lock to minute precision unless the lesson explicitly teaches sub-minute hand motion.
+Hour hand moves continuously.
 
 `:15` → 25% to next hour
 `:30` → exactly halfway
@@ -104,13 +105,91 @@ Hour hand still follows continuous time; for second-sensitive precision its theo
 
 Every nonzero-minute item includes displacement relation and item-specific negative.
 
-## Day/night pair
+## DAY_NIGHT_PAIR — canonical single-face behavior
 
-One question = one clock + two blank response fields unless explicitly requested otherwise. Minute/second components remain identical; internal 12/24-hour mapping is verified before sanitization.
+When the user requests one clock image to answer both daytime and nighttime, normalize to:
+
+`CLOCK_READING_MODE=DAY_NIGHT_PAIR`
+`ONE_CLOCK_TWO_ANSWERS=YES`
+`CLOCKS_PER_QUESTION=1`
+`ANSWER_FIELDS_PER_QUESTION=2`
+`DAY_NIGHT_LABELS=กลางวัน,กลางคืน`
+`ANSWER_TIME_FORMAT=24_HOUR` unless explicitly overridden
+
+**Non-negotiable composition:**
+
+`1 QUESTION = EXACTLY 1 ANALOG CLOCK FACE + EXACTLY 2 BLANK ANSWER FIELDS`
+
+Student-visible default:
+
+`กลางวัน ........ น. | กลางคืน ........ น.`
+
+Do **not** create a separate daytime clock and nighttime clock for the same question.
+
+The clock geometry is drawn once. Both answers are interpretations of the **same hand positions**.
+
+### Pair mapping
+
+Let the analog face represent canonical 12-hour value `h12:m`.
+
+For ordinary paired elementary practice, the two 24-hour interpretations must:
+
+- preserve the same minute value;
+- preserve the same second value if seconds are active;
+- differ by exactly 12 hours modulo 24.
+
+Canonical pair examples:
+
+- 1:30 ↔ 13:30
+- 7:00 ↔ 19:00
+- 10:30 ↔ 22:30
+- 12:15 ↔ 00:15
+
+For a 12-o'clock face, the pair is `12:xx` and `00:xx`; do not output `24:xx`.
+
+If the requested labels are specifically `กลางวัน` and `กลางคืน`, use the pedagogical mapping defined by the task/profile and verify it internally before release. Do not invent contextual AM/PM cues that contradict the intended pair.
+
+### Student-safe blueprint
+
+Student Blueprint contains only:
+
+- neutral item ID
+- one neutral clock template reference
+- two blank fields with the requested labels
+
+It must not contain either paired target time.
+
+### Renderer metadata
+
+Final Prompt contains one renderer-only clock state per question:
+
+`SEMANTIC_TARGET_12H + MINUTE_ANGLE + HOUR_ANGLE + RELATIONAL_WORDING + ITEM_SPECIFIC_HARD_NEGATIVE`
+
+Mark:
+
+`RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
+
+The two internal day/night answer values may be used for verification, but they must not be printed when `SHOW_ANSWER_KEY=NO`.
+
+### Hard negatives
+
+For DAY_NIGHT_PAIR:
+
+- **DO NOT draw two clocks for one question.**
+- **DO NOT change hand positions between daytime and nighttime answers.**
+- **DO NOT print either target time beside/inside the clock.**
+- **DO NOT fill either answer blank.**
+- **DO NOT remove canonical clock numerals merely to hide target values.**
+
+## Day/night pair source specification
+
+Detailed feature contract:
+
+`domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md`
 
 ## Visibility
 
-Clock target time/angles belong to teacher-visible renderer metadata marked `RENDER_ONLY_NOT_FOR_WORKSHEET`. Student Blueprint must not contain target time or angle.
+Clock target time/angles and paired answers belong to teacher-visible/internal state. Student Blueprint must not contain target time or angle.
 
 Clock numerals 1–12 remain visible when configured; leak guards prohibit target-time text, not face numerals.
 
@@ -133,6 +212,9 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_NONZERO_MINUTE_DISPLACEMENT_QA`
 `PROMPT_HALF_HOUR_MIDPOINT_QA`
 `PROMPT_DAY_NIGHT_MAPPING_QA`
+`PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
+`PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
+`PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA`
 `PROMPT_CLOCK_LABEL_PRESERVATION_QA`
 
-Wrong unit conversion, time relation, hand formula, pinned nonzero-minute hour hand, wrong midpoint, or leaked clock answer blocks release.
+Wrong unit conversion, time relation, hand formula, pinned nonzero-minute hour hand, wrong midpoint, wrong day/night pair, two clocks for one paired question, changed hand state between pair interpretations, or leaked clock answer blocks release.
