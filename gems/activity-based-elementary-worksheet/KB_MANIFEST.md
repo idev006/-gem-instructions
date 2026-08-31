@@ -133,7 +133,11 @@ Direct speedometer reading does not automatically enable speed-rate calculation.
 
 - clock continuous hour-hand interpolation and exact minute-mark topology
 - canonical 0–5 kg dial active sweep/gap, no gap ticks
-- ruler 1 cm @1 mm = 10 intervals / 11 positions / 9 interior positions; physical edge is not a graduation
+- ruler 1 cm @1 mm canonical serialization:
+  - `INTERVALS_PER_CM=10`
+  - `POSITIONS_PER_CM_SPAN=11`
+  - `INTERIOR_POSITIONS_PER_CM_SPAN=9`
+  - `PHYSICAL_EDGE_IS_GRADUATION=NO`
 - speedometer canonical 0–120 km/h = 12 intervals / 13 positions, 240° active arc, 120° inactive gap
 - protractor exact origin/baseline/direction
 - thermometer exact interval/position count, scale direction and target endpoint
