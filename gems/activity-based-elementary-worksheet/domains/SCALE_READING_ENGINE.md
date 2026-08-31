@@ -1,6 +1,6 @@
 # SCALE_READING_ENGINE — Weight / Dial Scale Rules
 
-Version: 1.4.0
+Version: 1.5.0
 Status: PRODUCTION_CANDIDATE
 Owning worker: `W03_WEIGHT_SCALE`
 Requires `INSTRUMENT_READING_ENGINE.md` when a learner reads a dial.
@@ -38,7 +38,7 @@ Before arithmetic:
 - 0–5 kg
 - 1 kg major division
 - 0.1 kg minor division
-- 10 intervals/kg
+- `INTERVALS_PER_KG=10`
 - answer: `........ กิโลกรัม ........ ขีด`
 
 If the user specifies another valid dial capacity/resolution, derive its topology rather than silently forcing the 5 kg template.
@@ -91,7 +91,33 @@ Major labels must increase clockwise in the exact sequence:
 
 A counter-clockwise, rotated-without-state, scrambled, or duplicated label sequence is `CRITICAL_ACADEMIC`.
 
-## 6. Target mapping
+## 6. Per-kilogram subdivision hierarchy — mandatory
+
+Every complete 1 kg major span is a local scale oracle and must independently preserve:
+
+`INTERVALS_PER_KG=10`
+`POSITIONS_PER_KG_ENDPOINT_INCLUSIVE=11`
+`INTERIOR_POSITIONS_PER_KG_SPAN=9`
+`HALF_KG_INTERMEDIATE_OFFSET=0.5`
+`HALF_KG_INTERMEDIATE_TICK_REUSES_EXISTING_POSITION=YES`
+
+Within each span `k → k+1` kg:
+
+- whole-kilogram endpoints are major ticks;
+- the existing `k+0.5 kg` position is an intermediate tick;
+- that 0.5 kg intermediate tick must be longer/more prominent than ordinary 0.1 kg ticks but shorter/weaker than the whole-kilogram major tick;
+- ordinary minor positions are `k+0.1,k+0.2,k+0.3,k+0.4,k+0.6,k+0.7,k+0.8,k+0.9`;
+- the hierarchy changes stroke length/weight only and never creates an extra physical graduation.
+
+Mutually exclusive class rule for local offset `j=0..10`:
+
+- major when `j in {0,10}`;
+- intermediate when `j=5`;
+- ordinary minor otherwise.
+
+A dial that has ten intervals numerically but no visible 0.5 kg intermediate hierarchy fails the canonical teaching profile.
+
+## 7. Target mapping
 
 For canonical 0.1 kg profile:
 
@@ -106,13 +132,13 @@ Per-item renderer state:
 
 Mark the whole state `RENDER_ONLY_NOT_FOR_WORKSHEET`.
 
-## 7. Canonical-label preservation
+## 8. Canonical-label preservation
 
 Dial labels `0,1,2,3,4,5` are legitimate instructional labels and must remain visible in the canonical profile.
 
 Leak guard forbids item-specific target text such as `1.2 kg` from being printed as an extra annotation or completed answer. It does **not** remove canonical scale labels.
 
-## 8. Weight calculations
+## 9. Weight calculations
 
 Task types:
 
@@ -126,19 +152,19 @@ Examples of valid internal process:
 
 Do not mix raw numerals across units without conversion.
 
-## 9. Pedagogy
+## 10. Pedagogy
 
 If the learning objective is kg+ขีด dial reading, do not let the set be dominated by whole-kilogram targets. Include sufficient non-whole targets unless whole-kilogram practice is explicitly requested.
 
 Use `MEASUREMENT_COVERAGE_P1_P6.md` for conservative grade progression.
 
-## 10. Layout/readability
+## 11. Layout/readability
 
 For 10 canonical 0.1 kg dial items on A4 portrait, a 2×5 plan is a candidate only after numeric `PHYSICAL_PAGE_STATE` proof. Preferred selected diameter may be 32–42 mm; the stronger practical domain minimum is 30 mm unless a user/domain rule requires larger.
 
 `SELECTED_RENDER_SIZE_MM` and `METROLOGY_MINIMUM_SIZE_MM` are distinct. Reduce decoration before dial size. Under one-page lock, fail feasibility rather than merge/omit ticks.
 
-## 11. Active/gap geometry contract
+## 12. Active/gap geometry contract
 
 Active positions are generated only by:
 
@@ -156,7 +182,7 @@ Inside the open inactive arc `(300°,360°)` forbid all scale-like radial marks,
 
 The outer housing may continue through the gap, but it is not a graduation.
 
-## 12. Common-center contract
+## 13. Common-center contract
 
 All radial geometry is generated from one center:
 
@@ -166,7 +192,7 @@ All radial geometry is generated from one center:
 
 For any target angle θ, the needle ray must be collinear with the center-to-target-tick radius. Composition/layout may translate or uniformly scale the whole canonical dial, but may not move pivot, labels, ticks, or ring independently.
 
-## 13. QA
+## 14. QA
 
 Prompt-phase gates:
 
@@ -191,7 +217,9 @@ Prompt-phase gates:
 `PROMPT_DIAL_ACTIVE_TICK_SET_QA`
 `PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
 `PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
+`PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA`
+`PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA`
 
 Artifact geometry is not PASS until the rendered worksheet is inspected.
 
-Any wrong conversion/arithmetic, reversed/scrambled label sequence, full-circle substitution, ticks/pseudo-ticks in the inactive gap, off-center pivot, nonrepresentable target, or wrong needle mapping blocks prompt release.
+Any wrong conversion/arithmetic, reversed/scrambled label sequence, wrong per-kg subdivision/hierarchy, full-circle substitution, ticks/pseudo-ticks in the inactive gap, off-center pivot, nonrepresentable target, or wrong needle mapping blocks prompt release.
