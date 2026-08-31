@@ -1,6 +1,6 @@
 # Metrology Assurance Profile — Learner-Read Measurement Instruments
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Mandatory independent measurement-safety contract
 Compatible Gem baseline: 2.6.x
 Independent owner: `W10_METROLOGY_ENGINEER`
@@ -12,6 +12,8 @@ A learner-read measuring instrument is not decorative art. Its visible graduatio
 `ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER`
 
 This profile provides an independent second audit after the owning academic worker and W07 geometry audit. W10 does not create target values or override domain formulas. W10 independently verifies that the specified instrument can physically and visually encode those values correctly at final print size.
+
+This profile inherits `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md` for page-packing evidence.
 
 ## Mandatory dual-audit chain
 
@@ -42,7 +44,9 @@ W10 independently checks:
 15. absence of decoration that can be mistaken for a graduation;
 16. repeated-template consistency;
 17. photocopy/print distinguishability;
-18. dimensional feasibility under page constraints.
+18. true metrology minimum size and its oracle source;
+19. selected render size distinguished from minimum size;
+20. numeric dimensional feasibility under complete page constraints.
 
 ## Independent quantitative oracles
 
@@ -55,6 +59,10 @@ W10 independently checks:
 Canonical ruler 1 cm @1 mm:
 `10 intervals / 11 positions / 9 interior positions`.
 The physical ruler edge is not an extra graduation.
+
+For a printed linear scale of length `L`:
+`tick_center_spacing_mm = L / intervals`.
+The comparison operator in prose must agree with the computed result.
 
 ### Cyclic full-circle scales
 
@@ -91,6 +99,9 @@ and a reading-ring diameter of at least `68.76 mm`; production minimum is `70 mm
 
 `intervals=(max-min)/minor_interval`, endpoint-inclusive positions, monotonic vertical mapping, exact target representability, and liquid endpoint on the target graduation centerline.
 
+For 0–50°C @1°C using a 60 mm printed scale:
+`60/50 = 1.20 mm` exactly. Valid statements include `spacing=1.20 mm`, `spacing>=1.20 mm`, or `spacing>0.60 mm`; `spacing>1.20 mm` is false for that exact geometry.
+
 ### Graduated container
 
 Exact interval/position count plus a single declared read convention (`SIMPLE_FLAT`, concave-bottom, or convex-top as configured). The level/meniscus read point must map exactly to the target value.
@@ -117,13 +128,47 @@ W10 audit is mandatory for:
 
 If scale correctness depends on exact geometry, `RENDER_PATH=AUTO` may exist only before resolution. The final prompt must resolve to `DETERMINISTIC_VECTOR` or `HYBRID` with deterministic instrument geometry. `IMAGE_ONLY` is forbidden when nondeterministic drawing can alter learner-read graduation geometry.
 
-Gate: `PROMPT_METROLOGY_RENDER_PATH_QA`.
+`OUTPUT_MODE` is a separate contract field; a render-path enum in `OUTPUT_MODE` is invalid.
 
-## Page-pressure rule
+Gates:
+`PROMPT_METROLOGY_RENDER_PATH_QA`
+`PROMPT_OUTPUT_MODE_QA`
+`PROMPT_FIELD_SEMANTICS_QA`.
 
-Page count, theme, card density and decoration may never force an instrument below its audited minimum geometry. If `ONE_PAGE_LOCK=ON` conflicts with safe scale geometry, prompt release is blocked rather than shrinking, deleting, merging or compressing graduations.
+## Minimum-size semantics
 
-Gate: `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`.
+W10 output must distinguish:
+
+`METROLOGY_MINIMUM_SIZE_MM`
+`SELECTED_RENDER_SIZE_MM`
+`SIZE_ORACLE_SOURCE`
+
+A selected size larger than necessary may not be relabeled as the metrology minimum without a stronger domain or user-explicit requirement.
+
+## Page-pressure and physical packing rule
+
+Page count, theme, card density and decoration may never force an instrument below its audited minimum geometry.
+
+More importantly, tick-spacing PASS does **not** imply page-feasibility PASS.
+
+Before `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA=PASS`, W10 must provide the complete numeric `PHYSICAL_PAGE_STATE` required by `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`, including page dimensions, margins, header/title/directions reserve, rows/columns, complete item bounding boxes, gaps and answer zones.
+
+For A4 portrait:
+- width = 210 mm
+- height = 297 mm
+
+Immediate lower-bound examples:
+- 5 × 80 mm dial rows = 400 mm → impossible on A4 portrait even before other content;
+- 5 × 70 mm protractor rows = 350 mm → impossible;
+- 5 × 60 mm thermometer scale rows = 300 mm → impossible before other content;
+- 5 × 50 mm container item boxes = 250 mm → remaining content must be explicitly budgeted, not assumed.
+
+If a candidate plan fails and `ONE_PAGE_LOCK=OFF`, W08 must paginate and return a new physical packing state for re-audit.
+
+If `ONE_PAGE_LOCK=ON` conflicts with safe geometry, prompt release is blocked rather than shrinking, deleting, merging or compressing graduations.
+
+Gate:
+`PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`.
 
 ## Mandatory W10 output
 
@@ -133,10 +178,14 @@ For each canonical learner-read instrument template, W10 returns an independent 
 - `TOPOLOGY_CHECK`
 - `COUNT_ORACLE`
 - `SPACING_ORACLE`
+- `METROLOGY_MINIMUM_SIZE_MM`
+- `SELECTED_RENDER_SIZE_MM`
+- `SIZE_ORACLE_SOURCE`
 - `REFERENCE_ORIGIN_CHECK`
 - `TARGET_ALIGNMENT_CHECK`
 - `LABEL_ASSOCIATION_CHECK`
 - `INACTIVE_REGION_CHECK` when applicable
+- `PHYSICAL_PAGE_STATE`
 - `PRINT_FEASIBILITY_CHECK`
 - `INDEPENDENT_VERDICT=PASS|FAIL`
 
@@ -156,10 +205,13 @@ The audit state is teacher/runtime metadata and must never be printed on the stu
 `PROMPT_METROLOGY_INACTIVE_REGION_QA` when applicable
 `PROMPT_METROLOGY_TEMPLATE_CONSISTENCY_QA`
 `PROMPT_METROLOGY_RENDER_PATH_QA`
+`PROMPT_METROLOGY_SIZE_ORACLE_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
+`PROMPT_PHYSICAL_PAGE_STATE_QA`
+`PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
 
-Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
+Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED` for the current compiled plan.
 
 ## Artifact boundary
 
