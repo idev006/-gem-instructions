@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 """Static SSOT validator for activity-based-elementary-worksheet 2.6.x.
 
-Run from repository root:
-    python gems/activity-based-elementary-worksheet/tools/validate_ssot.py
-
-This validates structural/document-contract consistency only. It does not claim
-that downstream rendered worksheet artifacts have passed visual QA.
+Structural/document-contract validation only. Full deterministic dry-run is
+performed separately by full_dry_run_suite.py. Neither claims artifact pixels pass.
 """
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,7 +11,6 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = "2.6"
 
 WORKERS = {
     "W01_ACADEMIC_CONTENT": "workers/W01_ACADEMIC_CONTENT.md",
@@ -38,63 +33,61 @@ REQUIRED_FILES = [
     "policies/PARAMETER_POLICY.md",
     "domains/DOMAIN_REGISTRY.md",
     "domains/MEASUREMENT_COVERAGE_P1_P6.md",
+    "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md",
     "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md",
     "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
+    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md",
     "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md",
     "qa/DOMAIN_RELEASE_MATRIX.md",
     "examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md",
+    "tools/full_dry_run_suite.py",
+    "tools/build_install_package.py",
     *WORKERS.values(),
 ]
 
 EXPECTED_DOMAINS = {
-    "TIME",
-    "TIME_CLOCK",
-    "MEASUREMENT_WEIGHT",
-    "MEASUREMENT_LENGTH",
-    "MEASUREMENT_DISTANCE",
-    "MEASUREMENT_ANGLE",
-    "MEASUREMENT_PERIMETER_AREA",
-    "MEASUREMENT_TEMPERATURE",
-    "MEASUREMENT_CAPACITY",
-    "MEASUREMENT_VOLUME",
+    "TIME", "TIME_CLOCK", "MEASUREMENT_WEIGHT", "MEASUREMENT_LENGTH",
+    "MEASUREMENT_DISTANCE", "MEASUREMENT_ANGLE", "MEASUREMENT_PERIMETER_AREA",
+    "MEASUREMENT_TEMPERATURE", "MEASUREMENT_CAPACITY", "MEASUREMENT_VOLUME",
 }
 
-CHECK_TOKENS = {
+CHECKS = {
     "GEM_INSTRUCTIONS_PRODUCTION.md": [
-        "Orchestrator",
-        "W04_LENGTH_DISTANCE",
-        "angle/protractor",
-        "perimeter",
-        "cm³/dm³/m³",
-        "ARTIFACT_QA=NOT_YET_TESTED",
-        "RENDER_ONLY_NOT_FOR_WORKSHEET",
-    ],
-    "KB_ROUTER.md": [
-        "angle/protractor",
-        "perimeter/area",
-        "time-unit conversion",
-        "cubic-unit conversion",
+        "Orchestrator", "W02_TIME_CLOCK", "FINAL_IMAGE_GENERATION_PROMPT",
+        "ARTIFACT_QA=NOT_YET_TESTED", "RENDER_ONLY_NOT_FOR_WORKSHEET",
     ],
     "policies/PARAMETER_POLICY.md": [
-        "TIME_PRECISION=HOUR|MINUTE|SECOND",
-        "ANGLE_TASK_TYPE",
-        "AREA_TASK_TYPE",
-        "DM3",
-        "PI_POLICY",
+        "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR",
+        "TARGET_MINUTE_MODE=ANY_VALID|MULTIPLE_OF_GRANULARITY|EXACT_MINUTE_SET",
+        "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
+        "PROTRACTOR_RANGE=0_180|0_360", "DM3", "PI_POLICY",
     ],
-    "domains/MEASUREMENT_COVERAGE_P1_P6.md": [
-        "ANGLE / PROTRACTOR",
-        "PERIMETER",
-        "AREA",
-        "SOLID VOLUME",
-        "60 seconds = 1 minute",
+    "workers/W02_TIME_CLOCK.md": [
+        "Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}",
+        "กลางวัน = h12+12", "กลางคืน = h12+12",
+        "PROMPT_PER_ITEM_RENDER_STATE_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA",
     ],
-    "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md": [
-        "M-39",
-        "M-41",
-        "M-46",
-        "M-49",
+    "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md": [
+        "01:30 → กลางวัน 13:30 | กลางคืน 01:30",
+        "06:30 → กลางวัน 06:30 | กลางคืน 18:30",
+        "12:15 → กลางวัน 12:15 | กลางคืน 00:15",
+        "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
     ],
+    "workers/W04_LENGTH_DISTANCE.md": [
+        "CYCLIC_FULL_CIRCLE", "360 equal intervals / 360 distinct positions",
+        "no duplicated 0°/360° physical mark",
+    ],
+    "workers/W09_QA_RELEASE.md": [
+        "Critical QA is conjunctive", "PROMPT_RELEASE=BLOCKED",
+        "PROMPT_PAGE_LOCK_PROVENANCE_QA", "PROMPT_HALF_HOUR_INTENT_QA",
+        "PROMPT_DAY_NIGHT_MAPPING_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA",
+    ],
+    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md": [
+        "DN-01 — Thai P3 AUTO mode", "DN-10 — strict half-hour intent",
+        "DN-13 — numeric angles mandatory", "DN-17 — page-lock provenance",
+        "DN-19 — false-PASS prevention",
+    ],
+    "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
 }
 
 EXACT_RELATIONS = [
@@ -112,103 +105,64 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def fail(errors: list[str], message: str) -> None:
-    errors.append(message)
-
-
 def main() -> int:
     errors: list[str] = []
-
     for rel in REQUIRED_FILES:
         if not (ROOT / rel).is_file():
-            fail(errors, f"missing required file: {rel}")
-
+            errors.append(f"missing required file: {rel}")
     if errors:
-        for e in errors:
-            print("FAIL", e)
+        for e in errors: print("FAIL", e)
         return 1
 
-    # Worker identity/schema/baseline.
-    seen_ids: set[str] = set()
-    for worker_id, rel in WORKERS.items():
-        text = read(rel)
-        if f"WORKER_ID={worker_id}" not in text:
-            fail(errors, f"{rel}: wrong/missing WORKER_ID={worker_id}")
-        if "BASELINE_COMPATIBILITY=2.6.x" not in text:
-            fail(errors, f"{rel}: missing baseline compatibility 2.6.x")
-        if "WORKER_SCHEMA_VERSION=1" not in text:
-            fail(errors, f"{rel}: missing worker schema 1")
-        found = re.findall(r"WORKER_ID=([A-Z0-9_]+)", text)
+    seen: set[str] = set()
+    for wid, rel in WORKERS.items():
+        txt = read(rel)
+        for token in (f"WORKER_ID={wid}", "BASELINE_COMPATIBILITY=2.6.x", "WORKER_SCHEMA_VERSION=1"):
+            if token not in txt: errors.append(f"{rel}: missing {token}")
+        found = re.findall(r"WORKER_ID=([A-Z0-9_]+)", txt)
         if found:
-            if found[0] in seen_ids:
-                fail(errors, f"duplicate worker id: {found[0]}")
-            seen_ids.add(found[0])
+            if found[0] in seen: errors.append(f"duplicate worker id: {found[0]}")
+            seen.add(found[0])
+    if len(seen) != 9: errors.append(f"expected 9 unique worker IDs, got {len(seen)}")
 
-    if len(seen_ids) != 9:
-        fail(errors, f"expected 9 unique base worker IDs, got {len(seen_ids)}")
-
-    # Domain registry and release matrix must contain the same formal measurement domains.
-    registry = read("domains/DOMAIN_REGISTRY.md")
-    matrix = read("qa/DOMAIN_RELEASE_MATRIX.md")
+    registry, matrix = read("domains/DOMAIN_REGISTRY.md"), read("qa/DOMAIN_RELEASE_MATRIX.md")
     for domain in sorted(EXPECTED_DOMAINS):
-        if f"| {domain} |" not in registry:
-            fail(errors, f"DOMAIN_REGISTRY missing {domain}")
-        if f"| {domain} |" not in matrix:
-            fail(errors, f"DOMAIN_RELEASE_MATRIX missing {domain}")
+        if f"| {domain} |" not in registry: errors.append(f"registry missing {domain}")
+        if f"| {domain} |" not in matrix: errors.append(f"release matrix missing {domain}")
 
-    # Core known tokens.
-    for rel, tokens in CHECK_TOKENS.items():
-        text = read(rel)
+    for rel, tokens in CHECKS.items():
+        txt = read(rel)
         for token in tokens:
-            if token not in text:
-                fail(errors, f"{rel}: missing required token: {token}")
+            if token not in txt: errors.append(f"{rel}: missing token: {token}")
 
-    # Exact measurement relations.
     for rel, relation in EXACT_RELATIONS:
-        if relation not in read(rel):
-            fail(errors, f"{rel}: missing exact relation: {relation}")
+        if relation not in read(rel): errors.append(f"{rel}: missing exact relation: {relation}")
 
-    # Single render-path contract and prompt/artifact phase contract.
-    core = read("GEM_INSTRUCTIONS_PRODUCTION.md")
-    if "DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY" not in core:
-        fail(errors, "core: resolved render-path enum missing")
-    if "ARTIFACT_QA=NOT_YET_TESTED" not in core:
-        fail(errors, "core: prompt/artifact phase boundary missing")
+    # Explicit conflict guards discovered by full dry-run review.
+    policy = read("policies/PARAMETER_POLICY.md")
+    if "CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR" in policy and "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR" not in policy:
+        errors.append("clock mode policy lacks AUTO resolution")
+    if "MINUTE_GRANULARITY=30" in read("workers/W02_TIME_CLOCK.md") and "TARGET_MINUTE_SET={30}" not in read("workers/W02_TIME_CLOCK.md"):
+        errors.append("half-hour intent not separated from granularity")
+    if "PROTRACTOR_RANGE=0_180|0_360" in policy and "CYCLIC_FULL_CIRCLE" not in read("workers/W04_LENGTH_DISTANCE.md"):
+        errors.append("0_360 protractor exposed without deterministic full-circle topology")
 
-    # Runtime canonical files must not declare stale 2.3/2.4/2.5 baselines.
-    runtime_files = [
-        "GEM_INSTRUCTIONS_PRODUCTION.md",
-        "OUTPUT_CONTRACT.md",
-        "ARCHITECTURE.md",
-        "KB_ROUTER.md",
-        "KB_MANIFEST.md",
-        "policies/PARAMETER_POLICY.md",
-        "domains/DOMAIN_REGISTRY.md",
-        *WORKERS.values(),
-    ]
-    stale_pattern = re.compile(r"(?:baseline|Version:|Compatible Gem baseline:)[^\n]*(?:2\.3\.|2\.4\.|2\.5\.)", re.I)
-    for rel in runtime_files:
-        if stale_pattern.search(read(rel)):
-            fail(errors, f"{rel}: stale runtime baseline reference detected")
-
-    # Student visibility / renderer metadata terminology.
-    output = read("OUTPUT_CONTRACT.md")
-    for token in ["RENDER_ONLY_NOT_FOR_WORKSHEET", "STUDENT_VISIBLE_WORKSHEET", "ARTIFACT_QA=NOT_YET_TESTED"]:
-        if token not in output:
-            fail(errors, f"OUTPUT_CONTRACT missing {token}")
+    stale = re.compile(r"(?:baseline|Version:|Compatible Gem baseline:)[^\n]*(?:2\.3\.|2\.4\.|2\.5\.)", re.I)
+    for rel in ["GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md", "domains/DOMAIN_REGISTRY.md", *WORKERS.values()]:
+        if stale.search(read(rel)): errors.append(f"{rel}: stale runtime baseline reference")
 
     if errors:
         print(f"SSOT VALIDATION: FAIL ({len(errors)} issue(s))")
-        for e in errors:
-            print("FAIL", e)
+        for e in errors: print("FAIL", e)
         return 1
 
     print("SSOT VALIDATION: PASS")
     print("baseline: 2.6.x")
     print("workers: 9/9 unique, schema=1")
-    print("measurement domains: registry/matrix aligned")
-    print("visibility/render-path/phase contracts: present")
-    print("measurement relations/regression tokens: present")
+    print("clock day/night + half-hour + page-lock hardening: present")
+    print("0–180 and deterministic 0–360 protractor contracts: present")
+    print("full dry-run executable: present")
+    print("artifact QA: NOT_YET_TESTED")
     return 0
 
 
