@@ -31,9 +31,9 @@ add('capacity-linear-scale','uniform graduations' in capacity and 'no decorative
 add('graph-scale-profile','SCALE_LINE_INTEGRITY_PROFILE.md' in graph)
 add('system-profile-inherits-scale-profile','SCALE_LINE_INTEGRITY_PROFILE.md' in system_profile)
 add('builder-embeds-scale-profile','SCALE_LINE_PROFILE' in builder and 'policies/SCALE_LINE_INTEGRITY_PROFILE.md' in builder)
-add('builder-runs-scale-suite','scale_line_integrity_regression_suite.py' in builder and '1364/1364 PASS' in builder)
+add('builder-runs-scale-suite','scale_line_integrity_regression_suite.py' in builder and '1366/1366 PASS' in builder)
 add('workflow-runs-scale-suite','Scale-line integrity regression' in workflow and '40 cases' in workflow)
-add('validator-release-1364','scale_line_integrity_regression_suite.py' in validator and '1364' in validator and '1364/1364 PASS' in checklist)
+add('validator-release-1366','scale_line_integrity_regression_suite.py' in validator and '1366' in validator and '1366/1366 PASS' in checklist)
 assert len(CASES)==40,len(CASES)
 failed=[c for c in CASES if not c[1]]
 if failed:
