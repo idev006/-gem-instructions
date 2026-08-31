@@ -94,8 +94,10 @@ def main():
     if len(list(know.glob('*.txt')))!=10: raise RuntimeError('Knowledge bundle count must equal 10')
 
     install=read('GEM_INSTALLATION_GUIDE.md')
+    classroom_uat=read('qa/CLASSROOM_ARTIFACT_QUALIFICATION_UAT.md')
     (PACKAGE_DIR/'INSTALL_ME_FIRST.txt').write_text(install,encoding='utf-8')
     (guide/'GEM_INSTALLATION_GUIDE.txt').write_text(install,encoding='utf-8')
+    (guide/'CLASSROOM_ARTIFACT_QUALIFICATION_UAT_24_CASES.txt').write_text(classroom_uat,encoding='utf-8')
     report_names=['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt']
     for name,r in zip(report_names,results): (guide/name).write_text(r.stdout,encoding='utf-8')
 
@@ -114,6 +116,7 @@ def main():
     print('COMBINED DRY-RUN: 1075/1075 PASS')
     print('PACKAGE BUILD: PASS')
     print('Knowledge files: 10')
+    print('Classroom artifact UAT guide: INCLUDED (24 rendered cases)')
     print(f'ZIP: {ZIP_PATH}')
     print(f'ZIP SHA256: {sha256(ZIP_PATH)}')
     return 0
