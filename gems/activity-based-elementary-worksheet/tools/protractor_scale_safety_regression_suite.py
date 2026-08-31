@@ -55,8 +55,10 @@ add("w08-one-page-block", "PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL" in w08 and "70 m
 add("w08-65-rejected", "65 mm protractor is invalid" in w08)
 
 add("w09-spacing-gate", "PROMPT_PROTRACTOR_PRINT_SPACING_QA" in w09 and "PROMPT_SCALE_PRINT_SPACING_ORACLE_QA" in w09)
-add("w09-render-path-gate", "PROMPT_PROTRACTOR_RENDER_PATH_QA" in w09 and "RENDER_PATH=AUTO" in w09)
-add("w09-release-blocked", "65 mm protractor therefore fails" in w09 and "PROMPT_RELEASE=BLOCKED" in w09)
+# Semantic evidence: the specific protractor gate must exist and W09 must require deterministic geometry.
+add("w09-render-path-gate", "PROMPT_PROTRACTOR_RENDER_PATH_QA" in w09 and "deterministic instrument geometry" in w09)
+# Semantic evidence: W09 must explicitly reject 65 mm at the known spacing and retain the global release blocker.
+add("w09-release-blocked", "65 mm" in w09 and "0.567 mm" in w09 and "fails" in w09 and "PROMPT_RELEASE=BLOCKED" in w09)
 
 assert len(CASES) == 24, len(CASES)
 failed = [c for c in CASES if not c[1]]
