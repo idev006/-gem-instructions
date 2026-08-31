@@ -17,11 +17,8 @@ def add(name, ok, detail=""):
     CASES.append((name, bool(ok), detail))
 
 profile = read("policies/SYSTEM_WIDE_QUALITY_PROFILE.md")
-core = read("GEM_INSTRUCTIONS_PRODUCTION.md")
-out = read("OUTPUT_CONTRACT.md")
-w08 = read("workers/W08_LAYOUT_RENDER_THAI.md")
-w09 = read("workers/W09_QA_RELEASE.md")
 builder = read("tools/build_install_package.py")
+workflow = (ROOT.parent.parent / ".github/workflows/activity-based-elementary-worksheet-gem-ssot.yml").read_text(encoding="utf-8")
 
 workers = [
     "W01_ACADEMIC_CONTENT", "W02_TIME_CLOCK", "W03_WEIGHT_SCALE",
@@ -55,17 +52,17 @@ profile_tokens = [
 for token in profile_tokens:
     add(f"profile-{token}", token in profile)
 
-# 22-30: integration/runtime/package protections.
+# 22-30: the shared profile must be shipped and release-blocking.
 checks = [
-    ("core-inherits-profile", "SYSTEM_WIDE_QUALITY_PROFILE.md" in core),
-    ("core-atomic-state", "PROMPT_RENDER_STATE_SERIALIZATION_QA" in core),
-    ("output-atomic-state", "PROMPT_RENDER_STATE_SERIALIZATION_QA" in out),
-    ("output-page-wording", "PROMPT_PAGE_POLICY_WORDING_QA" in out),
-    ("w08-atomic-serializer", "PROMPT_RENDER_STATE_SERIALIZATION_QA" in w08),
-    ("w08-page-wording", "PROMPT_PAGE_POLICY_WORDING_QA" in w08),
-    ("w09-evidence-consistency", "PROMPT_QA_EVIDENCE_CONSISTENCY_QA" in w09),
-    ("w09-difficulty-fidelity", "SYSTEM_DIFFICULTY_FIDELITY_QA" in w09),
-    ("builder-shared-profile", "SYSTEM_WIDE_QUALITY_PROFILE.md" in builder),
+    ("builder-shared-profile-path", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md" in builder),
+    ("builder-shared-profile-main", "MANDATORY SYSTEM-WIDE QUALITY PROFILE" in builder),
+    ("builder-shared-profile-workers", "SHARED_PROFILE" in builder and "bundle_text" in builder),
+    ("builder-system-gate", "system_wide_quality_regression_suite.py" in builder),
+    ("builder-871-total", "871/871 PASS" in builder),
+    ("workflow-system-gate", "System-wide quality regression" in workflow),
+    ("workflow-30-cases", "30 cases" in workflow),
+    ("profile-atomic-block", "Atomic renderer-state serialization" in profile),
+    ("profile-no-hard-page-drift", "ONE_PAGE_LOCK=OFF" in profile and "exactly 1 page" in profile),
 ]
 for name, ok in checks:
     add(name, ok)
