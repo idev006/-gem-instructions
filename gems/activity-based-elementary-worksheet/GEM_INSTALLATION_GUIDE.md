@@ -62,9 +62,9 @@ Install only a ZIP whose exact GitHub Actions source commit passed:
 - actual weight-dial inactive-gap regression `32/32`
 - physical page feasibility regression `48/48`
 - actual instrument geometry regression `64/64`
-- measurement reference artifact regression `64/64`
+- measurement reference artifact regression `66/66`
 - repository full-line audit `81/81`
-- combined `1364/1364 PASS`
+- combined `1366/1366 PASS`
 - package build PASS
 - ZIP integrity PASS
 - artifact upload PASS
