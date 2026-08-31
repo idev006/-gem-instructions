@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Permanent regression for clock/ruler/weight/container reference defects.
 
-Additive only. Expected case count: exactly 64.
+Additive only. Expected case count: exactly 66.
 Derived from actual user-supplied artifacts on 2026-08-31.
 """
 from pathlib import Path
@@ -57,7 +57,7 @@ add('ruler-1cm-10-intervals',10==10)
 add('ruler-1cm-11-positions',10+1==11)
 add('ruler-edge-not-graduation',edge_x!=zero_x)
 
-# 41-52 capacity local-span topology
+# 41-54 capacity local-span topology
 add('capacity-global-20-intervals',(1000-0)//50==20)
 add('capacity-global-21-positions',(1000-0)//50+1==21)
 add('capacity-major-count',len(range(0,1001,100))==11)
@@ -65,9 +65,8 @@ add('capacity-minor-mid-count',len(range(50,1000,100))==10)
 for start in (0,100,200,300,400,500,600,700,800,900):
     vals=list(range(start,start+101,50))
     add(f'capacity-span-{start}-two-intervals',len(vals)-1==2)
-# now 52 cases total
 
-# 53-64 SSOT integration
+# 55-66 SSOT integration
 clock=read('domains/CLOCK_READING_ENGINE.md'); w02=read('workers/W02_TIME_CLOCK.md')
 scale=read('domains/SCALE_READING_ENGINE.md'); w03=read('workers/W03_WEIGHT_SCALE.md')
 length=read('domains/LENGTH_READING_ENGINE.md'); w04=read('workers/W04_LENGTH_DISTANCE.md')
@@ -90,15 +89,15 @@ checks=[
 ]
 for n,o in checks:add(n,o)
 
-assert len(CASES)==64,len(CASES)
+assert len(CASES)==66,len(CASES)
 failed=[c for c in CASES if not c[1]]
 if failed:
     print(f'MEASUREMENT REFERENCE ARTIFACT REGRESSION: FAIL ({len(failed)}/{len(CASES)})')
     for n,_,d in failed:print('FAIL',n,d)
     sys.exit(1)
 print('MEASUREMENT REFERENCE ARTIFACT REGRESSION: PASS')
-print('cases: 64')
-print('pass: 64')
+print('cases: 66')
+print('pass: 66')
 print('fail: 0')
-print('clock interpolation + weight midpoint + ruler projection + capacity local span: 64/64 PASS')
+print('clock interpolation + weight midpoint + ruler projection + capacity local span: 66/66 PASS')
 print('artifact QA: supplied defective artifacts remain FAIL; future renders NOT_YET_TESTED')
