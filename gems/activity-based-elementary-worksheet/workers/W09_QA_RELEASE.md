@@ -118,11 +118,13 @@ Every canonical learner-read template requires independent `METROLOGY_AUDIT_STAT
 
 `TOPOLOGY_CHECK`
 `COUNT_ORACLE`
+`LOCAL_SPAN_RECOUNT_CHECK`
 `SPACING_ORACLE`
 `METROLOGY_MINIMUM_SIZE_MM`
 `SELECTED_RENDER_SIZE_MM`
 `SIZE_ORACLE_SOURCE`
 `REFERENCE_ORIGIN_CHECK`
+`REFERENCE_PROJECTION_CHECK`
 `COMMON_CENTER_CHECK`
 `POINTER_ORIGIN_COINCIDENCE_CHECK`
 `RADIAL_COLLINEARITY_CHECK`
@@ -145,7 +147,9 @@ Mandatory gates include:
 `PROMPT_METROLOGY_INDEPENDENCE_QA`
 `PROMPT_METROLOGY_INTERVAL_COUNT_QA`
 `PROMPT_METROLOGY_POSITION_COUNT_QA`
+`PROMPT_METROLOGY_LOCAL_SPAN_RECOUNT_QA` when applicable
 `PROMPT_METROLOGY_REFERENCE_QA`
+`PROMPT_METROLOGY_REFERENCE_PROJECTION_QA` when applicable
 `PROMPT_METROLOGY_COMMON_CENTER_QA` when radial/angular
 `PROMPT_METROLOGY_RADIAL_COLLINEARITY_QA` when radial/angular
 `PROMPT_METROLOGY_SPACING_ORACLE_QA`
@@ -165,7 +169,7 @@ Mandatory gates include:
 
 ## Scale-line hard gates
 
-For every learner-read scale require resolved `SCALE_LINE_SPEC` and exact topology/count, anchoring, spacing, hierarchy, labels/order, common center/origin, target alignment, inactive-region integrity, decoration isolation, shape integrity and template consistency.
+For every learner-read scale require resolved `SCALE_LINE_SPEC` and exact topology/count, local-span topology when applicable, anchoring, spacing, hierarchy, labels/order, common center/origin, target alignment, inactive-region integrity, decoration isolation, shape integrity and template consistency.
 
 Critical gates:
 
@@ -188,6 +192,7 @@ Critical gates:
 `PROMPT_POINTER_ORIGIN_COINCIDENCE_QA` when pointer/ray exists
 `PROMPT_RADIAL_COLLINEARITY_QA` when radial/angular
 `PROMPT_INSTRUMENT_SHAPE_INTEGRITY_QA`
+`PROMPT_LOCAL_SPAN_RECOUNT_QA` when applicable
 
 ## Ruler hard gates
 
@@ -200,15 +205,29 @@ For 1 mm resolution, every complete 1 cm span independently verifies:
 
 A 5 mm hierarchy mark occupies an existing position.
 
+For object-on-ruler measurement, require exact endpoint/reference identity and projection guides:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+`START_PROJECTION_GUIDE_X == OBJECT_START_X`
+`END_PROJECTION_GUIDE_X == OBJECT_END_X`
+
+For ZERO_START_MODE additionally require `OBJECT_START_X == ZERO_GRADUATION_X`; the physical edge cannot substitute for zero if they differ.
+
 Required:
 `PROMPT_RULER_SUBDIVISION_COUNT_QA`
 `PROMPT_RULER_EDGE_NOT_TICK_QA`
+`PROMPT_RULER_ENDPOINT_PROJECTION_GUIDE_QA`
+`PROMPT_RULER_ZERO_START_ALIGNMENT_QA`
+`PROMPT_RULER_NONZERO_START_RELATION_QA`
 
 ## Clock/day-night hard gates
 
 Thai Grade 3 AUTO analog-clock requests resolve to `DAY_NIGHT_PAIR` unless explicit SINGLE intent. Paired mode requires one face, exactly two blank response fields, deterministic day/night mapping, the same hand state for the day/night pair, 12-hour separation modulo 24, and no target values/angles in Student Blueprint. Strict half-hour intent means minute=30 unless the teacher explicitly requests a mixed minute set.
 
 Each high-risk clock item still requires the canonical atomic renderer state: semantic target + exact numeric hand angles + relational verification + item-specific hard negative. Clock hands share one exact pivot.
+
+Continuous hour-hand interpolation is mandatory for all nonzero minutes. Quarter-hour checkpoints are :15=25%, :30=50%, :45=75% of the way to the next hour. For 14:45/2:45 the short hand must be at 82.5° and must not remain on numeral 2.
 
 Applicable clock gates — retained as permanent compatibility/release contracts:
 
@@ -219,6 +238,8 @@ Applicable clock gates — retained as permanent compatibility/release contracts
 `PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
 `PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA`
 `PROMPT_PER_ITEM_RENDER_STATE_QA`
+`PROMPT_NONZERO_MINUTE_DISPLACEMENT_QA`
+`PROMPT_CLOCK_QUARTER_HOUR_INTERPOLATION_QA`
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 
 Any applicable clock gate FAIL/NOT_RUN blocks prompt release.
@@ -232,6 +253,8 @@ Canonical 0–5 kg @0.1:
 - `CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`;
 - 50 active intervals /51 positions;
 - active formula `active_tick_angle(i)=(6*i) mod 360, i=0..50`;
+- `INTERVALS_PER_KG=10`;
+- 0.5 kg existing position is a required intermediate tick, longer than ordinary 0.1 kg ticks and shorter/weaker than major kg ticks;
 - inactive open gap `(300°,360°)` with `INACTIVE_GAP_RADIAL_MARK_COUNT=0`;
 - `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`.
 
@@ -240,7 +263,9 @@ Applicable gates:
 `PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
 `PROMPT_DIAL_COMMON_CENTER_QA`
 `PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA`
-`PROMPT_DIAL_ACTIVE_TICK_SET_QA`.
+`PROMPT_DIAL_ACTIVE_TICK_SET_QA`
+`PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA`
+`PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA`.
 
 ## Speedometer hard gates
 
@@ -291,6 +316,23 @@ Applicable gates:
 `PROMPT_TEMP_SCALE_DIRECTION_QA`
 `PROMPT_TEMP_LABEL_ALIGNMENT_QA`
 `PROMPT_NO_BETWEEN_TICKS_QA`.
+
+## Graduated-container hard gates
+
+Canonical 0–1000 mL @50 mL with 100 mL majors:
+- 20 intervals /21 positions globally;
+- `INTERVALS_PER_100ML=2`;
+- `INTERIOR_POSITIONS_PER_100ML_SPAN=1`;
+- the sole interior position is +50 mL;
+- the +50 mL tick is shorter/weaker and normally unlabeled;
+- every adjacent 100 mL major span is independently recounted.
+
+Applicable gates:
+`PROMPT_CAPACITY_TOPOLOGY_QA`
+`PROMPT_CAPACITY_PER_100ML_SUBDIVISION_QA`
+`PROMPT_CAPACITY_LOCAL_SPAN_RECOUNT_QA`
+`PROMPT_CAPACITY_MAJOR_MINOR_HIERARCHY_QA`
+`PROMPT_LEVEL_ALIGNMENT_SPEC_QA`.
 
 ## Protractor hard gates
 
@@ -375,7 +417,7 @@ Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-If actual artifact contains incorrect learner-read scale, label order, pivot/origin, or distorted protractor:
+If actual artifact contains incorrect learner-read scale, local-span subdivision, endpoint reference/projection, label order, pivot/origin, hour-hand interpolation, or distorted protractor:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
