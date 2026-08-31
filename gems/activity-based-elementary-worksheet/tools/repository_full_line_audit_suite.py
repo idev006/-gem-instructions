@@ -43,7 +43,8 @@ add('nontrivial-file-count',len(files)>=40,f'files={len(files)}')
 add('nontrivial-line-count',line_count>=4000,f'lines={line_count}')
 add('nontrivial-byte-count',byte_count>=200000,f'bytes={byte_count}')
 
-# Files required for current architecture.
+# Files required for current architecture. New defect/suite presence is enforced by
+# validate_ssot and release-integrity cases below so the 81-case baseline stays additive/stable.
 required=[
 'GEM_INSTRUCTIONS_PRODUCTION.md','ARCHITECTURE.md','OUTPUT_CONTRACT.md','KB_ROUTER.md','KB_MANIFEST.md','README.md','USER_GUIDE.md','GEM_INSTALLATION_GUIDE.md',
 'policies/SYSTEM_WIDE_QUALITY_PROFILE.md','policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md','policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md',
@@ -56,9 +57,9 @@ for i,rel in enumerate(required): add(f'required-{i}',(ROOT/rel).is_file(),rel)
 # Aggregate current authoritative text for stale-contract scans.
 current_paths=[
 'GEM_INSTRUCTIONS_PRODUCTION.md','ARCHITECTURE.md','OUTPUT_CONTRACT.md','KB_ROUTER.md','KB_MANIFEST.md','README.md','USER_GUIDE.md','GEM_INSTALLATION_GUIDE.md',
-'workers/W03_WEIGHT_SCALE.md','workers/W04_LENGTH_DISTANCE.md','workers/W05_TEMPERATURE_CAPACITY_VOLUME.md','workers/W07_INSTRUMENT_AUDITOR.md','workers/W08_LAYOUT_RENDER_THAI.md','workers/W09_QA_RELEASE.md','workers/W10_METROLOGY_ENGINEER.md',
+'workers/W02_TIME_CLOCK.md','workers/W03_WEIGHT_SCALE.md','workers/W04_LENGTH_DISTANCE.md','workers/W05_TEMPERATURE_CAPACITY_VOLUME.md','workers/W07_INSTRUMENT_AUDITOR.md','workers/W08_LAYOUT_RENDER_THAI.md','workers/W09_QA_RELEASE.md','workers/W10_METROLOGY_ENGINEER.md',
 'policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md','policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md',
-'domains/INSTRUMENT_READING_ENGINE.md','domains/SCALE_READING_ENGINE.md','domains/SPEEDOMETER_READING_ENGINE.md','domains/TEMPERATURE_READING_ENGINE.md']
+'domains/INSTRUMENT_READING_ENGINE.md','domains/CLOCK_READING_ENGINE.md','domains/SCALE_READING_ENGINE.md','domains/LENGTH_READING_ENGINE.md','domains/SPEEDOMETER_READING_ENGINE.md','domains/TEMPERATURE_READING_ENGINE.md','domains/CAPACITY_READING_ENGINE.md']
 auth='\n'.join(read(p) for p in current_paths).lower()
 
 # Stale/unsafe authoritative phrases must be gone.
@@ -125,15 +126,15 @@ for wid in workers:
 builder=read('tools/build_install_package.py'); validator=read('tools/validate_ssot.py'); checklist=read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md')
 workflow_text=workflow.read_text(encoding='utf-8')
 release_checks=[
-('builder-geometry64','instrument_geometry_artifact_regression_suite.py' in builder),
+('builder-geometry64','instrument_geometry_artifact_regression_suite.py' in builder and 'measurement_reference_artifact_regression_suite.py' in builder),
 ('builder-line81','repository_full_line_audit_suite.py' in builder),
-('validator-geometry64','instrument_geometry_artifact_regression_suite.py' in validator),
+('validator-geometry64','instrument_geometry_artifact_regression_suite.py' in validator and 'measurement_reference_artifact_regression_suite.py' in validator),
 ('validator-line81','repository_full_line_audit_suite.py' in validator),
-('workflow-geometry64','Actual instrument geometry regression — 64 cases' in workflow_text),
+('workflow-geometry64','Actual instrument geometry regression — 64 cases' in workflow_text and 'Measurement reference artifact regression — 64 cases' in workflow_text),
 ('workflow-line81','Repository full-line audit — 81 semantic cases' in workflow_text),
-('checklist-geometry64','actual instrument geometry regression: 64' in checklist.lower()),
+('checklist-geometry64','actual instrument geometry regression: 64' in checklist.lower() and 'measurement reference artifact regression: 64' in checklist.lower()),
 ('checklist-line81','repository full-line audit: 81' in checklist.lower()),
-('release-total-1300',all('1300/1300 PASS' in x for x in [builder,checklist,install,readme])),
+('release-total-1364',all('1364/1364 PASS' in x for x in [builder,checklist,install,readme])),
 ('five-profile-packaging','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in builder and 'Mandatory shared profiles: 5' in builder),
 ]
 for n,o in release_checks:add(n,o)
