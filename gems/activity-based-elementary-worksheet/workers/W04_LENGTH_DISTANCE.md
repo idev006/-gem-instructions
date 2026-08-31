@@ -62,7 +62,7 @@ Canonical 1 cm @1 mm:
 `INTERIOR_POSITIONS_PER_CM_SPAN=9`
 `PHYSICAL_EDGE_IS_GRADUATION=NO`
 
-A 5 mm intermediate mark, when used, occupies an existing 1 mm position; it never adds a new scale position.
+A 5 mm intermediate mark occupies an existing 1 mm position; it never adds a new scale position.
 
 The renderer-side review must recount each complete 1 cm span before finalization. Any extra/missing minor mark is `CRITICAL_ACADEMIC`.
 
@@ -96,15 +96,19 @@ Canonical elementary default unless explicitly overridden:
 
 - range 0–120 km/h;
 - `OPEN_ARC_BOUNDED`;
+- angle convention `0°=top`, clockwise positive;
 - 240° active sweep starting at 240°, clockwise;
 - major interval 20 km/h;
 - minor interval 10 km/h;
 - 12 active intervals / 13 active positions;
-- 120° inactive gap with zero value ticks;
+- 120° inactive gap with zero value ticks/pseudo-ticks;
 - one instructional needle;
-- canonical mapping `target_angle=(240 + 2*target_kmh) mod 360`.
+- canonical mapping `target_angle=(240 + 2*target_kmh) mod 360`;
+- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER` exactly.
 
-Every speedometer item must be exactly representable in discrete mode and serialize semantic speed, tick index, exact target angle, relation to nearest major labels and item-specific hard negative.
+Every speedometer item must be exactly representable in discrete mode and serialize semantic speed, tick index, normalized exact target angle, dial center, pivot-equals-center constraint, relation to nearest major labels and item-specific hard negative.
+
+An off-center pivot is a release blocker even if the needle tip visually reaches the intended tick.
 
 ## Angle / protractor
 
@@ -117,9 +121,58 @@ For minor interval `d`:
 
 At 1°: 180 intervals / 181 endpoint-inclusive positions.
 
-Required geometry: exact center/origin, selected 0° baseline, exact target ray, explicit left-zero/right-zero direction, no perspective/skew, no decorative competing rays.
+### Canonical coordinate system — mandatory
 
-For dense 1° learner-read protractors, scale placement is independently constrained by printed geometry:
+Use a perfect, undistorted upper semicircle generated from one center/origin:
+
+`PROTRACTOR_CENTER=(cx,cy)`
+`PROTRACTOR_RADIUS=R`
+`BASELINE_LEFT=(cx-R,cy)`
+`BASELINE_RIGHT=(cx+R,cy)`
+
+Screen-coordinate convention (`y` increases downward):
+
+- 0° = right horizontal direction;
+- 90° = straight up;
+- 180° = left horizontal direction;
+- active scale reads counter-clockwise from right 0° to left 180°.
+
+Outer reading-arc point at angle θ:
+
+`OUTER(θ)=(cx + R*cos(θ), cy - R*sin(θ))`
+
+Every graduation is radial from the same center. For tick inner radius `r(θ)`:
+
+`INNER(θ)=(cx + r(θ)*cos(θ), cy - r(θ)*sin(θ))`
+
+Required coincidence:
+
+`ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == PROTRACTOR_CENTER`
+
+Required shape:
+
+`WIDTH=2R`
+`SEMICIRCLE_BODY_HEIGHT=R`
+
+Do not treat protractor width as its vertical body height. A 70 mm wide semicircular protractor has `R=35 mm` and a 35 mm semicircle body before label/answer/clearance reserves.
+
+### Scale construction
+
+For 0–180° @1°:
+
+- exactly 180 equal 1° intervals / 181 positions;
+- one active numeric scale only by default;
+- labels `0,10,20,...,180` associated with their exact major ticks;
+- 10° positions are major;
+- 5° positions are intermediate and reuse existing 1° positions;
+- all other integer-degree positions are minor;
+- no second mirrored/complementary number row unless the explicit learning objective is dual-scale selection;
+- no perspective, ellipse, non-uniform stretch, shear or local arc distortion;
+- baseline must be straight and pass exactly through the center;
+- target ray starts exactly at `PROTRACTOR_CENTER` and intersects the exact target graduation;
+- no decorative competing rays.
+
+For dense 1° learner-read protractors:
 
 `tick_center_spacing_mm = reading_radius_mm × radians(1)`
 
@@ -129,19 +182,18 @@ With default `MIN_TICK_CENTER_SPACING_MM=0.60`:
 `MIN_READING_RING_DIAMETER_MM ≈ 68.76`
 `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
 
-A 65 mm protractor is invalid at 1° resolution because the 1° arc spacing is only about 0.567 mm. This is a release blocker, not a cosmetic warning.
+A 65 mm wide protractor is invalid because its 1° reading-ring spacing is about 0.567 mm.
 
-For 0–180° @1°:
+### Protractor page-box semantics
 
-- final prompt must resolve the instrument to a deterministic vector geometry layer; unresolved `RENDER_PATH=AUTO` is not allowed;
-- use one clearly active 0→180 reading direction unless dual-scale reading is explicitly the lesson objective;
-- a competing mirrored inner scale is forbidden by default because it can make complementary readings such as 40°/140° ambiguous;
-- 10° marks are major;
-- when item verification uses 5° relations, 5° intermediate marks are REQUIRED, not optional, and occupy existing 1° positions;
-- 1° marks remain the smallest instructional graduation and must not be omitted or merged;
-- baseline ray and target ray start at the exact origin and intersect exact configured graduations.
+W04 returns geometric body dimensions, not a false square box:
 
-If a one-page lock cannot preserve the 70 mm minimum, label clearance, writable answer area and page margins for all items, return infeasible to W08/W09. Never shrink below the verified print-spacing minimum.
+`PROTRACTOR_BODY_WIDTH_MM >= 70`
+`PROTRACTOR_BODY_HEIGHT_MM = PROTRACTOR_BODY_WIDTH_MM/2`
+
+W08 must add numeric reserves for labels, question number, answer line, row gap and margins to obtain `ITEM_MIN_HEIGHT_MM` and then prove page packing. A 2-column layout is preferred when it passes the numeric page proof; 2×5 is neither automatically valid nor automatically invalid.
+
+If `ONE_PAGE_LOCK=OFF` and 2×5 fails the complete proof, paginate. Never reduce the 70 mm width below the verified print-spacing minimum merely to force one page.
 
 ### Full-circle 0–360°
 
@@ -226,12 +278,18 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_SPEEDOMETER_TARGET_REPRESENTABILITY_QA`
 `PROMPT_SPEEDOMETER_ANGLE_MAPPING_QA`
 `PROMPT_SPEEDOMETER_NEEDLE_ALIGNMENT_QA`
+`PROMPT_SPEEDOMETER_PIVOT_CENTER_QA`
+`PROMPT_SPEEDOMETER_RADIAL_COLLINEARITY_QA`
 `PROMPT_SPEEDOMETER_INACTIVE_GAP_QA`
 `PROMPT_PROTRACTOR_TOPOLOGY_QA`
 `PROMPT_PROTRACTOR_BASELINE_QA`
 `PROMPT_PROTRACTOR_DIRECTION_QA`
 `PROMPT_PROTRACTOR_PRINT_SPACING_QA`
 `PROMPT_PROTRACTOR_ACTIVE_SCALE_QA`
+`PROMPT_PROTRACTOR_SINGLE_SCALE_QA`
+`PROMPT_PROTRACTOR_COMMON_CENTER_QA`
+`PROMPT_PROTRACTOR_RADIAL_TICK_QA`
+`PROMPT_PROTRACTOR_SHAPE_INTEGRITY_QA`
 `PROMPT_PROTRACTOR_RENDER_PATH_QA`
 `PROMPT_PROTRACTOR_INTERMEDIATE_HIERARCHY_QA`
 `PROMPT_ANGLE_TARGET_QA`
@@ -242,4 +300,4 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_CANONICAL_LABEL_PRESERVATION_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W04 instruments
 
-Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/needle, route relation, protractor geometry/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
+Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/pivot, route relation, protractor geometry/distortion/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
