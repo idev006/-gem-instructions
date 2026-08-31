@@ -37,21 +37,32 @@ Use grams as canonical elementary base unit before mixed-unit arithmetic. Conver
 
 ## Canonical 0–5 kg teaching dial
 
-- 300° active sweep
-- 60° inactive gap
-- 0° top, clockwise positive
-- labels: 0@240°, 1@300°, 2@0°, 3@60°, 4@120°, 5@180°
-- 0.1 kg = 6°
-- 50 active intervals / 51 active positions
-- zero value ticks in inactive-gap interior
-- one centered needle
+The canonical classroom orientation is intentionally simple and monotonic:
 
-Hard negative: **DO NOT draw a 360-degree value scale** and do not continue ticks through the gap.
+- angle convention: `0° = top / 12 o'clock`, clockwise positive;
+- label `0` is at the top;
+- values increase clockwise around the active scale;
+- labels: `0@0°`, `1@60°`, `2@120°`, `3@180°`, `4@240°`, `5@300°`;
+- 300° active sweep from 0→5;
+- 60° inactive gap from the 5 kg endpoint at 300° back to the 0 kg endpoint at 360°/0°;
+- 0.1 kg = 6°;
+- 50 active intervals / 51 endpoint-inclusive active positions;
+- zero instructional or decorative radial scale-like marks in the open inactive gap;
+- one instructional needle;
+- `NEEDLE_PIVOT == DIAL_CENTER == ACTIVE_TICK_RING_CENTER` exactly.
+
+Hard negatives:
+
+- **DO NOT** reverse the label sequence;
+- **DO NOT** rotate labels independently from ticks/needle mapping;
+- **DO NOT** draw a 360° value scale;
+- **DO NOT** continue ticks through the 5→0 gap;
+- **DO NOT** move the needle pivot away from the center used to construct the reading ring.
 
 Target mapping for canonical 0.1 kg profile:
 
 `tick_index=round(w/0.1)`
-`target_angle=(240+6*tick_index) mod 360`
+`target_angle=(6*tick_index) mod 360`
 
 Require exact representability.
 
@@ -79,28 +90,42 @@ Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/SCALE_READING_ENGINE.md
 
 ## Inactive-gap exclusion contract
 
-For the canonical 0–5 kg dial, W03 must return an explicit gap object in the renderer state rather than relying on prose such as `leave a gap`:
+For the canonical 0–5 kg dial, W03 must return an explicit geometric state rather than prose such as `leave a gap`:
 
-`ACTIVE_START_ANGLE=240°`
-`ACTIVE_END_ANGLE=180°`
+`ACTIVE_START_ANGLE=0°`
+`ACTIVE_END_ANGLE=300°`
 `ACTIVE_SWEEP_DEG=300°`
-`INACTIVE_GAP_START_ANGLE=180°`
-`INACTIVE_GAP_END_ANGLE=240°`
+`INACTIVE_GAP_START_ANGLE=300°`
+`INACTIVE_GAP_END_ANGLE=360°/0°`
 `INACTIVE_GAP_SWEEP_DEG=60°`
 `INACTIVE_GAP_TICK_COUNT=0`
 `INACTIVE_GAP_RADIAL_MARK_COUNT=0`
 
 Active positions are exactly:
 
-`active_tick_angle(i)=(240+6*i) mod 360, i=0..50`
+`active_tick_angle(i)=(6*i) mod 360, i=0..50`
 
-No renderer may add another radial line between the 5 endpoint and the 0 endpoint. This prohibition includes unlabeled pseudo-ticks, decorative hatch marks, repeated rays, and duplicate endpoint marks. The outer circle may continue through the gap but is not a graduation.
+There are exactly 51 active tick positions. No renderer may add another radial line inside the open arc `(300°,360°)`. This prohibition includes unlabeled pseudo-ticks, decorative hatch marks, repeated rays, and duplicate endpoint marks. The outer housing/arc may continue through the gap but is not a graduation.
 
 Canonical label angles are template-locked:
 
-`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+`LABEL_ANGLES={0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`
 
-A familiar-looking alternative orientation is not equivalent unless the entire scale state, endpoints, target mapping and gap geometry are consistently transformed by the owning domain. For the canonical template, the renderer must use the serialized angles exactly.
+Label-order oracle:
+
+`CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`
+
+The renderer must verify both angle association and monotonic label order. A visually plausible but counter-clockwise or scrambled sequence is `CRITICAL_ACADEMIC`.
+
+## Common-center contract
+
+For every radial dial:
+
+`DIAL_CENTER=(cx,cy)`
+`READING_RING_CENTER=DIAL_CENTER`
+`NEEDLE_PIVOT=DIAL_CENTER`
+
+The needle is a radial segment beginning at `DIAL_CENTER` and directed at `target_angle`. Its endpoint must intersect the target graduation on the authoritative reading ring. Moving the pivot to improve composition is forbidden.
 
 ## QA
 
@@ -113,12 +138,14 @@ A familiar-looking alternative orientation is not equivalent unless the entire s
 `PROMPT_NO_FULL_CIRCLE_SUBSTITUTION_QA`
 `PROMPT_DIAL_INTERVAL_POSITION_COUNT_QA`
 `PROMPT_NEEDLE_MAPPING_QA`
+`PROMPT_DIAL_COMMON_CENTER_QA`
 `PROMPT_MINOR_TARGET_DISTRIBUTION_QA`
 `PROMPT_SCALE_LABEL_PRESERVATION_QA`
+`PROMPT_DIAL_LABEL_ORDER_QA`
 `PROMPT_DIAL_GAP_GEOMETRY_SERIALIZATION_QA`
 `PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA`
 `PROMPT_DIAL_ACTIVE_TICK_SET_QA`
 `PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
 `PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
 
-Wrong conversion/arithmetic, full-circle substitution, any radial scale-like mark in the inactive gap, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
+Wrong conversion/arithmetic, reversed/scrambled major-label order, full-circle substitution, any radial scale-like mark in the inactive gap, off-center pivot, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
