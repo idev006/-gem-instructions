@@ -24,6 +24,8 @@ Owning-worker template, topology, active range, intervals, target mapping, minim
 - protractor baseline/scale-direction/shape-integrity audit
 - renderer self-review checklist definition
 - independent recount oracle for learner-read scales
+- local-span recount audit where global counts can hide subdivision errors
+- ruler endpoint projection/reference audit
 - artifact inspection checklist definition
 
 ## RETURNS
@@ -92,6 +94,7 @@ Any independent pivot/origin translation is `CRITICAL_ACADEMIC`.
 - exact active range and exact interval/position count;
 - uniform spacing and monotonic direction;
 - major/intermediate/minor hierarchy without extra positions;
+- local-span topology must agree with global topology when a major span has a declared subdivision grammar;
 - common baseline/ring/arc anchoring;
 - common center/origin for radial/angular geometry;
 - labels aligned to intended marks with clearance and correct value order;
@@ -126,19 +129,40 @@ W07 defines the canonical checklist consumed by W08/W09:
 For every learner-read instrument the renderer-side prompt must require:
 
 1. independent recount of intervals/positions;
-2. check of baseline/ring/arc anchoring;
-3. check common center/origin when radial/angular;
-4. check uniform spacing and major/intermediate/minor hierarchy;
-5. check label alignment, clearance and monotonic order;
-6. no missing/extra/merged/floating tick;
-7. physical-edge-not-a-tick check for ruler/linear scales;
-8. target pointer/hand/ray/level/endpoint alignment;
-9. radial pointer/ray collinearity from the common center;
-10. inactive-region and decoration-isolation check;
-11. template shape/aspect-ratio consistency;
-12. repair/regenerate and full recheck on any mismatch.
+2. independent local-span recount when owning domain defines one;
+3. check of baseline/ring/arc anchoring;
+4. check common center/origin when radial/angular;
+5. check uniform spacing and major/intermediate/minor hierarchy;
+6. check label alignment, clearance and monotonic order;
+7. no missing/extra/merged/floating tick;
+8. physical-edge-not-a-tick check for ruler/linear scales;
+9. endpoint projection/reference check for object-on-ruler tasks;
+10. target pointer/hand/ray/level/endpoint alignment;
+11. radial pointer/ray collinearity from the common center;
+12. inactive-region and decoration-isolation check;
+13. template shape/aspect-ratio consistency;
+14. repair/regenerate and full recheck on any mismatch.
 
 A vague `looks correct` check is insufficient.
+
+## Ruler reference/projection audit
+
+For object-on-ruler measurement:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+`START_PROJECTION_GUIDE_X == OBJECT_START_X`
+`END_PROJECTION_GUIDE_X == OBJECT_END_X`
+
+Projection guides must be thin dashed vertical helper lines, perpendicular to the ruler baseline, visually distinct from ticks and excluded from graduation counts.
+
+For `ZERO_START_MODE` additionally require:
+
+`OBJECT_START_X == ZERO_GRADUATION_X`
+
+The physical ruler edge is not accepted as the start reference when it differs from the zero graduation.
+
+For `NONZERO_START_MODE`, W07 verifies both guides and the visual relation supporting `END_VALUE - START_VALUE`.
 
 ## Minimum size
 
@@ -159,6 +183,14 @@ Expected labels:
 Expected clockwise major-label order:
 
 `[0,1,2,3,4,5]`
+
+Expected local hierarchy for every 1 kg span:
+
+`INTERVALS_PER_KG=10`
+`INTERIOR_POSITIONS_PER_KG_SPAN=9`
+`HALF_KG_INTERMEDIATE_OFFSET=0.5`
+
+The +0.5 kg position is one existing intermediate graduation, longer/more prominent than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks. It must not add a physical position.
 
 Expected gap state:
 
@@ -195,6 +227,15 @@ For 0–50°C @1°C:
 - each 10°C major span contains 10 intervals / 9 interior positions;
 - liquid endpoint lies exactly on target graduation centerline.
 
+## Graduated-container local-span audit
+
+For canonical 0–1000 mL @50 mL with 100 mL major divisions:
+
+`INTERVALS_PER_100ML=2`
+`INTERIOR_POSITIONS_PER_100ML_SPAN=1`
+
+W07 independently recounts every adjacent major span and verifies exactly one interior +50 mL graduation. Multiple short strokes between adjacent 100 mL labels are a failure even when the global labels appear correct.
+
 ## Protractor audit
 
 For 0–180° @1°:
@@ -217,6 +258,7 @@ For 0–180° @1°:
 `PROMPT_INTERVAL_COUNT_QA`
 `PROMPT_POSITION_COUNT_QA`
 `PROMPT_MAJOR_MINOR_QA`
+`PROMPT_LOCAL_SPAN_RECOUNT_QA` when applicable
 `PROMPT_NO_MISSING_TICK_SPEC_QA`
 `PROMPT_NO_EXTRA_TICK_SPEC_QA`
 `PROMPT_NON_SCALE_REGION_QA`
@@ -230,6 +272,7 @@ For 0–180° @1°:
 `PROMPT_INSTRUMENT_COMMON_CENTER_QA` when radial/angular
 `PROMPT_POINTER_ORIGIN_COINCIDENCE_QA` when pointer/ray exists
 `PROMPT_RADIAL_COLLINEARITY_QA` when radial/angular
+`PROMPT_RULER_ENDPOINT_PROJECTION_GUIDE_QA` when object-on-ruler
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA`
 `PROMPT_INSTRUMENT_INDEPENDENT_RECOUNT_QA`
 `PROMPT_INSTRUMENT_REVISE_UNTIL_PASS_QA`
@@ -254,9 +297,9 @@ Before actual image:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 
-If an artifact is supplied, inspect every instructional instrument individually for shape/orientation, range, interval/position count, spacing, anchoring, labels/order, common center/origin, pointer/hand/ray/level, target alignment, no missing/extra/merged marks, inactive-region integrity, distortion and photocopy readability.
+If an artifact is supplied, inspect every instructional instrument individually for shape/orientation, range, global and local interval/position count, spacing, anchoring, labels/order, common center/origin, projection/reference guides, pointer/hand/ray/level, target alignment, no missing/extra/merged marks, inactive-region integrity, distortion and photocopy readability.
 
-For a ruler 1 cm @1 mm, independently verify 10 spaces, 11 endpoint-inclusive positions, 9 interior positions, and no border/decoration acting as an extra graduation.
+For a ruler 1 cm @1 mm, independently verify 10 spaces, 11 endpoint-inclusive positions, 9 interior positions, no border/decoration acting as an extra graduation, and correct endpoint projections for object measurement.
 
 For an open-arc dial, inspect the inactive region independently and count radial marks there; expected count is zero unless the owning domain explicitly defines otherwise.
 
