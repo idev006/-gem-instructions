@@ -80,11 +80,11 @@ checklist=read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md')
 for n,o in [
 ('builder-profile','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in builder),
 ('builder-suite','physical_page_feasibility_regression_suite.py' in builder),
-('builder-total','1364/1364 PASS' in builder),
+('builder-total','1366/1366 PASS' in builder),
 ('validator-profile','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in validator),
 ('validator-suite','physical_page_feasibility_regression_suite.py' in validator),
 ('workflow-suite','Physical page feasibility regression — 48 cases' in workflow),
-('checklist-total','1364/1364 PASS' in checklist),
+('checklist-total','1366/1366 PASS' in checklist),
 ('checklist-shape-aware','shape-aware' in checklist.lower()),
 ]:add(n,o)
 
