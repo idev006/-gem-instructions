@@ -105,7 +105,21 @@ If seconds are explicitly visualized: `second_angle=6*s`
 
 `:15` → 25% to next hour
 `:30` → exactly halfway
-`:45` → 75%
+`:45` → 75% to next hour
+
+Quarter-hour interpolation is mandatory geometry, not optional visual styling.
+
+Canonical quarter-hour relations for any starting hour `h`:
+
+- `h:15` → hour hand displaced `7.5°` from h toward h+1;
+- `h:30` → displaced `15°`;
+- `h:45` → displaced `22.5°`, exactly 75% of the 30° hour sector.
+
+14:45 / 2:45 permanent regression:
+- minute hand = `270°` at numeral 9;
+- hour hand = `82.5°` clockwise from 12;
+- hour hand = exactly 75% of the way from 2 to 3;
+- hard negative: never place the short hand directly on numeral 2.
 
 10:30 regression:
 - minute hand 180° at 6
@@ -178,6 +192,7 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_PER_ITEM_RENDER_STATE_QA`
 `PROMPT_NONZERO_MINUTE_DISPLACEMENT_QA`
 `PROMPT_HALF_HOUR_MIDPOINT_QA`
+`PROMPT_CLOCK_QUARTER_HOUR_INTERPOLATION_QA`
 `PROMPT_DAY_NIGHT_MAPPING_QA`
 `PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
 `PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
@@ -185,4 +200,4 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 `PROMPT_CLOCK_LABEL_PRESERVATION_QA`
 
-Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles, pinned nonzero-minute hour hand, wrong midpoint, Student Blueprint target leak, or filled answer blocks release.
+Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles, pinned nonzero-minute hour hand, wrong quarter/half-hour interpolation, Student Blueprint target leak, or filled answer blocks release.
