@@ -91,6 +91,8 @@ Every learner-read visual item requires an atomic renderer-only state:
 
 `SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL/ENDPOINT + RELATIONAL WORDING + ITEM-SPECIFIC HARD_NEGATIVE`
 
+Every high-risk item therefore carries an explicit **item-specific hard negative** as part of the same atomic state; the underscore form above is the machine-stable key and this phrase is the semantic contract.
+
 Semantic-only instructions such as `show 10:30`, `show 70°`, `show 2.4 kg`, or `show 60 km/h` are insufficient.
 
 Renderer state must be marked `RENDER_ONLY_NOT_FOR_WORKSHEET`.
