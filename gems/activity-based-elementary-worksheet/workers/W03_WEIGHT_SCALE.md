@@ -51,13 +51,27 @@ The canonical classroom orientation is intentionally simple and monotonic:
 - one instructional needle;
 - `NEEDLE_PIVOT == DIAL_CENTER == ACTIVE_TICK_RING_CENTER` exactly.
 
+### Per-kilogram subdivision hierarchy
+
+Every complete 1 kg span must serialize and verify:
+
+`INTERVALS_PER_KG=10`
+`POSITIONS_PER_KG_ENDPOINT_INCLUSIVE=11`
+`INTERIOR_POSITIONS_PER_KG_SPAN=9`
+`HALF_KG_INTERMEDIATE_OFFSET=0.5`
+`HALF_KG_INTERMEDIATE_TICK_REUSES_EXISTING_POSITION=YES`
+
+Within each 1 kg span, the whole-kilogram endpoints are major ticks; the existing +0.5 kg position is an intermediate tick; all other interior 0.1 kg positions are ordinary minor ticks. The +0.5 kg intermediate tick must be visually longer/more prominent than ordinary minor ticks but shorter/weaker than a whole-kilogram major tick. It never creates an extra graduation.
+
 Hard negatives:
 
 - **DO NOT** reverse the label sequence;
 - **DO NOT** rotate labels independently from ticks/needle mapping;
 - **DO NOT** draw a 360° value scale;
 - **DO NOT** continue ticks through the 5→0 gap;
-- **DO NOT** move the needle pivot away from the center used to construct the reading ring.
+- **DO NOT** move the needle pivot away from the center used to construct the reading ring;
+- **DO NOT** render all ten 0.1 kg subdivisions with identical hierarchy when the canonical teaching profile requires the +0.5 kg intermediate tick;
+- **DO NOT** add an extra tick at +0.5 kg.
 
 Target mapping for canonical 0.1 kg profile:
 
@@ -147,5 +161,7 @@ The needle is a radial segment beginning at `DIAL_CENTER` and directed at `targe
 `PROMPT_DIAL_ACTIVE_TICK_SET_QA`
 `PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
 `PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
+`PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA`
+`PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA`
 
-Wrong conversion/arithmetic, reversed/scrambled major-label order, full-circle substitution, any radial scale-like mark in the inactive gap, off-center pivot, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
+Wrong conversion/arithmetic, reversed/scrambled major-label order, wrong per-kilogram subdivision or missing/extra half-kilogram hierarchy mark, full-circle substitution, any radial scale-like mark in the inactive gap, off-center pivot, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
