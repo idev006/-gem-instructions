@@ -6,7 +6,7 @@
 
 ## ACCEPTS
 
-Grade, question type/count, time format, precision, start range, duration bounds, interval, midnight-crossing flag, clock mode, target times, answer format, day/night labels, dual-answer mode.
+Grade, question type/count, time format, precision, start range, duration bounds, interval, exact minute set, midnight-crossing flag, clock mode, target times, answer format.
 
 ## OWNS
 
@@ -15,13 +15,13 @@ Grade, question type/count, time format, precision, start range, duration bounds
 - time-unit conversion
 - time comparison/schedules
 - analog clock hour/minute geometry
-- day/night paired reading
-- **single-clock / two-answer day-night interpretation**
+- day/night paired reading and deterministic Thai day/night mapping
+- half-hour intent normalization
 - time/clock-specific QA
 
 ## RETURNS
 
-Verified canonical time relations, student-visible givens/blanks, clock template requirements, renderer-only clock states, day/night answer-pair state, hard negatives, domain QA requirements.
+Verified canonical time relations, student-visible givens/blanks, clock template requirements, renderer-only clock states, hard negatives, domain QA requirements.
 
 ## MUST_NOT_DECIDE
 
@@ -35,33 +35,19 @@ Final page layout, global render path, ruler/scale/capacity formulas, global ans
 
 Canonical calculation base unit: **seconds** when second precision is active; otherwise minutes are permitted internally.
 
-For `h:m:s`:
-
-`total_seconds = 3600*h + 60*m + s`
-
-For minute-only tasks:
-
-`total_minutes = 60*h + m`
-
+For `h:m:s`: `total_seconds = 3600*h + 60*m + s`
+For minute-only tasks: `total_minutes = 60*h + m`
 Validate minute/second fields 00–59.
 
 ## Time calculation
 
-Same-day duration:
+Same-day duration: `duration=end-start`
 
-`duration=end-start`
-
-Midnight allowed:
-
-`duration=(end+day_length-start) mod day_length`
-
+Midnight allowed: `duration=(end+day_length-start) mod day_length`
 where `day_length=86400 seconds` or `1440 minutes` according to internal precision.
 
-Forward:
-`end=start+duration`
-
-Reverse:
-`start=end-duration`
+Forward: `end=start+duration`
+Reverse: `start=end-duration`
 
 Validate bounds, requested granularity/precision and crossing policy, then independently recompute.
 
@@ -70,6 +56,35 @@ Validate bounds, requested granularity/precision and crossing policy, then indep
 `TIME_PRECISION=HOUR|MINUTE|SECOND`
 
 Use second precision only when explicitly requested or grade/objective warrants it. Do not add a seconds hand to an analog clock unless the learning objective explicitly includes seconds.
+
+## Clock-reading mode resolution
+
+`CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR`
+
+For Thai Grade 3 analog-clock reading, `AUTO` resolves to `DAY_NIGHT_PAIR` by default unless the teacher explicitly requests a single answer/AM-only/PM-only interpretation.
+
+For other grades/profiles, AUTO follows the learning objective and curriculum profile. Explicit valid teacher mode always wins.
+
+When `DAY_NIGHT_PAIR` is active:
+
+`ONE_CLOCK_TWO_ANSWERS=YES`
+`CLOCKS_PER_QUESTION=1`
+`ANSWER_FIELDS_PER_QUESTION=2`
+`DAY_NIGHT_LABELS=กลางวัน,กลางคืน`
+`ANSWER_TIME_FORMAT=24_HOUR` unless explicitly overridden.
+
+## Half-hour intent normalization
+
+Do not confuse granularity with an exact target-minute set.
+
+`MINUTE_GRANULARITY=30` means valid minute positions can be multiples of 30 (`:00` and `:30`).
+
+Teacher wording such as `เน้นเวลาครึ่งชั่วโมง`, `เฉพาะครึ่งชั่วโมง`, `half-hour only`, or equivalent must normalize to:
+
+`TARGET_MINUTE_MODE=EXACT_MINUTE_SET`
+`TARGET_MINUTE_SET={30}`
+
+Therefore a strict half-hour worksheet contains only `hh:30` targets unless the teacher explicitly asks to mix whole-hour items.
 
 ## Clock topology
 
@@ -86,116 +101,65 @@ For `h:m`:
 `minute_angle=6*m`
 `hour_angle=30*(h mod 12)+0.5*m`
 
-If seconds are explicitly visualized:
-
-`second_angle=6*s`
-
-Hour hand moves continuously.
+If seconds are explicitly visualized: `second_angle=6*s`
 
 `:15` → 25% to next hour
 `:30` → exactly halfway
 `:45` → 75%
 
 10:30 regression:
-
 - minute hand 180° at 6
 - hour hand 315°
 - exactly halfway 10–11
 - hard negative: never directly on 10
 
-Every nonzero-minute item includes displacement relation and item-specific negative.
+Every nonzero-minute item includes **all four** renderer-state components:
 
-## DAY_NIGHT_PAIR — canonical single-face behavior
+`SEMANTIC TARGET + EXACT NUMERIC ANGLES + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
 
-When the user requests one clock image to answer both daytime and nighttime, normalize to:
+Missing numeric hand angles for a high-risk clock item blocks prompt release.
 
-`CLOCK_READING_MODE=DAY_NIGHT_PAIR`
-`ONE_CLOCK_TWO_ANSWERS=YES`
-`CLOCKS_PER_QUESTION=1`
-`ANSWER_FIELDS_PER_QUESTION=2`
-`DAY_NIGHT_LABELS=กลางวัน,กลางคืน`
-`ANSWER_TIME_FORMAT=24_HOUR` unless explicitly overridden
+## Deterministic Thai day/night mapping
 
-**Non-negotiable composition:**
+For one 12-hour analog face `h12:m`, preserve the minute (and second when active) and map the two 24-hour interpretations deterministically:
 
-`1 QUESTION = EXACTLY 1 ANALOG CLOCK FACE + EXACTLY 2 BLANK ANSWER FIELDS`
+- `h12 = 1..5`: `กลางวัน = h12+12`, `กลางคืน = h12`
+- `h12 = 6..11`: `กลางวัน = h12`, `กลางคืน = h12+12`
+- `h12 = 12`: `กลางวัน = 12`, `กลางคืน = 00`
 
-Student-visible default:
+Examples:
+- face 01:30 → กลางวัน 13:30 | กลางคืน 01:30
+- face 05:30 → กลางวัน 17:30 | กลางคืน 05:30
+- face 06:30 → กลางวัน 06:30 | กลางคืน 18:30
+- face 10:30 → กลางวัน 10:30 | กลางคืน 22:30
+- face 12:30 → กลางวัน 12:30 | กลางคืน 00:30
+
+Never render `24:xx`; use `00:xx`.
+
+One question = one clock + two blank response fields in DAY_NIGHT_PAIR mode. Both answers refer to the **same single hand state**.
+
+Default student-visible response line:
 
 `กลางวัน ........ น. | กลางคืน ........ น.`
 
-Do **not** create a separate daytime clock and nighttime clock for the same question.
+## Visibility hard rule
 
-The clock geometry is drawn once. Both answers are interpretations of the **same hand positions**.
+`STUDENT_CONTENT_BLUEPRINT` is a student-visible semantic structure. It MUST NOT contain:
 
-### Pair mapping
+- `RENDER_ONLY_NOT_FOR_WORKSHEET` blocks
+- semantic target times
+- paired day/night answer values
+- hand angles
+- target tick/index values
+- renderer relation strings
 
-Let the analog face represent canonical 12-hour value `h12:m`.
+Clock target time/angles belong only to INTERNAL state and teacher-visible renderer metadata in the Final Prompt, marked `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
 
-For ordinary paired elementary practice, the two 24-hour interpretations must:
-
-- preserve the same minute value;
-- preserve the same second value if seconds are active;
-- differ by exactly 12 hours modulo 24.
-
-Canonical pair examples:
-
-- 1:30 ↔ 13:30
-- 7:00 ↔ 19:00
-- 10:30 ↔ 22:30
-- 12:15 ↔ 00:15
-
-For a 12-o'clock face, the pair is `12:xx` and `00:xx`; do not output `24:xx`.
-
-If the requested labels are specifically `กลางวัน` and `กลางคืน`, use the pedagogical mapping defined by the task/profile and verify it internally before release. Do not invent contextual AM/PM cues that contradict the intended pair.
-
-### Student-safe blueprint
-
-Student Blueprint contains only:
-
-- neutral item ID
-- one neutral clock template reference
-- two blank fields with the requested labels
-
-It must not contain either paired target time.
-
-### Renderer metadata
-
-Final Prompt contains one renderer-only clock state per question:
-
-`SEMANTIC_TARGET_12H + MINUTE_ANGLE + HOUR_ANGLE + RELATIONAL_WORDING + ITEM_SPECIFIC_HARD_NEGATIVE`
-
-Mark:
-
-`RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
-
-The two internal day/night answer values may be used for verification, but they must not be printed when `SHOW_ANSWER_KEY=NO`.
-
-### Hard negatives
-
-For DAY_NIGHT_PAIR:
-
-- **DO NOT draw two clocks for one question.**
-- **DO NOT change hand positions between daytime and nighttime answers.**
-- **DO NOT print either target time beside/inside the clock.**
-- **DO NOT fill either answer blank.**
-- **DO NOT remove canonical clock numerals merely to hide target values.**
-
-## Day/night pair source specification
-
-Detailed feature contract:
-
-`domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md`
-
-## Visibility
-
-Clock target time/angles and paired answers belong to teacher-visible/internal state. Student Blueprint must not contain target time or angle.
-
-Clock numerals 1–12 remain visible when configured; leak guards prohibit target-time text, not face numerals.
+Clock numerals 1–12 remain visible when configured.
 
 ## Grade progression
 
-Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/TIME_ENGINE.md`.
+Use `domains/MEASUREMENT_COVERAGE_P1_P6.md`, `domains/TIME_ENGINE.md`, and `domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md`.
 
 Do not introduce second precision, complex regrouping or midnight crossing merely because grade is higher; follow the learning objective.
 
@@ -207,14 +171,18 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_TIME_FORWARD_REVERSE_QA`
 `PROMPT_TIME_CROSSING_QA`
 `PROMPT_TIME_SCHEDULE_QA`
+`PROMPT_CLOCK_MODE_RESOLUTION_QA`
+`PROMPT_HALF_HOUR_INTENT_QA`
 `PROMPT_CLOCK_TOPOLOGY_QA`
 `PROMPT_CLOCK_HAND_FORMULA_QA`
+`PROMPT_PER_ITEM_RENDER_STATE_QA`
 `PROMPT_NONZERO_MINUTE_DISPLACEMENT_QA`
 `PROMPT_HALF_HOUR_MIDPOINT_QA`
 `PROMPT_DAY_NIGHT_MAPPING_QA`
 `PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
 `PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
 `PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA`
+`PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 `PROMPT_CLOCK_LABEL_PRESERVATION_QA`
 
-Wrong unit conversion, time relation, hand formula, pinned nonzero-minute hour hand, wrong midpoint, wrong day/night pair, two clocks for one paired question, changed hand state between pair interpretations, or leaked clock answer blocks release.
+Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles, pinned nonzero-minute hour hand, wrong midpoint, Student Blueprint target leak, or filled answer blocks release.
