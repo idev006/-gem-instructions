@@ -1,10 +1,12 @@
 # Scale-Line Integrity Profile — All Learner-Read Scales
 
-Version: 1.2.0
+Version: 1.3.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
-Primary auditor: `W07_INSTRUMENT_AUDITOR`
+Primary geometry auditor: `W07_INSTRUMENT_AUDITOR`
+Independent metrology auditor: `W10_METROLOGY_ENGINEER`
 Companion prevention profile: `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+Companion independent audit: `policies/METROLOGY_ASSURANCE_PROFILE.md`
 
 Applies whenever a learner reads graduations, ticks, marks, grid/axis intervals, or a pointer/level against a scale, including:
 
@@ -17,7 +19,7 @@ Applies whenever a learner reads graduations, ticks, marks, grid/axis intervals,
 - semicircular/full-circle protractors
 - learner-read graph axes
 
-This profile complements domain formulas. Owning domain workers define values/topology; this profile protects the physical/visual integrity of the scale lines used to represent them. The companion review-revise profile requires the downstream renderer to recount and repair learner-read instruments before finalization.
+This profile complements domain formulas. Owning domain workers define values/topology; W07 protects geometric construction; W10 independently verifies metrology feasibility and quantitative scale evidence; the review-revise profile requires the downstream renderer to recount and repair learner-read instruments before finalization.
 
 ## 1. Core rule
 
@@ -27,7 +29,7 @@ A scale line is academic data.
 
 Missing, extra, merged, floating, uneven, misaligned, reversed, occluded, or visually ambiguous graduations are critical academic defects when the learner must read them.
 
-A scale is not valid merely because its interval count is numerically correct. The final printed geometry must also preserve independently verifiable spacing, anchoring, hierarchy, direction, labels, and target alignment.
+A scale is not valid merely because its interval count is numerically correct. The final printed geometry must also preserve independently verifiable spacing, anchoring, hierarchy, direction, labels, target alignment, and metrology feasibility.
 
 ## 2. Mandatory scale-line specification
 
@@ -149,6 +151,8 @@ For a 0–180° protractor at 1° resolution and the default 0.60 mm minimum:
 `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM = 70 mm`
 
 A 65 mm diameter protractor fails this spacing oracle because its 1° arc spacing is only about 0.567 mm. It must not pass `PROMPT_SCALE_PRINT_SEPARATION_QA`.
+
+W10 independently recomputes the print-spacing oracle and returns `PROMPT_METROLOGY_SPACING_ORACLE_QA` evidence; copying W07's value is insufficient.
 
 `PROMPT_SCALE_PRINT_SEPARATION_QA` is mandatory.
 
@@ -295,15 +299,18 @@ For dense radial instruments, serialize the computed `PRINT_SPACING_ORACLE` resu
 
 `PROMPT_SCALE_LINE_SERIALIZATION_QA` blocks release if the final prompt leaves scale-line geometry to renderer invention.
 
-## 15. Mandatory renderer review linkage
+## 15. Mandatory renderer review + independent metrology linkage
 
-For every learner-read instrument, scale-line rules must be consumed by the mandatory `INSTRUMENT_REVIEW_REVISE_PROTOCOL`.
+For every learner-read instrument, scale-line rules must be consumed by both:
 
-The renderer must independently recount/rederive the visible scale against this profile and the owning domain state. If any count, spacing, anchoring, label, target-alignment or inactive-region mismatch is detected, repair/regenerate and re-run the entire instrument checklist before finalization.
+- `INSTRUMENT_REVIEW_REVISE_PROTOCOL`; and
+- W10 `METROLOGY_AUDIT_STATE` from `METROLOGY_ASSURANCE_PROFILE.md`.
+
+The renderer must independently recount/rederive the visible scale against this profile and the owning domain state. W10 separately recomputes quantitative evidence before W09 release. If any count, spacing, anchoring, label, target-alignment or inactive-region mismatch is detected, repair/regenerate and re-run the entire instrument checklist before finalization.
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-Renderer self-review remains a prevention layer and does not prove actual artifact correctness.
+Renderer self-review and W10 prompt audit remain prevention layers and do not prove actual artifact correctness.
 
 ## 16. Artifact phase
 
@@ -348,5 +355,7 @@ One incorrect instructional scale blocks classroom release.
 `PROMPT_SCALE_LINE_SERIALIZATION_QA`
 `PROMPT_PROTRACTOR_ACTIVE_SCALE_QA` when applicable
 `PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
+`PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
+`PROMPT_METROLOGY_INDEPENDENCE_QA`
 
 Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
