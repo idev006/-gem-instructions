@@ -44,15 +44,18 @@ jobs:
       - name: Scale-line integrity regression — 40 cases
         run: python gems/activity-based-elementary-worksheet/tools/scale_line_integrity_regression_suite.py
 
+      - name: Instrument review + speedometer regression — 60 cases
+        run: python gems/activity-based-elementary-worksheet/tools/instrument_review_speedometer_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
       - name: Verify ZIP
-        run: python -m zipfile -t gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT.zip
+        run: python -m zipfile -t gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.2_LTS_9WORKERS_TXT.zip
 
       - name: Upload installation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT
-          path: gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT.zip
+          name: activity-based-elementary-worksheet_Gem_v2.6.2_LTS_9WORKERS_TXT
+          path: gems/activity-based-elementary-worksheet/dist/activity-based-elementary-worksheet_Gem_v2.6.2_LTS_9WORKERS_TXT.zip
           if-no-files-found: error
