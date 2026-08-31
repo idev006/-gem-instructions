@@ -77,6 +77,31 @@ Canonical dial labels 0–5 remain visible. Leak guard forbids target-specific v
 
 Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/SCALE_READING_ENGINE.md`.
 
+## Inactive-gap exclusion contract
+
+For the canonical 0–5 kg dial, W03 must return an explicit gap object in the renderer state rather than relying on prose such as `leave a gap`:
+
+`ACTIVE_START_ANGLE=240°`
+`ACTIVE_END_ANGLE=180°`
+`ACTIVE_SWEEP_DEG=300°`
+`INACTIVE_GAP_START_ANGLE=180°`
+`INACTIVE_GAP_END_ANGLE=240°`
+`INACTIVE_GAP_SWEEP_DEG=60°`
+`INACTIVE_GAP_TICK_COUNT=0`
+`INACTIVE_GAP_RADIAL_MARK_COUNT=0`
+
+Active positions are exactly:
+
+`active_tick_angle(i)=(240+6*i) mod 360, i=0..50`
+
+No renderer may add another radial line between the 5 endpoint and the 0 endpoint. This prohibition includes unlabeled pseudo-ticks, decorative hatch marks, repeated rays, and duplicate endpoint marks. The outer circle may continue through the gap but is not a graduation.
+
+Canonical label angles are template-locked:
+
+`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+
+A familiar-looking alternative orientation is not equivalent unless the entire scale state, endpoints, target mapping and gap geometry are consistently transformed by the owning domain. For the canonical template, the renderer must use the serialized angles exactly.
+
 ## QA
 
 `PROMPT_WEIGHT_UNIT_COMPATIBILITY_QA`
@@ -90,5 +115,10 @@ Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/SCALE_READING_ENGINE.md
 `PROMPT_NEEDLE_MAPPING_QA`
 `PROMPT_MINOR_TARGET_DISTRIBUTION_QA`
 `PROMPT_SCALE_LABEL_PRESERVATION_QA`
+`PROMPT_DIAL_GAP_GEOMETRY_SERIALIZATION_QA`
+`PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA`
+`PROMPT_DIAL_ACTIVE_TICK_SET_QA`
+`PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
+`PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
 
-Wrong conversion/arithmetic, full-circle substitution, ticks in gap, wrong target mapping, or label/target leak blocks release.
+Wrong conversion/arithmetic, full-circle substitution, any radial scale-like mark in the inactive gap, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
