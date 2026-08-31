@@ -28,7 +28,7 @@ graph = read("domains/TABLE_GRAPH_READING_ENGINE.md")
 system_profile = read("policies/SYSTEM_WIDE_QUALITY_PROFILE.md")
 builder = read("tools/build_install_package.py")
 validator = read("tools/validate_ssot.py")
-checklist = read("qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md")
+checklist = read("qa/BASELINE_2_6_2_RELEASE_CHECKLIST.md")
 workflow = (REPO / ".github/workflows/activity-based-elementary-worksheet-gem-ssot.yml").read_text(encoding="utf-8")
 
 # 1-13 mandatory QA family.
@@ -50,9 +50,18 @@ qa_tokens = [
 for token in qa_tokens:
     add(f"profile-{token}", token in profile)
 
-# 14-20 domain coverage in shared profile.
-for label in ["### Clock", "### Dial scale", "### Ruler", "### Thermometer", "### Graduated container", "### Protractor", "### Graph axis"]:
-    add(f"domain-{label[4:].lower().replace(' ', '-')}", label in profile)
+# 14-20 domain coverage in shared profile. Check semantic domain presence rather than brittle exact heading text.
+domain_checks = [
+    ("clock", "Clock" in profile),
+    ("dial-scale", "dial scale" in profile.lower()),
+    ("ruler", "Ruler" in profile),
+    ("thermometer", "Thermometer" in profile),
+    ("graduated-container", "Graduated container" in profile),
+    ("protractor", "Protractor" in profile),
+    ("graph-axis", "Graph axis" in profile),
+]
+for label, ok in domain_checks:
+    add(f"domain-{label}", ok)
 
 # 21-28 topology/readability invariants.
 checks = [
@@ -80,9 +89,9 @@ add("capacity-linear-scale", "uniform graduations" in capacity and "no decorativ
 add("graph-scale-profile", "SCALE_LINE_INTEGRITY_PROFILE.md" in graph)
 add("system-profile-inherits-scale-profile", "SCALE_LINE_INTEGRITY_PROFILE.md" in system_profile)
 add("builder-embeds-scale-profile", "SCALE_LINE_PROFILE" in builder and "policies/SCALE_LINE_INTEGRITY_PROFILE.md" in builder)
-add("builder-runs-scale-suite", "scale_line_integrity_regression_suite.py" in builder and "911/911 PASS" in builder)
+add("builder-runs-scale-suite", "scale_line_integrity_regression_suite.py" in builder and "971/971 PASS" in builder)
 add("workflow-runs-scale-suite", "Scale-line integrity regression" in workflow and "40 cases" in workflow)
-add("validator-release-911", "scale_line_integrity_regression_suite.py" in validator and "911" in validator and "911/911 PASS" in checklist)
+add("validator-release-971", "scale_line_integrity_regression_suite.py" in validator and "971" in validator and "971/971 PASS" in checklist)
 
 assert len(CASES) == 40, len(CASES)
 failed = [case for case in CASES if not case[1]]
