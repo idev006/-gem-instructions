@@ -12,8 +12,10 @@ Owning-domain verified state, `SCALE_LINE_SPEC`, W07 audit state, resolved or ca
 
 - independent metrology verification for every learner-read measuring instrument/axis;
 - interval/position recount independent of owning worker;
+- local-span recount independent of global count when a major-span subdivision grammar exists;
 - physical print-spacing oracle;
 - zero/reference/origin/baseline correctness audit;
+- ruler object-endpoint/reference-projection audit;
 - common-center/common-origin coincidence audit for radial/angular instruments;
 - scale-direction and monotonicity audit;
 - major/intermediate/minor hierarchy audit without extra positions;
@@ -60,8 +62,12 @@ Examples:
 - speedometer 0–120 @10 → 12/13 active topology + common-center oracle;
 - protractor 0–180 @1° → 180/181 + radial spacing + perfect-semicycle/common-origin oracle;
 - thermometer → endpoint-inclusive count + hierarchy recount + exact target index;
-- container → exact count + configured meniscus/read convention;
+- container → exact count + configured meniscus/read convention + local-span recount when major/minor ratio is declared;
 - graph axis → numeric interval mapped to uniform physical spacing.
+
+`LOCAL_SPAN_RECOUNT_CHECK` is mandatory whenever a global count can conceal a wrong number of subdivisions between adjacent major labels.
+
+`REFERENCE_PROJECTION_CHECK` is mandatory for object-on-ruler tasks where endpoints are projected to graduations.
 
 ## Common-center / common-origin metrology
 
@@ -177,6 +183,39 @@ Mandatory W10 audit applies to:
 - graph axis;
 - any future learner-read graduated instrument.
 
+## Clock independent oracle
+
+For any `h:m` analog clock:
+
+`minute_angle=6*m`
+`hour_angle=30*(h mod 12)+0.5*m`
+
+For nonzero minutes, W10 independently verifies displacement from the starting hour numeral. Quarter-hour checkpoints:
+
+- :15 → 25% of the hour sector;
+- :30 → 50%;
+- :45 → 75%.
+
+For 14:45/2:45, expected hour angle is 82.5° and direct placement on numeral 2 is rejected.
+
+## Ruler independent reference oracle
+
+For object-on-ruler tasks:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+
+and, when guides are needed:
+
+`START_PROJECTION_GUIDE_X == OBJECT_START_X`
+`END_PROJECTION_GUIDE_X == OBJECT_END_X`
+
+For ZERO_START_MODE additionally require `OBJECT_START_X == ZERO_GRADUATION_X`; the physical ruler edge cannot substitute for zero when the two x-coordinates differ.
+
+For NONZERO_START_MODE independently recompute `TARGET_LENGTH=END_VALUE-START_VALUE`.
+
+Required evidence: `REFERENCE_PROJECTION_CHECK`.
+
 ## Weight-dial independent oracle
 
 For canonical 0–5 kg / 0.1 kg:
@@ -203,13 +242,23 @@ Canonical order:
 
 `CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`
 
-W10 independently verifies active set, zero-gap radial marks, label-to-tick association, clockwise order, and:
+Per-kg local hierarchy:
+
+`INTERVALS_PER_KG=10`
+`INTERIOR_POSITIONS_PER_KG_SPAN=9`
+`HALF_KG_INTERMEDIATE_OFFSET=0.5`
+
+The +0.5 kg mark is an existing intermediate position, not an added tick, and must have visible intermediate hierarchy.
+
+W10 independently verifies active set, per-kg local span, zero-gap radial marks, label-to-tick association, clockwise order, and:
 
 `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`.
 
 Required evidence:
 
 `ACTIVE_TICK_SET_CHECK`
+`LOCAL_SPAN_RECOUNT_CHECK`
+`HIERARCHY_CHECK`
 `INACTIVE_GAP_ANGLE_CHECK`
 `INACTIVE_GAP_RADIAL_MARK_COUNT`
 `CANONICAL_LABEL_ANGLE_CHECK`
@@ -239,6 +288,18 @@ Canonical 0–50°C @1°C:
 - target liquid endpoint = target tick centerline;
 - 60 mm selected scale length → exactly 1.20 mm spacing.
 
+## Graduated-container independent oracle
+
+Canonical 0–1000 mL @50 mL with major interval 100 mL:
+
+- 20 intervals /21 positions globally;
+- each 100 mL major span = exactly 2 intervals /3 endpoint-inclusive positions;
+- each 100 mL span has exactly 1 interior position at +50 mL;
+- the +50 mL tick is intermediate/minor hierarchy and does not add a position;
+- every adjacent major span is independently recounted before PASS.
+
+Required evidence: `LOCAL_SPAN_RECOUNT_CHECK`.
+
 ## Protractor independent oracle
 
 Canonical 0–180° @1°:
@@ -259,11 +320,13 @@ Canonical 0–180° @1°:
 `INSTRUMENT_FAMILY`
 `TOPOLOGY_CHECK`
 `COUNT_ORACLE`
+`LOCAL_SPAN_RECOUNT_CHECK` when applicable
 `SPACING_ORACLE`
 `METROLOGY_MINIMUM_SIZE_MM`
 `SELECTED_RENDER_SIZE_MM`
 `SIZE_ORACLE_SOURCE`
 `REFERENCE_ORIGIN_CHECK`
+`REFERENCE_PROJECTION_CHECK` when object endpoints project to a scale
 `COMMON_CENTER_CHECK` when radial/angular
 `POINTER_ORIGIN_COINCIDENCE_CHECK` when pointer/ray exists
 `RADIAL_COLLINEARITY_CHECK` when radial/angular
@@ -287,7 +350,9 @@ Canonical 0–180° @1°:
 `PROMPT_METROLOGY_INDEPENDENCE_QA`
 `PROMPT_METROLOGY_INTERVAL_COUNT_QA`
 `PROMPT_METROLOGY_POSITION_COUNT_QA`
+`PROMPT_METROLOGY_LOCAL_SPAN_RECOUNT_QA` when applicable
 `PROMPT_METROLOGY_REFERENCE_QA`
+`PROMPT_METROLOGY_REFERENCE_PROJECTION_QA` when applicable
 `PROMPT_METROLOGY_COMMON_CENTER_QA` when radial/angular
 `PROMPT_METROLOGY_RADIAL_COLLINEARITY_QA` when radial/angular
 `PROMPT_METROLOGY_SPACING_ORACLE_QA`
@@ -317,7 +382,7 @@ W10 prompt audit does not prove pixels.
 Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 
-If a rendered instrument is supplied, independently inspect visible tick count, spacing, anchoring, labels/order, common center/origin, target alignment, shape integrity and print readability. For open-arc dials, count radial marks in the inactive region independently; any count above zero is a critical topology defect.
+If a rendered instrument is supplied, independently inspect visible tick count, local-span subdivision count, spacing, anchoring, labels/order, reference projections, common center/origin, target alignment, shape integrity and print readability. For open-arc dials, count radial marks in the inactive region independently; any count above zero is a critical topology defect.
 
 One wrong instructional scale means:
 
