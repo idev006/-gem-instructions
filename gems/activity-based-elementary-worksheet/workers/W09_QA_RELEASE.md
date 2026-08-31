@@ -6,7 +6,7 @@
 
 ## ACCEPTS
 
-Route decision, selected worker outputs, normalized spec with provenance, Student Blueprint, layout blueprint, render constraints, `SCALE_LINE_SPEC`, instrument review/revise protocol, and final prompt draft.
+Route decision, owning-worker outputs, normalized spec/provenance, Student Blueprint, W07 geometry audit, W10 `METROLOGY_AUDIT_STATE`, layout blueprint, render constraints, resolved `SCALE_LINE_SPEC`, review/revise protocol, and final prompt draft.
 
 ## OWNS
 
@@ -16,19 +16,20 @@ Route decision, selected worker outputs, normalized spec with provenance, Studen
 - prompt completeness/copy-readiness
 - measurement/global regression gates
 - scale-line integrity release gates
+- independent metrology release gates
 - renderer review/revise protocol gates
-- provenance checks for locked behaviors
+- page/render-path/provenance gates
 - prompt-vs-artifact phase semantics
 - release decision
 - installation health/self-check
 
 ## RETURNS
 
-QA report, prompt-release decision, artifact phase status, classroom-release status and repair instructions when blocked.
+QA report, `PROMPT_RELEASE` decision, artifact status, classroom status and repair instructions when blocked.
 
 ## MUST_NOT_DECIDE
 
-Academic formulas, domain target values, instrument topology, page design or Thai wording except detecting violations.
+Academic formulas, domain target values, instrument topology, metrology formulas owned by W10 profile, page design or Thai wording except detecting violations.
 
 ## Installation health
 
@@ -43,49 +44,62 @@ Required base worker IDs:
 `W07_INSTRUMENT_AUDITOR`
 `W08_LAYOUT_RENDER_THAI`
 `W09_QA_RELEASE`
+`W10_METROLOGY_ENGINEER`
 
-Every base worker must declare `BASELINE_COMPATIBILITY=2.6.x` and `WORKER_SCHEMA_VERSION=1`.
+All declare `BASELINE_COMPATIBILITY=2.6.x` and `WORKER_SCHEMA_VERSION=1`.
 
-Mandatory shared runtime profiles for learner-read instruments:
+Mandatory shared runtime profiles:
 
 - `policies/SYSTEM_WIDE_QUALITY_PROFILE.md`
 - `policies/SCALE_LINE_INTEGRITY_PROFILE.md`
 - `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+- `policies/METROLOGY_ASSURANCE_PROFILE.md`
+
+`KB_COMPATIBILITY_QA=FAIL` if any base worker/profile is missing or incompatible.
 
 ## Routing/ownership QA
 
-Only owning academic workers generate domain truth. W07 audits learner-read geometry. W08 owns layout/render/Thai and review-protocol serialization. W09 owns integration release.
+Only owning academic workers generate domain truth. W07 independently audits geometry/topology. W10 independently audits metrology/print feasibility. W08 owns layout/render/Thai and review serialization. W09 owns integration/release.
 
-Cross-worker academic override = FAIL.
+Every learner-read instrument route must include owning worker + `W07 + W10 + W08 + W09`.
+
+Cross-worker academic override = FAIL. W10 may reject unsafe instrument geometry but may not invent targets or override W02–W06 formulas.
 
 ## Hard Student Blueprint isolation
 
-`STUDENT_CONTENT_BLUEPRINT` is student-visible semantics only.
+`STUDENT_CONTENT_BLUEPRINT` contains student-visible semantics only.
 
-Forbidden hidden target classes include renderer-only markers, target values, paired day/night answers, hand/needle/ray angles, target tick/index/endpoint/liquid level, solved vectors, renderer relations or hard negatives.
+Forbidden: renderer-only markers, target values, paired answers, hand/needle/ray angles, target tick/index/endpoint/liquid level, solved vectors, renderer relations/hard negatives, W07 audit state, W10 metrology state.
 
-Any such leak:
+Any leak:
 
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA=FAIL`
 `PROMPT_RELEASE=BLOCKED`
 
-No sanitizer may convert a structurally invalid Student Blueprint into PASS.
+No sanitizer may convert a structurally invalid blueprint into PASS.
 
 ## Instrument academic-safety hard gate
 
-When a learner reads an instrument, the visible scale is academic data. Prompt release requires all applicable domain, scale-line and renderer review/revise gates to PASS.
+When a learner reads an instrument, visible geometry is academic data. Release requires:
 
-The final prompt must contain an `INSTRUMENT_REVIEW_REVISE_PROTOCOL` or exact semantic equivalent requiring:
+1. owning-domain academic state PASS;
+2. W07 geometry/scale audit PASS;
+3. W10 independent metrology audit PASS;
+4. W08 layout/render constraints PASS;
+5. renderer review/revise protocol present;
+6. all applicable W09 gates PASS.
 
-`GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
-
-and:
+Final prompt includes:
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-The protocol must require deterministic recount and exact target-alignment checks. A vague `looks correct` instruction is insufficient.
+and:
 
-Mandatory review/revise gates:
+`GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
+
+A vague `looks correct` review is insufficient.
+
+Required review gates:
 
 `PROMPT_NO_FIRST_PASS_INSTRUMENT_RELEASE_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA`
@@ -94,13 +108,34 @@ Mandatory review/revise gates:
 `PROMPT_INSTRUMENT_REVIEW_EVIDENCE_QA`
 `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA`
 
-Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
+## Independent W10 metrology hard gate
+
+Every canonical learner-read instrument template requires `METROLOGY_AUDIT_STATE` with independent quantitative evidence. W10 must not copy W07's conclusion.
+
+Mandatory applicable gates:
+
+`PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
+`PROMPT_METROLOGY_INDEPENDENCE_QA`
+`PROMPT_METROLOGY_INTERVAL_COUNT_QA`
+`PROMPT_METROLOGY_POSITION_COUNT_QA`
+`PROMPT_METROLOGY_REFERENCE_QA`
+`PROMPT_METROLOGY_SPACING_ORACLE_QA`
+`PROMPT_METROLOGY_HIERARCHY_QA`
+`PROMPT_METROLOGY_LABEL_ASSOCIATION_QA`
+`PROMPT_METROLOGY_TARGET_ALIGNMENT_QA`
+`PROMPT_METROLOGY_INACTIVE_REGION_QA` when applicable
+`PROMPT_METROLOGY_TEMPLATE_CONSISTENCY_QA`
+`PROMPT_METROLOGY_RENDER_PATH_QA`
+`PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
+`PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
+
+Missing, copied, contradictory, FAIL or NOT_RUN metrology evidence forces `PROMPT_RELEASE=BLOCKED`.
 
 ## Scale-line hard gates
 
-For every learner-read scale, require resolved `SCALE_LINE_SPEC` and all applicable gates from `SCALE_LINE_INTEGRITY_PROFILE.md`, including exact topology/count, anchoring, spacing, hierarchy, labels, target alignment, inactive-region integrity, decoration isolation and template consistency.
+For every learner-read scale require resolved `SCALE_LINE_SPEC` and exact topology/count, anchoring, spacing, hierarchy, labels, target alignment, inactive-region integrity, decoration isolation and template consistency.
 
-Critical gates include:
+Critical gates:
 
 `PROMPT_SCALE_LINE_SPEC_QA`
 `PROMPT_SCALE_TICK_ANCHOR_QA`
@@ -117,9 +152,9 @@ Critical gates include:
 `PROMPT_SCALE_TEMPLATE_CONSISTENCY_QA`
 `PROMPT_SCALE_LINE_SERIALIZATION_QA`
 
-## Actual ruler extra-tick regression — permanent
+## Permanent ruler extra-tick regression
 
-For any ruler with 1 mm minor resolution, independently verify every canonical 1 cm span:
+For ruler 1 mm resolution, every complete 1 cm span independently verifies:
 
 `1 cm = 10 mm`
 `INTERVALS_PER_CM=10`
@@ -127,26 +162,25 @@ For any ruler with 1 mm minor resolution, independently verify every canonical 1
 `INTERIOR_POSITIONS_PER_CM_SPAN=9`
 `PHYSICAL_EDGE_IS_GRADUATION=NO`
 
-A 5 mm hierarchy mark occupies an existing position; it never adds a new position.
+A 5 mm hierarchy mark occupies an existing position and never adds a position.
 
-Extra/missing ruler graduations, border-as-tick, nonuniform spacing or merged ticks are critical blockers.
-
-Required gates:
-
+Required:
 `PROMPT_RULER_SUBDIVISION_COUNT_QA`
 `PROMPT_RULER_EDGE_NOT_TICK_QA`
+
+Extra/missing marks, border-as-tick, nonuniform spacing or merged ticks block release.
 
 ## Clock/day-night hard gates
 
 For Thai Grade 3 analog-clock requests with AUTO, resolve to `DAY_NIGHT_PAIR` unless explicit SINGLE intent.
 
-Paired mode requires one face, exactly two blank fields, deterministic day/night mapping, same hand state, identical minute/second components, 12-hour separation modulo 24, and no target values in Student Blueprint.
+Paired mode requires one face, exactly two blank fields, deterministic day/night mapping, same hand state, identical minute/second components, 12-hour separation modulo 24, and no targets in Student Blueprint.
 
-Strict half-hour intent requires minute=30 only unless explicit mixed whole-hour request.
+Strict half-hour intent means minute=30 only unless explicitly mixed.
 
 Each high-risk clock item requires semantic target + exact numeric angles + relational wording + item-specific hard negative.
 
-Applicable mandatory clock gates:
+Applicable gates:
 
 `PROMPT_CLOCK_MODE_RESOLUTION_QA`
 `PROMPT_HALF_HOUR_INTENT_QA`
@@ -157,43 +191,27 @@ Applicable mandatory clock gates:
 `PROMPT_PER_ITEM_RENDER_STATE_QA`
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 
-Any FAIL above forces `PROMPT_RELEASE=BLOCKED`.
-
 ## Protractor hard gates
 
-For learner-read semicircular 0–180° protractors, especially at 1° resolution, scale placement is release-critical academic data.
+Canonical 0–180° @1°:
+- 180 equal intervals /181 endpoint-inclusive positions;
+- exact origin/baseline/direction/target ray;
+- deterministic instrument geometry;
+- one clearly active scale unless dual-scale reading is explicitly taught.
 
-Canonical 1° topology:
-
-- exactly 180 equal intervals / 181 endpoint-inclusive positions;
-- exact origin;
-- explicit baseline 0° direction;
-- exact target ray through the configured graduation;
-- no perspective/skew;
-- one clearly active reading direction unless dual-scale interpretation is explicitly taught.
-
-Printed spacing must be independently verified at the authoritative reading ring:
+Independent radial print-spacing oracle:
 
 `tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`
 
-For 1° and `MIN_TICK_CENTER_SPACING_MM=0.60`:
+At 1° and 0.60 mm floor:
 
 `MIN_READING_RADIUS_MM≈34.38`
 `MIN_READING_RING_DIAMETER_MM≈68.76`
 `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
 
-A 65 mm protractor therefore fails print-spacing QA at 1° resolution (~0.567 mm per interval).
+65 mm gives ~0.567 mm spacing and fails.
 
-A final prompt for learner-read 1° protractor geometry must not contain unresolved `RENDER_PATH=AUTO`; the instrument layer must be deterministic vector geometry. If exact theme art is desired, it remains isolated from the instrument geometry.
-
-A mirrored competing inner scale is forbidden by default. If item verification references 5° ticks, 5° intermediate marks are REQUIRED and must reuse existing 1° positions rather than add positions.
-
-If user-explicit `ONE_PAGE_LOCK=ON` cannot preserve 70 mm minimum width, labels, margins and answer space, then:
-
-`PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`
-`PROMPT_RELEASE=BLOCKED`
-
-Do not shrink the scale below the verified minimum.
+If 5° relations are referenced, 5° intermediate marks are REQUIRED but reuse existing 1° positions.
 
 Applicable gates:
 
@@ -208,23 +226,21 @@ Applicable gates:
 
 ## Speedometer hard gates
 
-Direct speedometer reading routes to `W04 + W07 + W08 + W09` and uses `SPEEDOMETER_READING_ENGINE.md`.
+Direct speedometer reading routes to `W04 + W07 + W10 + W08 + W09` and uses `SPEEDOMETER_READING_ENGINE.md`.
 
-Canonical elementary default unless explicitly overridden:
-
+Canonical default:
 - 0–120 km/h;
 - 240° active open arc starting at 240°, clockwise;
 - major 20 km/h;
 - minor 10 km/h;
-- 12 intervals / 13 active positions;
-- 120° inactive gap with zero value ticks;
+- 12 intervals /13 active positions;
+- 120° inactive gap;
 - one needle;
 - `target_angle=(240 + 2*target_kmh) mod 360`.
 
-Speedometer reading does not silently activate speed=distance/time calculation.
+Do not silently activate speed=distance/time calculation.
 
 Applicable gates:
-
 `PROMPT_SPEEDOMETER_TOPOLOGY_QA`
 `PROMPT_SPEEDOMETER_INTERVAL_POSITION_COUNT_QA`
 `PROMPT_SPEEDOMETER_TARGET_REPRESENTABILITY_QA`
@@ -234,19 +250,15 @@ Applicable gates:
 
 ## Thermometer hard gates
 
-Discrete thermometer tasks require exact range topology and target representability.
+Canonical profiles:
+- 0–50°C @1°C = 50 intervals /51 positions;
+- 0–100°C @5°C = 20/21;
+- -10–40°C @1°C = 50/51, zero index=10;
+- 20–120°F @2°F = 50/51.
 
-Canonical profiles include:
-
-- 0–50°C @1°C = 50 intervals / 51 positions;
-- 0–100°C @5°C = 20 / 21;
-- -10–40°C @1°C = 50 / 51, zero index=10;
-- 20–120°F @2°F = 50 / 51.
-
-Liquid endpoint must align exactly to target graduation centerline; no between-tick endpoint unless interpolation is explicitly taught.
+Liquid endpoint aligns exactly to target graduation centerline; no between-tick endpoint unless interpolation is explicitly taught.
 
 Applicable gates:
-
 `PROMPT_THERMOMETER_TOPOLOGY_QA`
 `PROMPT_THERMOMETER_INTERVAL_COUNT_QA`
 `PROMPT_THERMOMETER_POSITION_COUNT_QA`
@@ -259,71 +271,49 @@ Applicable gates:
 ## Page-policy provenance
 
 Defaults:
-
 `TARGET_PAGE_COUNT=1`
 `ONE_PAGE_PREFERRED=YES`
 `ONE_PAGE_LOCK=OFF`
 
-`ONE_PAGE_LOCK=ON` requires explicit user provenance. If lock is ON without provenance, fail `PROMPT_PAGE_LOCK_PROVENANCE_QA`.
+`ONE_PAGE_LOCK=ON` requires explicit user provenance. Missing provenance → `PROMPT_PAGE_LOCK_PROVENANCE_QA=FAIL`.
 
-A preferred 2×5 layout is not a hard one-page lock.
+If W07/W10 minimum geometry cannot fit an explicit one-page lock:
+`PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`
+`PROMPT_METROLOGY_PAGE_FEASIBILITY_QA=FAIL`
+`PROMPT_RELEASE=BLOCKED`
+
+Never shrink/delete/merge scale marks to force one page.
 
 ## Prompt completeness
 
-Final prompt must exist, be standalone, contain exact question count, one resolved render path, `RENDER_OBJECTIVE=STUDENT_WORKSHEET`, exact student-facing text/givens/blanks, every required per-item state, canonical labels, page-policy provenance, and mandatory instrument review protocol when applicable.
+Final prompt is standalone, exact question count, one resolved `render_path`, `RENDER_OBJECTIVE=STUDENT_WORKSHEET`, exact student text/givens/blanks, all per-item state, canonical labels, page provenance, scale spec, W10 audit evidence, and review protocol.
 
-No placeholders or external `see above` dependency.
+Required:
+`PROMPT_COPY_READY_QA`
+`PROMPT_COMPLETENESS_QA`
+`NO_PLACEHOLDER_QA`
+
+No placeholder or external `see above` dependency.
 
 ## Measurement regressions
 
-### Time
-- `60 s=1 min`, `60 min=1 h`, `24 h=1 day`
-- correct start/end/duration transformations
-- seconds hand only when objective includes seconds
+Time: `60 s=1 min`, `60 min=1 h`, `24 h=1 day`.
 
-### Clock
-- 10:30 → minute 180°, hour 315°, midpoint 10–11
-- nonzero-minute hour hand continuously displaced
-- strict half-hour minute=30 only
+Clock: 10:30 → minute 180°, hour 315°; continuous hour hand; strict half-hour :30.
 
-### Weight/dial
-- `1000 g=1 kg`
-- `1 ขีด=100 g=0.1 kg`
-- canonical 0–5 kg dial = 300° active +60° gap, 50/51 topology, no gap ticks
+Weight/dial: `1000 g=1 kg`; `1 ขีด=100 g=0.1 kg`; canonical 0–5 kg = 50/51 active +60° gap.
 
-### Length/ruler/distance
-- `10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`
-- 1 cm @1 mm = 10 intervals / 11 positions / 9 interior positions
-- physical edge not a tick
-- nonzero ruler start = end-start
-- speed/rate not silently inferred
+Length/ruler: `10 mm=1 cm`, `100 cm=1 m`, `1000 m=1 km`; ruler 10/11/9; nonzero=end-start.
 
-### Speedometer
-- canonical 0–120 km/h = 12 intervals /13 positions at 10 km/h minor interval
-- 60 km/h = 0° in canonical geometry
-- inactive gap contains no value ticks
+Speedometer: 0–120 @10 = 12/13; 60 km/h→0°; no gap ticks.
 
-### Angle/protractor
-- 0–180° @1° = 180/181
-- 0–360° @1° = 360 intervals/360 distinct positions
-- 1° semicircle print-spacing at default 0.60 mm requires reading-ring diameter ≥68.76 mm; production minimum width 70 mm
-- origin/baseline/direction exact
+Angle/protractor: 0–180 @1°=180/181; full-circle 0–360 @1°=360 intervals/360 distinct positions; exact origin/baseline/direction; radial print-spacing verified.
 
-### Perimeter/area
-- perimeter counts each boundary once
-- correct area formula and perpendicular height
-- squared-unit conversion uses squared factor
-
-### Temperature/capacity/volume
-- thermometer exact topology/representability/alignment
-- `1000 mL=1 L`
-- meniscus read point explicit
-- rectangular prism `V=l×w×h` after compatible-unit normalization
-- cubic conversion uses cubic factor
+Temperature/capacity/volume: exact thermometer topology/alignment; `1000 mL=1 L`; meniscus read point explicit; compatible-unit volume formulas.
 
 ## Arithmetic/color-by-code/Thai regressions
 
-Expressions recompute exactly; exact division remains exact; every color region maps exactly once; Thai target spelling/family is valid.
+Expressions recompute exactly; exact division remains exact; every active answer/color maps exactly once; Thai spelling/family is valid.
 
 ## Release gate semantics
 
@@ -333,9 +323,9 @@ If **any** applicable critical gate is FAIL or NOT_RUN:
 
 `PROMPT_RELEASE=BLOCKED`
 
-W09 must never emit `PROMPT_RELEASE=APPROVED` while the compiled prompt structurally violates a gate.
+W09 must never emit `PROMPT_RELEASE=APPROVED` while compiled output violates a gate.
 
-Required global applicable gates include:
+Global applicable gates include:
 
 `KB_ROUTE_QA`
 `KB_COMPATIBILITY_QA`
@@ -348,13 +338,13 @@ Required global applicable gates include:
 `STUDENT_VISIBLE_TARGET_TEXT_LEAK_QA`
 `CANONICAL_LABEL_PRESERVATION_QA`
 
-plus all applicable academic, page-policy, scale-line and instrument review/revise gates.
+plus all applicable academic, page, scale, review and metrology gates.
 
 ## Phase semantics
 
-Renderer self-review is prevention, not artifact proof.
+W07/W10 prompt audits and renderer self-review are prevention, not artifact proof.
 
-Before actual rendered image inspection:
+Before actual image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
@@ -364,12 +354,12 @@ If an actual artifact contains an incorrect learner-read scale:
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
 
-and the defect must become a permanent regression before the next accepted release artifact.
+and the defect becomes a permanent regression before the next accepted release.
 
 ## Health check
 
-When user asks for Gem self-check, report baseline, W01–W09 compatibility, W10 status, route table, supported instrument domains including speedometer, mandatory scale-line and review/revise profiles, render-path/page-lock rules, regression gate and prompt/artifact phase semantics.
+When user asks for Gem health/self-check, report 2.6.3 release family, W01–W10 compatibility, W10 metrology status, four mandatory profiles, routes, render/page rules, regression gate, and prompt/artifact phase semantics.
 
-## Hotfix
+## Base update / hotfix policy
 
-Reject broad W10 hotfixes that change architecture, visibility, worker schema or multiple unrelated domains. Cross-domain instrument safety changes belong in base SSOT and require full base rebuild/reinstall.
+W10 is now `W10_METROLOGY_ENGINEER`, not a hotfix override. Broad architecture, visibility, worker schema, metrology or scale-safety changes require canonical base SSOT + permanent regression + full rebuild/reinstall. The term hotfix is retained only as historical compatibility language, not as an installable W10 role in 2.6.3-LTS.
