@@ -51,9 +51,9 @@ Knowledge slot 10 is intentionally reserved for a narrow compatible hotfix.
 - `KB_ROUTER.md`
 - `KB_MANIFEST.md`
 - `policies/PARAMETER_POLICY.md`
+- `policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
 - `domains/DOMAIN_REGISTRY.md`
 - `domains/MEASUREMENT_COVERAGE_P1_P6.md`
-- `domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
 - `workers/` — W01..W09 contracts
 - `qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md`
 - `qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md`
