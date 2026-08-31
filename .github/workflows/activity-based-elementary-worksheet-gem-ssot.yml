@@ -38,6 +38,9 @@ jobs:
       - name: Semantic oracle regression — 20 cases
         run: python gems/activity-based-elementary-worksheet/tools/semantic_oracle_regression_suite.py
 
+      - name: System-wide quality regression — 30 cases
+        run: python gems/activity-based-elementary-worksheet/tools/system_wide_quality_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
