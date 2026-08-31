@@ -41,6 +41,9 @@ jobs:
       - name: System-wide quality regression — 30 cases
         run: python gems/activity-based-elementary-worksheet/tools/system_wide_quality_regression_suite.py
 
+      - name: Scale-line integrity regression — 40 cases
+        run: python gems/activity-based-elementary-worksheet/tools/scale_line_integrity_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
