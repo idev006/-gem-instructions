@@ -10,8 +10,9 @@ Grade, subdomain, question count, scale min/max, major/minor interval, unit, ori
 
 ## OWNS
 
-- thermometer scale semantics
+- thermometer scale semantics and exact graduation topology
 - exact liquid endpoint mapping
+- temperature comparison/change
 - mL/L arithmetic/conversion
 - graduated-container reading
 - flat liquid level
@@ -23,11 +24,11 @@ Grade, subdomain, question count, scale min/max, major/minor interval, unit, ori
 
 ## RETURNS
 
-Verified internal targets/calculations, student-safe givens/blanks, canonical visual template, renderer-only level/tick/meniscus state when visual, volume decomposition state, hard negatives, QA requirements.
+Verified internal targets/calculations, student-safe givens/blanks, canonical thermometer/container template, renderer-only level/tick/meniscus state when visual, volume decomposition state, hard negatives, QA requirements.
 
 ## MUST_NOT_DECIDE
 
-Final page layout, global render path, clock/ruler/dial formulas, global answer-key policy.
+Final page layout, global render path, clock/ruler/dial/speedometer formulas, global answer-key policy.
 
 ## Exact relations
 
@@ -53,7 +54,9 @@ Rectangular prism:
 
 All dimensions must be in compatible units before multiplication.
 
-## Temperature
+## Temperature — deterministic learner-read scale
+
+Use `domains/TEMPERATURE_READING_ENGINE.md`, `policies/SCALE_LINE_INTEGRITY_PROFILE.md`, and `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`.
 
 For minor interval `d`:
 
@@ -65,19 +68,53 @@ Target:
 `tick_index=round((target-min)/d)`
 `represented=min+tick_index*d`
 
-Require exact representability in discrete-reading mode. Liquid top must coincide with target graduation centerline; never between ticks unless interpolation is explicitly taught.
+Require exact representability in discrete-reading mode. Liquid endpoint must coincide with the exact target graduation centerline; never between ticks unless interpolation is explicitly taught.
+
+Canonical teaching profiles that may be selected when grade/objective fit:
+
+- `0–50°C @1°C` → 50 intervals / 51 positions;
+- `0–100°C @5°C` → 20 intervals / 21 positions;
+- `-10–40°C @1°C` → 50 intervals / 51 positions with zero at index 10;
+- `20–120°F @2°F` → 50 intervals / 51 positions.
+
+The scale direction, zero/minus sign, major labels and unit must be explicit. Do not create decorative ticks or a second apparent liquid endpoint.
+
+### Thermometer renderer-only state
+
+Each visual item must serialize:
+
+`ITEM_ID`
+`SEMANTIC_TARGET_TEMPERATURE`
+`TICK_INDEX`
+`REPRESENTED_VALUE`
+`LEVEL_RATIO`
+`NEAREST_MAJOR_LABELS`
+`RELATIONAL_VERIFICATION`
+`ITEM_SPECIFIC_HARD_NEGATIVE`
+
+### Thermometer renderer self-review
+
+Before finalizing the image, the renderer must independently:
+
+1. recount scale intervals/positions;
+2. verify monotonic direction;
+3. verify major/minor hierarchy and label alignment;
+4. recompute target tick index;
+5. confirm the visible liquid endpoint lies exactly on that graduation centerline;
+6. reject/regenerate any between-tick or extra/missing-tick construction;
+7. recheck after repair.
+
+A visually attractive but numerically wrong thermometer is `CRITICAL_ACADEMIC`.
 
 ## Capacity arithmetic
 
-Task types:
-
 `ADD | SUBTRACT | DIFFERENCE | COMPARE | CONVERT`
 
-Normalize L/mL to millilitres, compute exactly, verify, then convert result to requested display format.
+Normalize L/mL to millilitres, compute exactly, independently verify, then convert to requested display format.
 
 ## Graduated container
 
-Linear topology uses endpoint-inclusive N intervals / N+1 positions. No missing/extra graduations, no decorative competing levels.
+Linear topology uses endpoint-inclusive N intervals / N+1 positions. No missing/extra graduations and no decorative competing levels.
 
 `SIMPLE_FLAT`: one horizontal surface exactly on target graduation.
 
@@ -87,6 +124,8 @@ Linear topology uses endpoint-inclusive N intervals / N+1 positions. No missing/
 
 A nearly flat ambiguous meniscus fails scientific mode.
 
+Graduated containers also inherit mandatory scale-line integrity and renderer review/revise rules.
+
 ## Volume
 
 Rectangular prism:
@@ -95,8 +134,6 @@ Rectangular prism:
 2. compute `l×w×h`;
 3. attach the corresponding cubic unit;
 4. convert cubic units only using cubed conversion factors.
-
-Example principle:
 
 `1 m = 100 cm` therefore `1 m³ = 100³ cm³ = 1,000,000 cm³`.
 
@@ -119,14 +156,19 @@ Configured scale labels remain visible; only item-specific target values are for
 
 ## Grade progression
 
-Use `domains/MEASUREMENT_COVERAGE_P1_P6.md`, `domains/TEMPERATURE_READING_ENGINE.md`, and `domains/CAPACITY_READING_ENGINE.md`.
+Use `MEASUREMENT_COVERAGE_P1_P6.md`, `TEMPERATURE_READING_ENGINE.md`, and `CAPACITY_READING_ENGINE.md` conservatively.
 
-Do not assume scientific meniscus or cubic-unit conversion merely because grade is higher; require objective/context.
+Do not assume scientific meniscus, fine temperature resolution, Fahrenheit, or cubic-unit conversion merely because grade is higher; require objective/context.
 
 ## QA
 
+`PROMPT_THERMOMETER_TOPOLOGY_QA`
+`PROMPT_THERMOMETER_INTERVAL_COUNT_QA`
+`PROMPT_THERMOMETER_POSITION_COUNT_QA`
 `PROMPT_TEMP_TARGET_REPRESENTABILITY_QA`
 `PROMPT_TEMP_ENDPOINT_ALIGNMENT_SPEC_QA`
+`PROMPT_TEMP_SCALE_DIRECTION_QA`
+`PROMPT_TEMP_LABEL_ALIGNMENT_QA`
 `PROMPT_NO_BETWEEN_TICKS_QA`
 `PROMPT_CAPACITY_UNIT_COMPATIBILITY_QA`
 `PROMPT_CAPACITY_CONVERSION_QA`
@@ -140,5 +182,6 @@ Do not assume scientific meniscus or cubic-unit conversion merely because grade 
 `PROMPT_CUBIC_UNIT_CONVERSION_QA`
 `PROMPT_VOLUME_DECOMPOSITION_QA`
 `PROMPT_CAPACITY_LABEL_PRESERVATION_QA`
+`PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W05 instruments
 
-Wrong conversion, between-tick target, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, or target leak blocks release.
+Wrong conversion, wrong temperature topology/count/direction, between-tick target, wrong endpoint, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, target leak, or missing review/revise protocol blocks release.
