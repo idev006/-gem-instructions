@@ -51,7 +51,9 @@ add("w04-active-direction", "one clearly active 0→180 reading direction" in w0
 add("w04-five-degree-required", "5° intermediate marks are REQUIRED" in w04)
 
 add("w08-no-auto", "final prompt must not contain unresolved `RENDER_PATH=AUTO`" in w08)
-add("w08-one-page-block", "PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL" in w08 and "70 mm" in w08)
+# Semantic evidence: W08 must retain the one-page feasibility gate, the 70 mm minimum,
+# and the new numeric lower-bound that five rows require 350 mm / cannot PASS A4 portrait.
+add("w08-one-page-block", "PROMPT_ONE_PAGE_FEASIBILITY_QA" in w08 and "70 mm" in w08 and "350 mm" in w08 and "cannot PASS" in w08)
 add("w08-65-rejected", "65 mm protractor is invalid" in w08)
 
 add("w09-spacing-gate", "PROMPT_PROTRACTOR_PRINT_SPACING_QA" in w09 and "PROMPT_SCALE_PRINT_SPACING_ORACLE_QA" in w09)
