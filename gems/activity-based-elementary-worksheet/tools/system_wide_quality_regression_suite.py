@@ -60,11 +60,11 @@ checks = [
     ("builder-shared-profile-main", "MANDATORY SYSTEM-WIDE QUALITY PROFILE" in builder),
     ("builder-shared-profile-workers", "SHARED_PROFILES" in builder and "effective_sources = [*SHARED_PROFILES, *sources]" in builder),
     ("builder-system-gate", "system_wide_quality_regression_suite.py" in builder),
-    ("builder-current-total", "911/911 PASS" in builder),
+    ("builder-current-total", "971/971 PASS" in builder),
     ("workflow-system-gate", "System-wide quality regression" in workflow),
     ("workflow-30-cases", "30 cases" in workflow),
     ("profile-atomic-block", "Atomic renderer-state serialization" in profile),
-    ("profile-no-hard-page-drift", "ONE_PAGE_LOCK=OFF" in profile and "exactly 1 page" in profile),
+    ("profile-no-hard-page-drift", "ONE_PAGE_LOCK=OFF" in profile and "Hard one-page wording is forbidden" in profile),
 ]
 for name, ok in checks:
     add(name, ok)
