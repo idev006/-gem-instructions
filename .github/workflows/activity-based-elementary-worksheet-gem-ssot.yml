@@ -35,6 +35,9 @@ jobs:
       - name: Runtime UAT regression — 12 cases
         run: python gems/activity-based-elementary-worksheet/tools/runtime_uat_regression_suite.py
 
+      - name: Semantic oracle regression — 20 cases
+        run: python gems/activity-based-elementary-worksheet/tools/semantic_oracle_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
