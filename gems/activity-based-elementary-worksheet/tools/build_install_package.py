@@ -4,7 +4,8 @@
 Package is derived from GitHub SSOT. Build is blocked unless static SSOT
 validation, the 449-case core dry-run, the 360-case declared-skill matrix,
 the 12-case runtime-UAT regression, the 20-case semantic-oracle regression,
-and the 30-case system-wide quality regression all pass (871 cases total).
+the 30-case system-wide quality regression, and the 40-case scale-line
+integrity regression all pass (911 cases total).
 """
 from __future__ import annotations
 
@@ -21,7 +22,9 @@ DIST_ROOT = ROOT / "dist"
 PACKAGE_NAME = "activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT"
 PACKAGE_DIR = DIST_ROOT / PACKAGE_NAME
 ZIP_PATH = DIST_ROOT / f"{PACKAGE_NAME}.zip"
-SHARED_PROFILE = "policies/SYSTEM_WIDE_QUALITY_PROFILE.md"
+SYSTEM_PROFILE = "policies/SYSTEM_WIDE_QUALITY_PROFILE.md"
+SCALE_LINE_PROFILE = "policies/SCALE_LINE_INTEGRITY_PROFILE.md"
+SHARED_PROFILES = [SYSTEM_PROFILE, SCALE_LINE_PROFILE]
 
 WORKER_BUNDLES: dict[str, list[str]] = {
     "W01_ACADEMIC_CONTENT.txt": ["workers/W01_ACADEMIC_CONTENT.md"],
@@ -61,12 +64,12 @@ def run_gate(script: str) -> subprocess.CompletedProcess[str]:
 
 
 def bundle_text(worker_name: str, sources: list[str]) -> str:
-    # Every worker inherits the same cross-worker quality contract at runtime.
-    effective_sources = [SHARED_PROFILE, *sources]
+    # Every worker inherits the same cross-worker quality + scale-line contracts at runtime.
+    effective_sources = [*SHARED_PROFILES, *sources]
     header = (
         f"ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {worker_name}\n"
         "BASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\nIMPORTANT RUNTIME PACKAGING NOTE\n"
-        "Generated from GitHub SSOT. The mandatory system-wide quality profile is embedded in every worker bundle before worker/domain SSOT.\n\nEMBEDDED_SOURCES:\n"
+        "Generated from GitHub SSOT. Mandatory system-wide quality and scale-line integrity profiles are embedded in every worker bundle before worker/domain SSOT.\n\nEMBEDDED_SOURCES:\n"
     )
     header += "\n".join(f"- {s}" for s in effective_sources)
     sections = [header]
@@ -106,6 +109,11 @@ def main() -> int:
         print(system_quality.stdout); print(system_quality.stderr, file=sys.stderr)
         print("BUILD BLOCKED: 30-case system-wide quality regression failed", file=sys.stderr); return 1
 
+    scale_line = run_gate("scale_line_integrity_regression_suite.py")
+    if scale_line.returncode != 0:
+        print(scale_line.stdout); print(scale_line.stderr, file=sys.stderr)
+        print("BUILD BLOCKED: 40-case scale-line integrity regression failed", file=sys.stderr); return 1
+
     if PACKAGE_DIR.exists(): shutil.rmtree(PACKAGE_DIR)
     if ZIP_PATH.exists(): ZIP_PATH.unlink()
     instructions_dir = PACKAGE_DIR / "01_MAIN_INSTRUCTIONS"
@@ -115,13 +123,15 @@ def main() -> int:
 
     compact_note = (
         "COMPACT RUNTIME PROFILE\nThe 9 Knowledge TXT files are generated bundles. Supporting SSOT is embedded into the relevant worker bundle.\n"
-        "This package was built only after SSOT validation + 449 core + 360 declared-skill + 12 runtime-UAT + 20 semantic-oracle + 30 system-wide quality = 871/871 PASS.\n\n"
+        "This package was built only after SSOT validation + 449 core + 360 declared-skill + 12 runtime-UAT + 20 semantic-oracle + 30 system-wide quality + 40 scale-line integrity = 911/911 PASS.\n\n"
     )
     main_instructions = (
         compact_note
         + read("GEM_INSTRUCTIONS_PRODUCTION.md")
         + "\n\n===== MANDATORY SYSTEM-WIDE QUALITY PROFILE =====\n\n"
-        + read(SHARED_PROFILE)
+        + read(SYSTEM_PROFILE)
+        + "\n\n===== MANDATORY SCALE-LINE INTEGRITY PROFILE =====\n\n"
+        + read(SCALE_LINE_PROFILE)
         + "\n\n===== MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK =====\n\n"
         + read("policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md")
     )
@@ -141,6 +151,7 @@ def main() -> int:
     (guide_dir / "RUNTIME_UAT_REGRESSION_12_REPORT.txt").write_text(uat.stdout, encoding="utf-8")
     (guide_dir / "SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt").write_text(semantic.stdout, encoding="utf-8")
     (guide_dir / "SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt").write_text(system_quality.stdout, encoding="utf-8")
+    (guide_dir / "SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt").write_text(scale_line.stdout, encoding="utf-8")
 
     manifest = []
     for path in sorted(PACKAGE_DIR.rglob("*")):
@@ -154,8 +165,8 @@ def main() -> int:
         bad = z.testzip()
         if bad is not None: raise RuntimeError(f"ZIP integrity failure: {bad}")
 
-    print(validation.stdout.strip()); print(core.stdout.strip()); print(skill.stdout.strip()); print(uat.stdout.strip()); print(semantic.stdout.strip()); print(system_quality.stdout.strip())
-    print("COMBINED DRY-RUN: 871/871 PASS")
+    print(validation.stdout.strip()); print(core.stdout.strip()); print(skill.stdout.strip()); print(uat.stdout.strip()); print(semantic.stdout.strip()); print(system_quality.stdout.strip()); print(scale_line.stdout.strip())
+    print("COMBINED DRY-RUN: 911/911 PASS")
     print("PACKAGE BUILD: PASS"); print("Knowledge files: 9")
     print(f"ZIP: {ZIP_PATH}"); print(f"ZIP SHA256: {sha256(ZIP_PATH)}")
     return 0
