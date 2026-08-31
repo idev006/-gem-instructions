@@ -14,6 +14,8 @@ in the Gem **Instructions** field.
 
 The main file is the Orchestrator: route, visibility, integration, output contract and release policy. Do not replace it with a shortened formula dump.
 
+The Orchestrator also contains runtime-critical profiles that must be visible at instruction level, including Thai Grade 3 analog-clock AUTO behavior.
+
 ## 2. Knowledge upload — exactly 9 base files
 
 Upload compact `.txt` forms generated from:
@@ -32,7 +34,21 @@ Knowledge slot 10 remains empty by default and is reserved for `W10_HOTFIX_OVERR
 
 Do not separately upload all core/domain/QA repository files when using the compact package; the installable worker files consolidate operational rules.
 
-## 3. Health check after installation
+## 3. Release artifact eligibility
+
+Use an installation ZIP only when its source commit passed all current executable gates:
+
+- SSOT validation
+- core dry-run `449/449`
+- declared-skill matrix `360/360`
+- runtime UAT regression `12/12`
+- combined minimum `821/821 PASS`
+- package build
+- ZIP integrity verification
+
+If any gate fails or is not run, do not install that artifact as a release candidate.
+
+## 4. Health check after installation
 
 Send:
 
@@ -50,7 +66,7 @@ Expected:
 
 The health check should not generate a worksheet unless requested separately.
 
-## 4. Smoke tests
+## 5. Smoke tests
 
 ### A — elapsed time
 `ป.3 หาระยะเวลาจากเวลาเริ่มต้นและเวลาสิ้นสุด 10 ข้อ ไม่มีเฉลย`
@@ -62,10 +78,23 @@ Expected W02+W08+W09; deterministic time relations; one resolved render path.
 
 Expected exact 60/60/24 relations. A seconds hand must not appear unless analog-second reading is explicitly requested.
 
-### C — clock half-hour
+### C — Thai P3 clock half-hour runtime profile
 `ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
 
-10:30 renderer state: minute 180°, hour 315°, exactly halfway 10–11, not directly on 10. Student Blueprint contains no target time/angles.
+Expected canonical behavior:
+
+- `CLOCK_READING_MODE=DAY_NIGHT_PAIR`
+- exactly one analog clock per question
+- exactly two student answer fields per question: `กลางวัน ........ น.` and `กลางคืน ........ น.`
+- strict half-hour targets are `hh:30` only; no `:00` unless explicitly requested as a mixed worksheet
+- one shared hand state supports both day/night interpretations
+- renderer metadata includes exact numeric angles for every clock item
+- 10:30 regression: minute 180°, hour 315°, midpoint 10–11, never directly on 10
+- Student Blueprint contains no target times, answer values or angles
+- `ONE_PAGE_LOCK=OFF` unless the request explicitly says exactly one page
+- canonical clock topology is not reduced merely to force page fit
+
+An output with one answer line, implicit page lock, missing numeric angles or downgraded clock topology is a runtime UAT regression and must not be accepted.
 
 ### D — ruler
 `ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ ไม่มีเฉลย`
@@ -138,7 +167,7 @@ Expected `1000 cm³=1 dm³`, `1000 dm³=1 m³`, `1 m³=1,000,000 cm³`; reject l
 ### R — arithmetic/color-by-code/Thai
 Test W01 so measurement expansion does not regress general worksheet behavior.
 
-## 5. Prompt/artifact boundary
+## 6. Prompt/artifact boundary
 
 After Gem generates a prompt and before any downstream image is inspected:
 
@@ -151,7 +180,7 @@ But it must still report:
 
 Prompt QA does not guarantee third-party pixels.
 
-## 6. Update policy
+## 7. Update policy
 
 Baseline 2.6.x is LTS-style.
 
@@ -165,10 +194,12 @@ For a narrow future defect, prefer one slot-10 hotfix with:
 `NEW_RULE`
 `REGRESSION_TEST`
 
-Full reinstall should be reserved for worker-schema, architecture/routing, visibility/output-contract, or multi-domain critical changes.
+A real UAT defect should first be repaired in canonical SSOT according to ownership and then converted to a permanent automated regression test. Do not patch only final prose.
 
-## 7. Source of truth
+Full reinstall should be reserved for worker-schema, architecture/routing, visibility/output-contract, runtime-instruction profile, or multi-domain critical changes.
+
+## 8. Source of truth
 
 GitHub repository `idev006/-gem-instructions`, folder `gems/activity-based-elementary-worksheet`, is the project SSOT.
 
-Installation ZIPs must be generated from this SSOT. A ZIP must not become a competing specification newer than GitHub.
+Installation ZIPs must be generated from this SSOT and from a successful CI run. A ZIP must not become a competing specification newer than GitHub.
