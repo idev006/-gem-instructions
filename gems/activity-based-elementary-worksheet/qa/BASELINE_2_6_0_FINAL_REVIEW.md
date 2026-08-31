@@ -1,13 +1,13 @@
 # Baseline 2.6.0-LTS — Final Review Record
 
-Status: FINAL REVIEW COMPLETED
+Status: ACTIVE LTS REVIEW RECORD — REFRESHED AFTER RUNTIME UAT HARDENING
 Product: `activity-based-elementary-worksheet`
 Product role: `PRODUCTION_WORKSHEET_PROMPT_GENERATOR`
 Primary deliverable: `FINAL_IMAGE_GENERATION_PROMPT`
 
 ## 1. Review scope
 
-The 2.6.0-LTS consolidation reviewed and aligned:
+The 2.6.0-LTS consolidation and subsequent hardening reviewed and aligned:
 
 - Gem Orchestrator instructions
 - Specialist Worker architecture and ownership
@@ -16,11 +16,13 @@ The 2.6.0-LTS consolidation reviewed and aligned:
 - output/visibility contract
 - prompt-vs-artifact QA semantics
 - render-path resolution
-- one-page-first behavior
+- one-page-first behavior and explicit lock provenance
 - Thai/text/print constraints
 - P1–P6 measurement capability/progression
 - measurement formulas/unit conversion
 - instrument topology/geometry
+- Thai Grade 3 analog-clock runtime behavior
+- real-UAT-to-regression workflow
 - regression and release-evidence governance
 - installation/build pipeline
 - automated SSOT validation and CI
@@ -45,15 +47,13 @@ Base workers:
 
 Knowledge slot 10 remains reserved for a narrow compatible `W10_HOTFIX_OVERRIDE`.
 
-## 3. Runtime packaging repair
+## 3. Runtime packaging model
 
-A critical installation-design risk was identified during final review: uploading only nine raw Worker files would leave references to supporting repository files such as domain engines, registry, policy and QA suites that are not separately uploaded to Gemini Knowledge.
+`tools/build_install_package.py` derives the compact installation package from GitHub SSOT.
 
-This was repaired by `tools/build_install_package.py`.
+The compact runtime package bundles supporting SSOT into the appropriate Knowledge worker:
 
-The compact runtime package now bundles supporting SSOT into the appropriate Knowledge worker:
-
-- W02 bundle includes Time + Clock engines
+- W02 bundle includes Time + Clock engines and clock runtime profiles/specs
 - W03 bundle includes Scale engine
 - W04 bundle includes Length engine
 - W05 bundle includes Temperature + Capacity engines
@@ -61,11 +61,53 @@ The compact runtime package now bundles supporting SSOT into the appropriate Kno
 - W07 bundle includes shared Instrument engine
 - W09 bundle includes Output Contract, Architecture, Router, Manifest, Parameter Policy, Domain Registry, Measurement Coverage and critical QA/regression/release files
 
-Repository filenames inside generated Knowledge are treated as provenance/logical references, not missing runtime dependencies.
+Repository filenames inside generated Knowledge are provenance/logical references, not missing runtime dependencies.
 
-Result: the 9-file compact installation is runtime-complete without requiring the repository `.md` files to be uploaded separately.
+The generated package contains one Orchestrator Instructions file plus exactly nine Knowledge TXT files; slot 10 remains free for a compatible narrow hotfix.
 
-## 4. Formal P1–P6 measurement coverage
+## 4. Current executable release gate
+
+The historical 449-case core suite alone is **not** considered full release coverage.
+
+Current minimum executable prompt-system gate:
+
+- core deterministic/policy suite: `449/449 PASS`
+- declared-skill extended matrix: `360/360 PASS`
+- real-runtime UAT regression suite: `12/12 PASS`
+- combined minimum: `821/821 PASS`
+
+The package builder must block when any current suite fails or is not run.
+
+A real UAT defect must be converted into a permanent regression before a subsequent release artifact is accepted. Test counts must not be reduced merely to obtain a passing release.
+
+These suites validate prompt-system rules and deterministic policy; they do not replace downstream rendered-artifact inspection.
+
+## 5. Runtime UAT hardening — Thai P3 analog clock
+
+A real installed-Gem UAT exposed behavior that static/deterministic suites did not initially catch: a generic Thai P3 half-hour analog-clock command could regress to one answer field, infer `ONE_PAGE_LOCK=ON`, omit exact numeric angles, or degrade clock topology.
+
+The canonical runtime profile is now elevated to Orchestrator-level instructions and protected by a dedicated runtime UAT regression suite.
+
+For:
+
+`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
+
+required behavior is:
+
+- Thai P3 analog-clock `AUTO → DAY_NIGHT_PAIR` unless explicit SINGLE intent
+- exactly one analog clock face per question
+- exactly two blank response fields: `กลางวัน` and `กลางคืน`
+- strict half-hour intent means minute `30` only unless mixed whole-hour items are explicitly requested
+- deterministic day/night mapping
+- one shared hand state for both interpretations
+- every high-risk clock item includes semantic target + exact numeric angles + relational wording + item-specific hard negative
+- Student Blueprint contains no target time, answer pair or angles
+- `ONE_PAGE_LOCK=OFF` unless the user explicitly requires exactly one page
+- canonical instructional topology must not be degraded to force page fit
+
+Any violation is a runtime regression and must block prompt release when applicable.
+
+## 6. Formal P1–P6 measurement coverage
 
 Baseline 2.6.x formally covers, when grade/objective appropriate:
 
@@ -86,9 +128,9 @@ Baseline 2.6.x formally covers, when grade/objective appropriate:
 
 ### Angle / protractor
 - angle classification
-- semicircular protractor reading
+- semicircular and supported full-circle protractor reading
 - exact origin/baseline/target graduation
-- explicit left-zero/right-zero and inner/outer scale direction
+- explicit scale direction where applicable
 
 ### Perimeter / area
 - polygon perimeter
@@ -120,7 +162,7 @@ Baseline 2.6.x formally covers, when grade/objective appropriate:
 
 Canonical progression: `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
-## 5. Critical deterministic relations
+## 7. Critical deterministic relations
 
 Time:
 - `60 s=1 min`
@@ -155,7 +197,7 @@ When explicitly taught:
 
 Squared/cubic unit conversions must use squared/cubed linear factors respectively.
 
-## 6. High-risk visual regressions retained
+## 8. High-risk visual regressions retained
 
 ### Clock
 10:30:
@@ -183,14 +225,14 @@ Squared/cubic unit conversions must use squared/cubed linear factors respectivel
 - 181 positions
 - exact origin
 - selected 0° baseline
-- active inner/outer scale unambiguous
+- active scale unambiguous
 
 ### Thermometer / capacity
 - discrete target exactly representable
 - endpoint/read point exactly on target graduation
 - no hidden target-number annotation
 
-## 7. Visibility/release semantics
+## 9. Visibility/release semantics
 
 Three scopes are mandatory:
 
@@ -207,42 +249,33 @@ Before actual artifact inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-Prompt correctness is not a claim that third-party rendered pixels are correct.
+Prompt correctness is not a claim that downstream rendered pixels/glyphs/geometry are correct.
 
-## 8. Automated validation/build
+## 10. Automated validation/build
 
-Added:
+Required release workflow runs:
 
-- `tools/validate_ssot.py`
-- `tools/build_install_package.py`
-- `.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml`
+1. `tools/validate_ssot.py`
+2. `tools/full_dry_run_suite.py`
+3. `tools/full_skill_matrix_suite.py`
+4. `tools/runtime_uat_regression_suite.py`
+5. `tools/build_install_package.py`
+6. ZIP integrity verification
+7. installation-artifact upload
 
-CI validates SSOT, builds the compact installation package, verifies ZIP integrity and uploads the package artifact.
+`.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml` is the CI release gate.
 
-GitHub Actions run `33307276108` completed successfully for commit `b1adf021b2f22271b400b99819fb0121ae3811ab`:
+The authoritative release evidence is the successful GitHub Actions run for the current candidate HEAD. Do not rely on an older hard-coded workflow run or artifact digest after SSOT changes.
 
-- Validate Gem SSOT: PASS
-- Build compact installation package: PASS
-- Verify ZIP: PASS
-- Upload installation artifact: PASS
-
-Generated artifact:
-
-`activity-based-elementary-worksheet_Gem_v2.6.0_LTS_9WORKERS_TXT`
-
-Artifact digest recorded by GitHub:
-
-`sha256:37eac6e0e4ddb8c727e6fc2952c821d3538f29fa266b9946e0895a2f4eed3c91`
-
-## 9. Domain maturity decision
+## 11. Domain maturity decision
 
 Documentation/rule expansion does not by itself prove downstream-render maturity.
 
-All expanded measurement domains remain conservatively `PRODUCTION_CANDIDATE` until `qa/DOMAIN_RELEASE_MATRIX.md` promotion evidence is met.
+Expanded measurement domains remain conservatively governed by `qa/DOMAIN_RELEASE_MATRIX.md` until promotion evidence is met.
 
-No domain is promoted merely because this review added deterministic formulas or prompt-level regression.
+No domain is promoted merely because deterministic formulas or prompt-level regression are present.
 
-## 10. Known boundaries
+## 12. Known boundaries
 
 The following are intentionally not claimed as specialized deterministic 2.6 coverage:
 
@@ -251,28 +284,14 @@ The following are intentionally not claimed as specialized deterministic 2.6 cov
 - a universal mandatory curriculum sequence for every school
 - guaranteed correctness of nondeterministic downstream image pixels without artifact inspection
 
-These boundaries are explicit to prevent unsupported confidence.
-
-## 11. Final release decision
+## 13. Release decision
 
 ### Prompt-generation baseline
 
-`BASELINE_2_6_0_LTS=READY`
-
-Conditions satisfied:
-
-- Orchestrator architecture aligned
-- 9 Worker contracts aligned
-- full P1–P6 measurement capability specification present
-- route/manifest/policy/registry/release-matrix aligned
-- regression suite expanded
-- no runtime dangling-KB dependency in generated compact package
-- automated SSOT validator present
-- automated package builder present
-- CI validation/build/ZIP verification successful
+`BASELINE_2_6_0_LTS=READY_FOR_INSTALLATION_UAT` only when the **current candidate HEAD** has a successful CI run with all current gates, including `821/821` minimum regression cases and package/ZIP checks.
 
 ### Artifact/classroom status
 
 `ARTIFACT_QA=NOT_YET_TESTED` for any newly generated worksheet until its actual rendered artifact is inspected.
 
-This final review approves the **Gem prompt-generation baseline** for installation/UAT, not every future downstream worksheet image for automatic classroom release.
+This review approves the Gem prompt-generation architecture and release process; it does not grant automatic classroom release to every downstream worksheet image.
