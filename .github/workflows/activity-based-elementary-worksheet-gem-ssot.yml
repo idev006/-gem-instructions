@@ -59,6 +59,12 @@ jobs:
       - name: Physical page feasibility regression — 48 cases
         run: python gems/activity-based-elementary-worksheet/tools/physical_page_feasibility_regression_suite.py
 
+      - name: Actual instrument geometry regression — 64 cases
+        run: python gems/activity-based-elementary-worksheet/tools/instrument_geometry_artifact_regression_suite.py
+
+      - name: Repository full-line audit — 81 semantic cases
+        run: python gems/activity-based-elementary-worksheet/tools/repository_full_line_audit_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
