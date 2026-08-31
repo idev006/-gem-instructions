@@ -77,7 +77,25 @@ Canonical teaching profiles that may be selected when grade/objective fit:
 - `-10–40°C @1°C` → 50 intervals / 51 positions with zero at index 10;
 - `20–120°F @2°F` → 50 intervals / 51 positions.
 
+### Canonical 0–50°C @1°C hierarchy
+
+When this profile is selected:
+
+- major ticks: 0,10,20,30,40,50 → exactly 6 positions;
+- intermediate ticks: 5,15,25,35,45 → exactly 5 positions;
+- ordinary minor ticks: all other integer degrees → exactly 40 positions;
+- every 10°C span contains exactly 10 intervals and 9 interior positions;
+- major/intermediate/minor classes reuse the same 51 physical positions and never add extra ticks;
+- bottom-to-top value order is mandatory;
+- the bulb/stem below 0 is not part of the graduation count.
+
 The scale direction, zero/minus sign, major labels and unit must be explicit. Do not create decorative ticks or a second apparent liquid endpoint.
+
+### Thermometer size evidence
+
+For a 0–50°C @1°C scale, the spacing-derived minimum at the global 0.60 mm floor is 30 mm between the 0 and 50 tick centerlines. A larger selected render length may be used, but must be reported separately from the metrology minimum.
+
+If selected length is 60 mm, tick spacing is exactly 1.20 mm; do not claim `>1.20 mm`.
 
 ### Thermometer renderer-only state
 
@@ -88,6 +106,7 @@ Each visual item must serialize:
 `TICK_INDEX`
 `REPRESENTED_VALUE`
 `LEVEL_RATIO`
+`TARGET_TICK_Y`
 `NEAREST_MAJOR_LABELS`
 `RELATIONAL_VERIFICATION`
 `ITEM_SPECIFIC_HARD_NEGATIVE`
@@ -97,12 +116,15 @@ Each visual item must serialize:
 Before finalizing the image, the renderer must independently:
 
 1. recount scale intervals/positions;
-2. verify monotonic direction;
-3. verify major/minor hierarchy and label alignment;
-4. recompute target tick index;
-5. confirm the visible liquid endpoint lies exactly on that graduation centerline;
-6. reject/regenerate any between-tick or extra/missing-tick construction;
-7. recheck after repair.
+2. for 0–50°C @1°C verify 50 intervals / 51 positions;
+3. verify 6 major + 5 intermediate + 40 minor positions;
+4. verify each 10°C span contains 10 equal intervals / 9 interior positions;
+5. verify monotonic bottom-to-top direction;
+6. verify major/intermediate/minor hierarchy and label alignment;
+7. recompute target tick index;
+8. confirm the visible liquid endpoint lies exactly on that graduation centerline;
+9. reject/regenerate any between-tick or extra/missing-tick construction;
+10. recheck the complete instrument after repair.
 
 A visually attractive but numerically wrong thermometer is `CRITICAL_ACADEMIC`.
 
@@ -165,11 +187,14 @@ Do not assume scientific meniscus, fine temperature resolution, Fahrenheit, or c
 `PROMPT_THERMOMETER_TOPOLOGY_QA`
 `PROMPT_THERMOMETER_INTERVAL_COUNT_QA`
 `PROMPT_THERMOMETER_POSITION_COUNT_QA`
+`PROMPT_THERMOMETER_TEN_DEGREE_SPAN_QA`
+`PROMPT_THERMOMETER_HIERARCHY_COUNT_QA`
 `PROMPT_TEMP_TARGET_REPRESENTABILITY_QA`
 `PROMPT_TEMP_ENDPOINT_ALIGNMENT_SPEC_QA`
 `PROMPT_TEMP_SCALE_DIRECTION_QA`
 `PROMPT_TEMP_LABEL_ALIGNMENT_QA`
 `PROMPT_NO_BETWEEN_TICKS_QA`
+`PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
 `PROMPT_CAPACITY_UNIT_COMPATIBILITY_QA`
 `PROMPT_CAPACITY_CONVERSION_QA`
 `PROMPT_CAPACITY_CALCULATION_QA`
@@ -184,4 +209,4 @@ Do not assume scientific meniscus, fine temperature resolution, Fahrenheit, or c
 `PROMPT_CAPACITY_LABEL_PRESERVATION_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W05 instruments
 
-Wrong conversion, wrong temperature topology/count/direction, between-tick target, wrong endpoint, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, target leak, or missing review/revise protocol blocks release.
+Wrong conversion, wrong temperature topology/count/hierarchy/direction, between-tick target, wrong endpoint, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, target leak, or missing review/revise protocol blocks release.
