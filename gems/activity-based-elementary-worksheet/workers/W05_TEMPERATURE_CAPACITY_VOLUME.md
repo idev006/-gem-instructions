@@ -138,6 +138,18 @@ Normalize L/mL to millilitres, compute exactly, independently verify, then conve
 
 Linear topology uses endpoint-inclusive N intervals / N+1 positions. No missing/extra graduations and no decorative competing levels.
 
+For canonical `0–1000 mL @50 mL` with `MAJOR_DIVISION=100 mL`, W05 must serialize both global and local topology:
+
+`EXPECTED_INTERVAL_COUNT=20`
+`EXPECTED_POSITION_COUNT=21`
+`INTERVALS_PER_100ML=2`
+`POSITIONS_PER_100ML_ENDPOINT_INCLUSIVE=3`
+`INTERIOR_POSITIONS_PER_100ML_SPAN=1`
+`INTERIOR_VALUE_OFFSET=50 mL`
+`LOCAL_SPAN_RECOUNT_REQUIRED=YES`
+
+Every adjacent pair of 100 mL major ticks must contain exactly one interior 50 mL graduation. The 50 mL interior tick is shorter/weaker than the major ticks and does not create an extra position. A visually plausible scale with multiple extra strokes between 100 mL labels is `CRITICAL_ACADEMIC`.
+
 `SIMPLE_FLAT`: one horizontal surface exactly on target graduation.
 
 `READ_BOTTOM_MENISCUS`: clearly concave; lowest point exactly on target graduation.
@@ -147,6 +159,18 @@ Linear topology uses endpoint-inclusive N intervals / N+1 positions. No missing/
 A nearly flat ambiguous meniscus fails scientific mode.
 
 Graduated containers also inherit mandatory scale-line integrity and renderer review/revise rules.
+
+### Graduated-container renderer self-review
+
+For 0–1000 mL @50 mL, before finalizing each canonical template the renderer must:
+
+1. recount 20 intervals /21 positions globally;
+2. recount every 100 mL span independently as exactly 2 intervals /1 interior position;
+3. confirm the sole interior mark is at +50 mL;
+4. confirm major labels align to 100 mL ticks;
+5. reject any extra/duplicate/pseudo-tick inside a 100 mL span;
+6. verify the liquid read point aligns exactly to the target graduation;
+7. regenerate and fully recheck on any mismatch.
 
 ## Volume
 
@@ -199,6 +223,9 @@ Do not assume scientific meniscus, fine temperature resolution, Fahrenheit, or c
 `PROMPT_CAPACITY_CONVERSION_QA`
 `PROMPT_CAPACITY_CALCULATION_QA`
 `PROMPT_CAPACITY_TOPOLOGY_QA`
+`PROMPT_CAPACITY_PER_100ML_SUBDIVISION_QA`
+`PROMPT_CAPACITY_LOCAL_SPAN_RECOUNT_QA`
+`PROMPT_CAPACITY_MAJOR_MINOR_HIERARCHY_QA`
 `PROMPT_LEVEL_ALIGNMENT_SPEC_QA`
 `PROMPT_MENISCUS_CURVATURE_QA`
 `PROMPT_MENISCUS_READ_POINT_QA`
@@ -209,4 +236,4 @@ Do not assume scientific meniscus, fine temperature resolution, Fahrenheit, or c
 `PROMPT_CAPACITY_LABEL_PRESERVATION_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W05 instruments
 
-Wrong conversion, wrong temperature topology/count/hierarchy/direction, between-tick target, wrong endpoint, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, target leak, or missing review/revise protocol blocks release.
+Wrong conversion, wrong temperature topology/count/hierarchy/direction, between-tick target, wrong endpoint, wrong capacity local-span subdivision/hierarchy, wrong meniscus read point, wrong volume formula/decomposition, linear-factor cubic conversion, target leak, or missing review/revise protocol blocks release.
