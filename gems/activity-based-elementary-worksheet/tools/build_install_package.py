@@ -3,7 +3,8 @@
 
 Release gate: 449 core + 360 skill + 12 runtime UAT + 20 semantic oracle +
 30 system-wide + 40 scale-line + 60 instrument-review/speedometer +
-24 protractor-safety + 80 full-metrology + 32 actual weight-dial gap = 1107 cases.
+24 protractor-safety + 80 full-metrology + 32 actual weight-dial gap +
+48 physical-page-feasibility = 1155 cases.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -19,7 +20,8 @@ SYSTEM_PROFILE='policies/SYSTEM_WIDE_QUALITY_PROFILE.md'
 SCALE_LINE_PROFILE='policies/SCALE_LINE_INTEGRITY_PROFILE.md'
 REVIEW_PROFILE='policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md'
 METROLOGY_PROFILE='policies/METROLOGY_ASSURANCE_PROFILE.md'
-SHARED_PROFILES=[SYSTEM_PROFILE,SCALE_LINE_PROFILE,REVIEW_PROFILE,METROLOGY_PROFILE]
+PAGE_FEASIBILITY_PROFILE='policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md'
+SHARED_PROFILES=[SYSTEM_PROFILE,SCALE_LINE_PROFILE,REVIEW_PROFILE,METROLOGY_PROFILE,PAGE_FEASIBILITY_PROFILE]
 
 WORKER_BUNDLES={
 'W01_ACADEMIC_CONTENT.txt':['workers/W01_ACADEMIC_CONTENT.md'],
@@ -30,7 +32,7 @@ WORKER_BUNDLES={
 'W06_MONEY_CALENDAR_DATA.txt':['workers/W06_MONEY_CALENDAR_DATA.md','domains/MONEY_ENGINE.md','domains/CALENDAR_ENGINE.md','domains/TABLE_GRAPH_READING_ENGINE.md'],
 'W07_INSTRUMENT_AUDITOR.txt':['workers/W07_INSTRUMENT_AUDITOR.md','domains/INSTRUMENT_READING_ENGINE.md'],
 'W08_LAYOUT_RENDER_THAI.txt':['workers/W08_LAYOUT_RENDER_THAI.md'],
-'W09_QA_RELEASE.txt':['workers/W09_QA_RELEASE.md','OUTPUT_CONTRACT.md','ARCHITECTURE.md','KB_ROUTER.md','KB_MANIFEST.md','policies/PARAMETER_POLICY.md','policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md','domains/DOMAIN_REGISTRY.md','domains/MEASUREMENT_COVERAGE_P1_P6.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md'],
+'W09_QA_RELEASE.txt':['workers/W09_QA_RELEASE.md','OUTPUT_CONTRACT.md','ARCHITECTURE.md','KB_ROUTER.md','KB_MANIFEST.md','policies/PARAMETER_POLICY.md','policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md','domains/DOMAIN_REGISTRY.md','domains/MEASUREMENT_COVERAGE_P1_P6.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md'],
 'W10_METROLOGY_ENGINEER.txt':['workers/W10_METROLOGY_ENGINEER.md','domains/INSTRUMENT_READING_ENGINE.md'],
 }
 
@@ -51,7 +53,7 @@ def bundle_text(name,sources):
     effective_sources=[*SHARED_PROFILES,*sources]
     head=(f'ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {name}\n'
           'BASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\n'
-          'Generated from GitHub SSOT. System quality, scale-line integrity, review-revise and independent metrology profiles are embedded.\n\nEMBEDDED_SOURCES:\n')
+          'Generated from GitHub SSOT. System quality, scale-line integrity, review-revise, independent metrology and physical page-feasibility profiles are embedded.\n\nEMBEDDED_SOURCES:\n')
     head+='\n'.join(f'- {s}' for s in effective_sources)
     parts=[head]
     for rel in effective_sources:
@@ -71,6 +73,7 @@ def main():
       ('protractor_scale_safety_regression_suite.py','24-case protractor scale safety'),
       ('metrology_full_audit_regression_suite.py','80-case full metrology audit'),
       ('weight_dial_inactive_gap_regression_suite.py','32-case actual weight-dial inactive-gap regression'),
+      ('physical_page_feasibility_regression_suite.py','48-case physical page feasibility regression'),
     ]
     results=[]
     for script,label in gates:
@@ -82,12 +85,13 @@ def main():
     inst=PACKAGE_DIR/'01_MAIN_INSTRUCTIONS'; know=PACKAGE_DIR/'02_UPLOAD_10_WORKER_KNOWLEDGE_TXT'; guide=PACKAGE_DIR/'03_GUIDE'
     inst.mkdir(parents=True); know.mkdir(parents=True); guide.mkdir(parents=True)
 
-    compact=('COMPACT RUNTIME PROFILE\nBuilt only after 1107/1107 PASS. Exactly 10 base worker Knowledge files.\n\n')
+    compact=('COMPACT RUNTIME PROFILE\nBuilt only after 1155/1155 PASS. Exactly 10 base worker Knowledge files.\n\n')
     main_text=(compact+read('GEM_INSTRUCTIONS_PRODUCTION.md')+
       '\n\n===== MANDATORY SYSTEM-WIDE QUALITY PROFILE =====\n\n'+read(SYSTEM_PROFILE)+
       '\n\n===== MANDATORY SCALE-LINE INTEGRITY PROFILE =====\n\n'+read(SCALE_LINE_PROFILE)+
       '\n\n===== MANDATORY INSTRUMENT REVIEW-REVISE PROFILE =====\n\n'+read(REVIEW_PROFILE)+
       '\n\n===== MANDATORY METROLOGY ASSURANCE PROFILE =====\n\n'+read(METROLOGY_PROFILE)+
+      '\n\n===== MANDATORY PHYSICAL PAGE FEASIBILITY PROFILE =====\n\n'+read(PAGE_FEASIBILITY_PROFILE)+
       '\n\n===== MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK =====\n\n'+read('policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md'))
     (inst/'GEM_ORCHESTRATOR_INSTRUCTIONS.txt').write_text(main_text,encoding='utf-8')
 
@@ -97,11 +101,13 @@ def main():
     install=read('GEM_INSTALLATION_GUIDE.md')
     classroom_uat=read('qa/CLASSROOM_ARTIFACT_QUALIFICATION_UAT.md')
     dial_gap_defect=read('qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md')
+    page_defect=read('qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md')
     (PACKAGE_DIR/'INSTALL_ME_FIRST.txt').write_text(install,encoding='utf-8')
     (guide/'GEM_INSTALLATION_GUIDE.txt').write_text(install,encoding='utf-8')
     (guide/'CLASSROOM_ARTIFACT_QUALIFICATION_UAT_24_CASES.txt').write_text(classroom_uat,encoding='utf-8')
     (guide/'ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.txt').write_text(dial_gap_defect,encoding='utf-8')
-    report_names=['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt','WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_32_REPORT.txt']
+    (guide/'CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.txt').write_text(page_defect,encoding='utf-8')
+    report_names=['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt','WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_32_REPORT.txt','PHYSICAL_PAGE_FEASIBILITY_REGRESSION_48_REPORT.txt']
     for name,r in zip(report_names,results): (guide/name).write_text(r.stdout,encoding='utf-8')
 
     manifest=[]
@@ -116,11 +122,13 @@ def main():
         if bad: raise RuntimeError(f'ZIP integrity failure: {bad}')
 
     for r in results: print(r.stdout.strip())
-    print('COMBINED DRY-RUN: 1107/1107 PASS')
+    print('COMBINED DRY-RUN: 1155/1155 PASS')
     print('PACKAGE BUILD: PASS')
     print('Knowledge files: 10')
+    print('Mandatory shared profiles: 5')
     print('Classroom artifact UAT guide: INCLUDED (24 rendered cases)')
     print('Actual weight-dial inactive-gap regression: INCLUDED (32 cases)')
+    print('Physical page feasibility regression: INCLUDED (48 cases)')
     print(f'ZIP: {ZIP_PATH}')
     print(f'ZIP SHA256: {sha256(ZIP_PATH)}')
     return 0
