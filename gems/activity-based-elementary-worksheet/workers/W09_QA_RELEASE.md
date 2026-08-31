@@ -193,9 +193,22 @@ Required:
 
 ## Clock/day-night hard gates
 
-Thai Grade 3 AUTO analog-clock requests resolve to `DAY_NIGHT_PAIR` unless explicit SINGLE intent. Paired mode requires one face, two blank fields, deterministic day/night mapping, same hand state, 12-hour separation modulo 24, and no targets in Student Blueprint. Strict half-hour means minute=30 unless explicitly mixed.
+Thai Grade 3 AUTO analog-clock requests resolve to `DAY_NIGHT_PAIR` unless explicit SINGLE intent. Paired mode requires one face, exactly two blank response fields, deterministic day/night mapping, the same hand state for the day/night pair, 12-hour separation modulo 24, and no target values/angles in Student Blueprint. Strict half-hour intent means minute=30 unless the teacher explicitly requests a mixed minute set.
 
-Clock hands must share one pivot.
+Each high-risk clock item still requires the canonical atomic renderer state: semantic target + exact numeric hand angles + relational verification + item-specific hard negative. Clock hands share one exact pivot.
+
+Applicable clock gates — retained as permanent compatibility/release contracts:
+
+`PROMPT_CLOCK_MODE_RESOLUTION_QA`
+`PROMPT_HALF_HOUR_INTENT_QA`
+`PROMPT_DAY_NIGHT_MAPPING_QA`
+`PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
+`PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
+`PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA`
+`PROMPT_PER_ITEM_RENDER_STATE_QA`
+`PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
+
+Any applicable clock gate FAIL/NOT_RUN blocks prompt release.
 
 ## Weight-dial hard gates
 
