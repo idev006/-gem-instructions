@@ -71,6 +71,30 @@ Nonzero start: `length=end-start`
 
 Both endpoints must be valid graduations in exact-reading mode.
 
+### Ruler endpoint projection/reference contract
+
+For an object drawn above the ruler, W04 returns exact reference geometry:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+`START_PROJECTION_GUIDE_X = OBJECT_START_X = START_GRADUATION_X`
+`END_PROJECTION_GUIDE_X = OBJECT_END_X = END_GRADUATION_X`
+
+The start/end guides are thin dashed vertical helper lines from the exact object endpoints to the ruler reading zone. They must be perpendicular to the ruler baseline and visually distinct from ruler graduations. They do not count as ticks and may not obscure/create/duplicate a graduation.
+
+For `ZERO_START_MODE`:
+
+`OBJECT_START_X == ZERO_GRADUATION_X`
+`START_GRADUATION_VALUE=0`
+
+The physical ruler edge is not the measurement origin unless it coincides exactly with the zero graduation by explicit template definition. Default elementary templates keep the zero graduation visibly distinct from the physical border.
+
+For `NONZERO_START_MODE`:
+
+`TARGET_LENGTH = END_VALUE - START_VALUE`
+
+Both projection guides remain present so the subtraction relation is visually explicit.
+
 ## Length calculation
 
 `ADD | SUBTRACT | DIFFERENCE | COMPARE | CONVERT`
@@ -273,6 +297,9 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_RULER_ENDPOINT_QA`
 `PROMPT_RULER_SUBDIVISION_COUNT_QA`
 `PROMPT_RULER_EDGE_NOT_TICK_QA`
+`PROMPT_RULER_ENDPOINT_PROJECTION_GUIDE_QA`
+`PROMPT_RULER_ZERO_START_ALIGNMENT_QA`
+`PROMPT_RULER_NONZERO_START_RELATION_QA`
 `PROMPT_SPEEDOMETER_TOPOLOGY_QA`
 `PROMPT_SPEEDOMETER_INTERVAL_POSITION_COUNT_QA`
 `PROMPT_SPEEDOMETER_TARGET_REPRESENTABILITY_QA`
@@ -300,4 +327,4 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_CANONICAL_LABEL_PRESERVATION_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W04 instruments
 
-Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/pivot, route relation, protractor geometry/distortion/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
+Wrong conversion/arithmetic, ruler subdivision, missing/misaligned endpoint projection guides, physical-edge substitution for zero, speedometer mapping/gap/pivot, route relation, protractor geometry/distortion/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
