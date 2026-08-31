@@ -106,6 +106,7 @@ Critical gates include:
 `PROMPT_SCALE_TICK_ANCHOR_QA`
 `PROMPT_SCALE_MAJOR_MINOR_HIERARCHY_QA`
 `PROMPT_SCALE_PRINT_SEPARATION_QA`
+`PROMPT_SCALE_PRINT_SPACING_ORACLE_QA`
 `PROMPT_SCALE_UNIFORM_SPACING_QA`
 `PROMPT_SCALE_DIRECTION_QA`
 `PROMPT_SCALE_LABEL_ALIGNMENT_QA`
@@ -157,6 +158,53 @@ Applicable mandatory clock gates:
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 
 Any FAIL above forces `PROMPT_RELEASE=BLOCKED`.
+
+## Protractor hard gates
+
+For learner-read semicircular 0–180° protractors, especially at 1° resolution, scale placement is release-critical academic data.
+
+Canonical 1° topology:
+
+- exactly 180 equal intervals / 181 endpoint-inclusive positions;
+- exact origin;
+- explicit baseline 0° direction;
+- exact target ray through the configured graduation;
+- no perspective/skew;
+- one clearly active reading direction unless dual-scale interpretation is explicitly taught.
+
+Printed spacing must be independently verified at the authoritative reading ring:
+
+`tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`
+
+For 1° and `MIN_TICK_CENTER_SPACING_MM=0.60`:
+
+`MIN_READING_RADIUS_MM≈34.38`
+`MIN_READING_RING_DIAMETER_MM≈68.76`
+`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
+
+A 65 mm protractor therefore fails print-spacing QA at 1° resolution (~0.567 mm per interval).
+
+A final prompt for learner-read 1° protractor geometry must not contain unresolved `RENDER_PATH=AUTO`; the instrument layer must be deterministic vector geometry. If exact theme art is desired, it remains isolated from the instrument geometry.
+
+A mirrored competing inner scale is forbidden by default. If item verification references 5° ticks, 5° intermediate marks are REQUIRED and must reuse existing 1° positions rather than add positions.
+
+If user-explicit `ONE_PAGE_LOCK=ON` cannot preserve 70 mm minimum width, labels, margins and answer space, then:
+
+`PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`
+`PROMPT_RELEASE=BLOCKED`
+
+Do not shrink the scale below the verified minimum.
+
+Applicable gates:
+
+`PROMPT_PROTRACTOR_TOPOLOGY_QA`
+`PROMPT_PROTRACTOR_BASELINE_QA`
+`PROMPT_PROTRACTOR_DIRECTION_QA`
+`PROMPT_PROTRACTOR_PRINT_SPACING_QA`
+`PROMPT_PROTRACTOR_ACTIVE_SCALE_QA`
+`PROMPT_PROTRACTOR_RENDER_PATH_QA`
+`PROMPT_PROTRACTOR_INTERMEDIATE_HIERARCHY_QA`
+`PROMPT_SCALE_PRINT_SPACING_ORACLE_QA`
 
 ## Speedometer hard gates
 
@@ -258,6 +306,7 @@ No placeholders or external `see above` dependency.
 ### Angle/protractor
 - 0–180° @1° = 180/181
 - 0–360° @1° = 360 intervals/360 distinct positions
+- 1° semicircle print-spacing at default 0.60 mm requires reading-ring diameter ≥68.76 mm; production minimum width 70 mm
 - origin/baseline/direction exact
 
 ### Perimeter/area
