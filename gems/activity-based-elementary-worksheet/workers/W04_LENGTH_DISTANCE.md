@@ -6,23 +6,25 @@
 
 ## ACCEPTS
 
-Grade, question count/type, ruler/protractor range/resolution, unit set, start-position mode, target lengths/angles, length/distance task type, perimeter/area task type, figure parameters, answer format.
+Grade, question count/type, ruler/protractor/speedometer range and resolution, unit set, start-position mode, target lengths/angles/speeds, length/distance task type, perimeter/area task type, figure parameters, answer format.
 
 ## OWNS
 
-- ruler reading
-- zero/nonzero reference semantics
+- ruler reading and zero/nonzero reference semantics
 - mm/cm/m/km conversion
 - length add/subtract/difference/compare
 - distance total/difference/round trip/multi-segment/route compare
-- angle reading with 0–180° semicircular or 0–360° full-circle protractor when explicitly requested
+- angle/protractor reading
+- direct speedometer reading and speedometer value→tick→angle mapping
 - perimeter calculation
 - area calculation for supported elementary figures
-- length/distance/angle/perimeter/area QA
+- W04 domain QA
+
+Direct speedometer reading is owned here as instrument reading. Do **not** silently introduce `speed=distance/time`; speed/rate calculation is outside this engine unless separately defined.
 
 ## RETURNS
 
-Verified internal quantities, student-safe givens/blanks, canonical ruler/protractor template when visual, renderer-only endpoint/tick/ray states, unit-conversion constraints, QA requirements.
+Verified internal quantities, student-safe givens/blanks, canonical ruler/protractor/speedometer template when visual, renderer-only endpoint/tick/ray/needle states, unit constraints, QA requirements.
 
 ## MUST_NOT_DECIDE
 
@@ -36,23 +38,33 @@ Final page layout, global render path, time/weight/capacity formulas, global ans
 
 Normalize to one base unit before arithmetic. Millimetres are the preferred exact elementary internal base unit.
 
-## Ruler topology
+## Ruler topology — critical
 
 When ruler is learner-read:
 
-- straight front-facing scale
-- explicit zero graduation distinct from physical edge
-- uniform graduations
-- cm marks stronger than mm marks
-- no perspective/skew/stretch
-- no decorative tick-like marks
+- straight front-facing scale;
+- explicit zero graduation distinct from physical edge;
+- uniform graduations;
+- cm marks stronger/longer than mm marks;
+- no perspective/skew/stretch;
+- no decorative tick-like marks;
+- inherit `SCALE_LINE_INTEGRITY_PROFILE.md` and `INSTRUMENT_REVIEW_REVISE_PROFILE.md`.
 
 For minor interval `d`:
 
 `interval_count=(max-min)/d`
 `tick_position_count=interval_count+1`
 
-Canonical 1 cm @1 mm: 10 equal intervals / 11 endpoint-inclusive positions.
+Canonical 1 cm @1 mm:
+
+`INTERVALS_PER_CM=10`
+`POSITIONS_PER_CM_SPAN=11`
+`INTERIOR_POSITIONS_PER_CM_SPAN=9`
+`PHYSICAL_EDGE_IS_GRADUATION=NO`
+
+A 5 mm intermediate mark, when used, occupies an existing 1 mm position; it never adds a new scale position.
+
+The renderer-side review must recount each complete 1 cm span before finalization. Any extra/missing minor mark is `CRITICAL_ACADEMIC`.
 
 Zero start: `length=end`
 Nonzero start: `length=end-start`
@@ -69,12 +81,30 @@ Normalize units, compute exactly, independently verify, then format as requested
 
 `TOTAL | DIFFERENCE | ROUND_TRIP | MULTI_SEGMENT | ROUTE_COMPARE | CONVERT`
 
-- total = sum each segment exactly once
-- default elementary difference = nonnegative absolute difference unless wording is directional
-- same-route round trip = `2×one_way` only when same route is explicit/clear
-- asymmetric return = outbound + return
-- independently total each route before comparison
-- do not invent map scale or speed/rate unless explicitly requested
+- total = sum each segment exactly once;
+- default elementary difference = nonnegative absolute difference unless wording is directional;
+- same-route round trip = `2×one_way` only when same route is explicit/clear;
+- asymmetric return = outbound + return;
+- independently total each route before comparison;
+- do not invent map scale or speed/rate unless explicitly requested through a supported rule.
+
+## Speedometer reading
+
+Use `domains/SPEEDOMETER_READING_ENGINE.md`.
+
+Canonical elementary default unless explicitly overridden:
+
+- range 0–120 km/h;
+- `OPEN_ARC_BOUNDED`;
+- 240° active sweep starting at 240°, clockwise;
+- major interval 20 km/h;
+- minor interval 10 km/h;
+- 12 active intervals / 13 active positions;
+- 120° inactive gap with zero value ticks;
+- one instructional needle;
+- canonical mapping `target_angle=(240 + 2*target_kmh) mod 360`.
+
+Every speedometer item must be exactly representable in discrete mode and serialize semantic speed, tick index, exact target angle, relation to nearest major labels and item-specific hard negative.
 
 ## Angle / protractor
 
@@ -85,43 +115,22 @@ For minor interval `d`:
 `interval_count=180/d`
 `tick_position_count=interval_count+1`
 
-At 1° resolution: 180 intervals / 181 endpoint-inclusive positions.
+At 1°: 180 intervals / 181 endpoint-inclusive positions.
 
-Required geometry:
-
-- vertex exactly at center/origin
-- one baseline ray exactly aligned with selected 0° direction
-- second ray intersects exact target graduation
-- selected left-zero/right-zero scale direction explicit
-- dual-scale labels may exist but active scale must be unambiguous
-- no perspective/skew
-- no decorative radial lines resembling rays
+Required geometry: exact center/origin, selected 0° baseline, exact target ray, explicit left-zero/right-zero direction, no perspective/skew, no decorative competing rays.
 
 ### Full-circle 0–360°
 
-Use only when `PROTRACTOR_RANGE=0_360` is explicitly requested or curriculum/objective requires a full-turn measuring instrument.
+Use only when explicitly requested/required.
 
-Topology is `CYCLIC_FULL_CIRCLE`, not endpoint-inclusive linear duplication.
-
-For minor interval `d` where `360/d` is an integer:
+Topology is `CYCLIC_FULL_CIRCLE`.
 
 `interval_count=360/d`
 `distinct_tick_position_count=360/d`
 
-The 0° and 360° directions are the **same physical position**; do not draw a duplicate 360° graduation at the origin.
+0° and 360° are the same physical position; never duplicate the 360° graduation.
 
-At 1° resolution: 360 equal intervals / 360 distinct positions.
-
-Required geometry:
-
-- exact center/origin
-- one baseline ray exactly on selected 0° direction
-- direction explicit as clockwise or counterclockwise
-- target ray intersects exact target graduation
-- target normalized to `[0,360)` for renderer geometry; a pedagogical answer of 360° is allowed only for a full-turn concept explicitly taught
-- no duplicated 0°/360° physical mark
-- no perspective/skew
-- no decorative radial lines resembling measurement rays
+Target is normalized to `[0,360)` for renderer geometry. Direction must be explicit.
 
 ### Angle classifications
 
@@ -132,11 +141,11 @@ Required geometry:
 - reflex: `180° < angle < 360°` when taught
 - full turn: `360°` when explicitly taught
 
-Renderer-only target angle/tick/ray state belongs to teacher-visible metadata, not Student Blueprint.
+Renderer target state belongs to teacher-visible metadata, not Student Blueprint.
 
 ## Perimeter
 
-General polygon: `P=sum(all boundary side lengths exactly once)`
+Polygon: `P=sum(all boundary side lengths exactly once)`
 Rectangle: `P=2(l+w)`
 Square: `P=4s`
 
@@ -151,9 +160,7 @@ Parallelogram: `A=b×h`
 Trapezoid: `A=1/2×(a+b)×h`
 Circle when explicitly requested: `A=πr²`, `C=2πr=πd`
 
-Triangle/parallelogram/trapezoid height is the perpendicular height.
-
-Circle problems require one consistent `PI_POLICY` such as `3.14`, `22/7`, symbolic π, or teacher-defined custom policy.
+Triangle/parallelogram/trapezoid height is perpendicular. Circle problems require one consistent `PI_POLICY`.
 
 ## Area unit relations
 
@@ -164,19 +171,18 @@ Squared-unit conversion uses the square of the linear factor.
 
 ## Visibility
 
-Ruler/protractor target endpoints, ticks, angles and ray positions are `RENDER_ONLY_NOT_FOR_WORKSHEET`. Student Blueprint contains only learner-visible figures/givens/blanks.
+Ruler/protractor/speedometer target endpoints, indices, angles, rays and needle states are `RENDER_ONLY_NOT_FOR_WORKSHEET`. Student Blueprint contains learner-visible figures/givens/blanks only.
 
-Canonical ruler/protractor labels remain visible; leak guards prohibit hidden target callouts, not instructional scale labels.
+Canonical labels remain visible; leak guards prohibit hidden target callouts, not instructional labels.
 
 ## Grade progression
 
-Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/LENGTH_READING_ENGINE.md` conservatively.
+Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETER_READING_ENGINE.md` conservatively.
 
-- P1–P2: direct length/perimeter intuition and simple whole-unit tasks
-- P3: ruler cm/mm and basic perimeter/distance
-- P4: nonzero ruler starts, unit conversion, semicircular protractor, rectangle/square perimeter/area
-- P5: broader area/mixed units
-- P6: polygon/circle measurement; full-circle protractor only when explicitly taught/requested
+- P1–P2: simple whole-unit/direct visual reading;
+- P3: ruler cm/mm and basic distance/perimeter; speedometer only with simple labelled major marks when explicitly requested;
+- P4: nonzero ruler starts, conversion, protractor, rectangle/square area/perimeter; speedometer minor marks when objective supports;
+- P5–P6: broader mixed measurement/reasoning; do not introduce speed-rate calculation merely from speedometer reading.
 
 ## QA
 
@@ -187,6 +193,14 @@ Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/LENGTH_READING_ENGINE.m
 `PROMPT_RULER_TOPOLOGY_QA`
 `PROMPT_RULER_ZERO_REFERENCE_QA`
 `PROMPT_RULER_ENDPOINT_QA`
+`PROMPT_RULER_SUBDIVISION_COUNT_QA`
+`PROMPT_RULER_EDGE_NOT_TICK_QA`
+`PROMPT_SPEEDOMETER_TOPOLOGY_QA`
+`PROMPT_SPEEDOMETER_INTERVAL_POSITION_COUNT_QA`
+`PROMPT_SPEEDOMETER_TARGET_REPRESENTABILITY_QA`
+`PROMPT_SPEEDOMETER_ANGLE_MAPPING_QA`
+`PROMPT_SPEEDOMETER_NEEDLE_ALIGNMENT_QA`
+`PROMPT_SPEEDOMETER_INACTIVE_GAP_QA`
 `PROMPT_PROTRACTOR_TOPOLOGY_QA`
 `PROMPT_PROTRACTOR_BASELINE_QA`
 `PROMPT_PROTRACTOR_DIRECTION_QA`
@@ -196,5 +210,6 @@ Use `domains/MEASUREMENT_COVERAGE_P1_P6.md` and `domains/LENGTH_READING_ENGINE.m
 `PROMPT_AREA_UNIT_CONVERSION_QA`
 `PROMPT_PI_POLICY_QA` when circles are used
 `PROMPT_CANONICAL_LABEL_PRESERVATION_QA`
+`PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W04 instruments
 
-Wrong conversion/arithmetic, route relation, ruler reference, protractor topology/baseline/direction, perimeter/area formula, squared-unit conversion, or hidden-target leak blocks release.
+Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/needle, route relation, protractor geometry, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
