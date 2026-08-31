@@ -11,9 +11,9 @@ Applies to: `activity-based-elementary-worksheet` baseline 2.6.x
 - `KB_ROUTER.md` — 2.6.0-LTS
 - `KB_MANIFEST.md` — 2.6.0-LTS
 - `policies/PARAMETER_POLICY.md` — 2.6.0-LTS
+- `policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
 - `domains/DOMAIN_REGISTRY.md` — 2.6.0-LTS
 - `domains/MEASUREMENT_COVERAGE_P1_P6.md`
-- `domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
 - W01..W09 worker contracts
 - `qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md`
 - `qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md`
