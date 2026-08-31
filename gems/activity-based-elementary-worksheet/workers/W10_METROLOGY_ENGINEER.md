@@ -20,12 +20,13 @@ Owning-domain verified state, `SCALE_LINE_SPEC`, W07 audit state, resolved or ca
 - inactive-region audit;
 - label-to-tick association audit;
 - repeated-template consistency audit;
-- page-size feasibility from measurement readability;
+- metrology minimum-size derivation;
+- independent numeric physical-page feasibility evidence supplied to W08/W09;
 - metrology release verdict returned to W09.
 
 ## RETURNS
 
-One `METROLOGY_AUDIT_STATE` per canonical learner-read instrument template, independent numeric evidence, PASS/FAIL verdict, and repair requirements when blocked.
+One `METROLOGY_AUDIT_STATE` per canonical learner-read instrument template, independent numeric evidence, PASS/FAIL verdict, true metrology minimum size with oracle source, and repair requirements when blocked.
 
 ## MUST_NOT_DECIDE
 
@@ -44,6 +45,7 @@ W10 inherits:
 - `policies/SCALE_LINE_INTEGRITY_PROFILE.md`
 - `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 - `policies/METROLOGY_ASSURANCE_PROFILE.md`
+- `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
 ## Independent verification requirement
 
@@ -74,15 +76,63 @@ For 0–180° protractor @1°:
 
 Any proposed 65 mm diameter at 1° is rejected.
 
+For linear scales:
+
+`tick_center_spacing_mm = printed_scale_length_mm / interval_count`
+
+The comparison operator must match the computed value exactly. Example: 60 mm / 50 = exactly 1.20 mm, so `>=1.20 mm` is valid while `>1.20 mm` is false.
+
+## Minimum-size semantics
+
+W10 must never confuse a chosen layout size with the minimum size required by metrology.
+
+Required fields:
+
+`METROLOGY_MINIMUM_SIZE_MM`
+`SELECTED_RENDER_SIZE_MM`
+`SIZE_ORACLE_SOURCE=SPACING_ORACLE|DOMAIN_MINIMUM|USER_EXPLICIT|OTHER_JUSTIFIED`
+
+`METROLOGY_MINIMUM_SIZE_MM` is the smallest size satisfying the spacing oracle or a stronger legitimate domain/user minimum. `SELECTED_RENDER_SIZE_MM` may be larger, but the larger value must not be reported as the metrology minimum merely because it was convenient for layout.
+
+For the canonical 0–5 kg weight dial, the owning domain currently has a stronger practical minimum diameter of 30 mm; a generated 80 mm dial may be a selected size but is not automatically a metrology minimum.
+
 ## Render-path audit
 
 When learner-read geometry requires exact graduations, final `RENDER_PATH=AUTO` is invalid. The instrument geometry must be deterministic (`DETERMINISTIC_VECTOR` or deterministic component inside `HYBRID`).
 
 `IMAGE_ONLY` is rejected when nondeterminism can alter scale geometry.
 
-## Page-pressure audit
+`OUTPUT_MODE` is audited separately from `RENDER_PATH`; W10 must not accept a render-path value placed in the output-mode field as coherent evidence.
 
-If one-page constraints would shrink an instrument below the audited minimum, W10 returns FAIL. No worker may repair the conflict by deleting, merging, compressing, relabeling, or inventing scale marks.
+## Physical page feasibility audit
+
+Metrology-safe size does not imply page fit. W10 must independently verify the physical packing arithmetic defined by `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md` before returning `PRINT_FEASIBILITY_CHECK=PASS` or `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA=PASS`.
+
+For A4 portrait, page height is 297 mm and width is 210 mm before margins.
+
+A page-feasibility PASS requires numeric evidence for:
+- margins;
+- header/title/directions reserve;
+- grid rows/columns;
+- complete item bounding box, not instrument scale alone;
+- row/column gaps;
+- answer-zone height;
+- resulting usable width/height;
+- resulting required grid width/height.
+
+If any required dimension is missing, page feasibility is `NOT_RUN`, not PASS.
+
+Immediate impossibility oracles:
+- five rows of 80 mm dials require at least 400 mm vertically before other content → cannot fit A4 portrait;
+- five rows of 70 mm protractors require at least 350 mm → cannot fit A4 portrait;
+- five rows of 60 mm thermometer scales require at least 300 mm before answer/header/margins → cannot fit A4 portrait;
+- five 50 mm container item boxes consume 250 mm before gaps/header/margins → requires full numeric proof and must not be assumed PASS.
+
+If `ONE_PAGE_LOCK=OFF` and the candidate one-page plan fails, W10 returns page-feasibility FAIL for that candidate and requires W08 to paginate/recompute. This is not a prompt-release blocker once a new feasible paginated plan is supplied and re-audited.
+
+If `ONE_PAGE_LOCK=ON` and the candidate plan fails, W10 returns FAIL and W09 blocks release.
+
+No worker may repair page pressure by deleting, merging, compressing, relabeling, or inventing scale marks.
 
 ## Instrument families
 
@@ -140,6 +190,9 @@ Required W10 evidence fields for this family:
 `TOPOLOGY_CHECK`
 `COUNT_ORACLE`
 `SPACING_ORACLE`
+`METROLOGY_MINIMUM_SIZE_MM`
+`SELECTED_RENDER_SIZE_MM`
+`SIZE_ORACLE_SOURCE`
 `REFERENCE_ORIGIN_CHECK`
 `DIRECTION_MONOTONICITY_CHECK`
 `HIERARCHY_CHECK`
@@ -147,6 +200,7 @@ Required W10 evidence fields for this family:
 `TARGET_ALIGNMENT_CHECK`
 `INACTIVE_REGION_CHECK` when applicable
 `TEMPLATE_CONSISTENCY_CHECK`
+`PHYSICAL_PAGE_STATE`
 `PRINT_FEASIBILITY_CHECK`
 `INDEPENDENT_VERDICT=PASS|FAIL`
 
@@ -168,11 +222,14 @@ Required W10 evidence fields for this family:
 `PROMPT_METROLOGY_RENDER_PATH_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
+`PROMPT_METROLOGY_SIZE_ORACLE_QA`
+`PROMPT_PHYSICAL_PAGE_STATE_QA`
+`PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
 `PROMPT_METROLOGY_DIAL_ACTIVE_TICK_SET_QA` when applicable
 `PROMPT_METROLOGY_DIAL_GAP_RADIAL_MARK_ZERO_QA` when applicable
 `PROMPT_METROLOGY_DIAL_LABEL_ANGLE_QA` when applicable
 
-Any applicable FAIL or NOT_RUN is returned to W09 as a release blocker.
+Any applicable FAIL or NOT_RUN is returned to W09 as a release blocker for the current compiled plan.
 
 ## Artifact phase
 
