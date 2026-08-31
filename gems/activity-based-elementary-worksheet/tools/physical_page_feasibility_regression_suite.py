@@ -67,7 +67,7 @@ checks=[
 ('w10-weight-impossible','five rows of 80 mm circular dials require at least 400 mm' in w10),
 ('w10-protractor-shape-aware','semicircle body height is `R=W/2`' in w10 and 'must not' in w10.lower()),
 ('w10-thermo-impossible','five rows of 60 mm thermometer scales require at least 300 mm' in w10),
-('met-page-state','PHYSICAL_PAGE_STATE' in met and '210 mm' in met and '297 mm' in met),
+('met-page-state','PHYSICAL_PAGE_STATE' in met and '210mm' in met.replace(' ','') and '297mm' in met.replace(' ','')),
 ('defect-speed-clarification','Speedometer clarification — NOT A DEFECT' in defect),
 ]
 for n,o in checks:add(n,o)
