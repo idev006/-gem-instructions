@@ -1,11 +1,12 @@
 # INSTRUMENT_READING_ENGINE — Shared Educational Geometry Rules
 
-Version: 1.3.0
+Version: 1.4.0
 Status: Mandatory shared rules for learner-read visual instruments
 Owning cross-domain worker: `W07_INSTRUMENT_AUDITOR`
 Compatible Gem baseline: 2.6.x
+Requires: `policies/SCALE_LINE_INTEGRITY_PROFILE.md`
 
-Applies to analog clocks, dial scales, rulers, thermometers, graduated capacity instruments, and learner-read graph/axis geometry.
+Applies to analog clocks, dial scales, rulers, thermometers, graduated capacity instruments, protractors, and learner-read graph/axis geometry.
 
 ## 1. Core principle
 
@@ -14,6 +15,8 @@ If the learner must read a visual instrument, its geometry is **academic data**.
 `INSTRUMENT GEOMETRY > CONTEXT ART > DECORATION`
 
 A missing/extra tick, wrong pointer, distorted scale, ambiguous start point, or unreadable graduation is not a minor art defect.
+
+All learner-read scales additionally inherit the complete `SCALE_LINE_INTEGRITY_PROFILE.md`. The domain worker owns numeric meaning; W07 audits physical scale-line integrity.
 
 ## 2. Three layers
 
@@ -49,6 +52,9 @@ Lock:
 - major/minor spacing
 - label positions
 - stroke hierarchy
+- scale-line anchoring baseline/ring
+- scale direction
+- endpoint/inactive-region behavior
 - reserved box/aspect ratio
 
 Only intended pedagogical state changes, e.g. needle angle, hand position, liquid level, object endpoint.
@@ -78,23 +84,57 @@ Active interval count plus endpoint-inclusive active positions. Inactive/non-sca
 
 Example: canonical 0–5 kg teaching dial = 50 active intervals / 51 positions + 60° inactive gap.
 
-## 6. General geometry invariants
+### PROTRACTOR_HALF_CIRCLE
+
+For a canonical 0–180° semicircular protractor with minor interval d:
+
+`intervals=180/d`
+`positions=intervals+1`
+
+At 1°: 180 intervals / 181 positions.
+
+## 6. Mandatory SCALE_LINE_SPEC
+
+Before release, every learner-read scale must resolve the shared profile fields including:
+
+`TOPOLOGY_FAMILY, ACTIVE_RANGE, MINOR_INTERVAL, MAJOR_INTERVAL, EXPECTED_INTERVAL_COUNT, EXPECTED_POSITION_COUNT, SCALE_DIRECTION, REFERENCE_BASELINE_OR_RING, TICK_ANCHOR_MODE, MAJOR_MINOR_HIERARCHY, ENDPOINT_BEHAVIOR, MIN_PRINTED_INSTRUMENT_SIZE, MIN_TICK_CENTER_SPACING_MM`.
+
+Add `INACTIVE_REGION_RULE` when applicable.
+
+Missing or vague scale-line state fails `PROMPT_SCALE_LINE_SPEC_QA`.
+
+## 7. General geometry invariants
 
 - exact active range
 - exact interval/position count
 - uniform spacing
+- common baseline/ring anchoring
+- no floating/detached ticks
 - major/minor hierarchy
-- labels aligned to intended marks
+- labels aligned to intended marks with clearance
 - no missing graduation
-- no duplicate/extra graduation
+- no duplicate/extra/merged graduation
 - no instructional tick in inactive/non-scale region
-- exact target on valid graduation for exact-reading mode
+- exact target on valid graduation in exact-reading mode
+- scale values monotonic in configured direction
+- one canonical template per repeated instrument type
 - preserve aspect ratio
-- no perspective if it changes reading
+- no perspective when it changes reading
 - no crop/overlap
-- no decorative pointer/tick-like mark
+- no decorative pointer/tick/ray-like mark
 
-## 7. Target representability
+## 8. Scale-line print integrity
+
+Use `SCALE_LINE_INTEGRITY_PROFILE.md` as SSOT. Default lower bounds at final print size:
+
+- minor tick stroke >= 0.25 mm;
+- major tick stroke >= 0.35 mm;
+- major tick length >= 1.5× minor tick length;
+- smallest adjacent tick-center spacing >= 0.60 mm.
+
+If the intended scale cannot satisfy these while preserving readability, increase instrument size or paginate. Never solve density by deleting or merging required ticks.
+
+## 9. Target representability
 
 For a discrete linear scale:
 
@@ -105,23 +145,23 @@ Require `target==represented` within tolerance unless interpolation is explicitl
 
 The target endpoint/read point must be specified to coincide with the exact intended graduation.
 
-## 8. High-risk prompt serialization
+## 10. High-risk prompt serialization
 
 Every learner-read high-risk visual item must contain:
 
 `SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
 
-Semantic-only instructions such as `show 10:30` or `show 2.4 kg` are insufficient.
-
 Repeated instruments compile as:
 
-`CANONICAL TEMPLATE + ITEM 1 STATE + ... + ITEM N STATE`
+`CANONICAL TEMPLATE + RESOLVED SCALE_LINE_SPEC + ITEM 1 STATE + ... + ITEM N STATE`
+
+Semantic-only instructions such as `show 10:30`, `show 2.4 kg`, or `draw clear scale marks` are insufficient.
 
 No `same as above`, `etc.`, or omitted states.
 
-## 9. Minimum readability
+## 11. Minimum readability
 
-Owning domain defines/derives minimum printed size.
+Owning domain defines/derives minimum printed size; the scale-line profile adds minimum tick-center spacing and stroke hierarchy.
 
 When layout pressure threatens the smallest required graduation:
 
@@ -129,11 +169,12 @@ When layout pressure threatens the smallest required graduation:
 2. reduce/remove decoration;
 3. shorten nonessential instruction;
 4. reduce nonessential padding;
-5. preserve instrument size and answer space.
+5. preserve instrument size, scale lines and answer space;
+6. paginate when unlocked.
 
 If one-page lock still cannot fit safely, fail feasibility. Never merge/omit graduations to fit.
 
-## 10. Prompt-phase QA
+## 12. Prompt-phase QA
 
 Applicable:
 
@@ -151,9 +192,25 @@ Applicable:
 `PROMPT_PER_ITEM_RENDER_STATE_QA`
 `CANONICAL_LABEL_PRESERVATION_QA`
 
+Mandatory scale-line family:
+
+`PROMPT_SCALE_LINE_SPEC_QA`
+`PROMPT_SCALE_TICK_ANCHOR_QA`
+`PROMPT_SCALE_MAJOR_MINOR_HIERARCHY_QA`
+`PROMPT_SCALE_PRINT_SEPARATION_QA`
+`PROMPT_SCALE_UNIFORM_SPACING_QA`
+`PROMPT_SCALE_DIRECTION_QA`
+`PROMPT_SCALE_LABEL_ALIGNMENT_QA` when labels apply
+`PROMPT_SCALE_LABEL_CLEARANCE_QA` when labels apply
+`PROMPT_SCALE_TARGET_ALIGNMENT_QA`
+`PROMPT_SCALE_INACTIVE_REGION_QA` when applicable
+`PROMPT_SCALE_DECORATION_ISOLATION_QA`
+`PROMPT_SCALE_TEMPLATE_CONSISTENCY_QA`
+`PROMPT_SCALE_LINE_SERIALIZATION_QA`
+
 These gates validate the **prompt specification**, not pixels.
 
-## 11. Artifact phase
+## 13. Artifact phase
 
 Before actual downstream image inspection:
 
@@ -163,16 +220,20 @@ After an artifact exists, inspect every instructional instrument individually:
 
 - shape/orientation
 - active range
-- interval/position count
-- spacing
-- label placement
-- pointer/hand/level/endpoint
-- target alignment
-- no missing/extra marks
+- exact interval/position count
+- no missing/extra/merged tick
+- uniform spacing
+- common tick anchoring ring/baseline
+- major/minor hierarchy
+- label placement/clearance
+- pointer/hand/level/endpoint target alignment
+- inactive-region integrity
+- scale direction
+- no competing decorative marks
 - readability/photocopy quality
 
 One incorrect instructional instrument blocks classroom release.
 
-## 12. Domain authority
+## 14. Domain authority
 
-The owning domain worker/engine defines domain formulas (clock angles, dial sweep, ruler reference, meniscus convention, etc.). W07/shared engine audits cross-domain invariants and must not invent a conflicting formula.
+The owning domain worker/engine defines domain formulas (clock angles, dial sweep, ruler reference, meniscus convention, protractor direction, graph mapping, etc.). W07/shared engine audits cross-domain invariants and must not invent a conflicting formula.
