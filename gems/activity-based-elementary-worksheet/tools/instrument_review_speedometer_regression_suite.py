@@ -6,7 +6,6 @@ artifact defect. Complements, never replaces, the existing 911 cases.
 Expected case count: exactly 60.
 """
 from __future__ import annotations
-
 from pathlib import Path
 import math
 import sys
@@ -15,10 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent.parent
 CASES: list[tuple[str, bool, str]] = []
 
-
 def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
-
 
 def add(name: str, actual, expected) -> None:
     if isinstance(expected, float):
@@ -27,10 +24,8 @@ def add(name: str, actual, expected) -> None:
         ok = actual == expected
     CASES.append((name, ok, f"actual={actual!r} expected={expected!r}"))
 
-
 def token(name: str, haystack: str, needle: str) -> None:
     CASES.append((name, needle in haystack, needle))
-
 
 def linear_counts(min_v: float, max_v: float, d: float) -> tuple[int, int, int]:
     intervals = round((max_v - min_v) / d)
@@ -38,18 +33,14 @@ def linear_counts(min_v: float, max_v: float, d: float) -> tuple[int, int, int]:
     interior = max(positions - 2, 0)
     return intervals, positions, interior
 
-
 def represented(min_v: float, d: float, target: float) -> tuple[int, float, bool]:
     idx = round((target - min_v) / d)
     value = min_v + idx * d
     return idx, value, math.isclose(target, value, rel_tol=0.0, abs_tol=1e-9)
 
-
 def speed_angle(target: float) -> float:
     return (240 + 2 * target) % 360
 
-
-# 1-24 independent known-answer semantic oracles.
 r1 = linear_counts(0, 10, 1)
 add("ruler-1cm-intervals", r1[0], 10)
 add("ruler-1cm-positions", r1[1], 11)
@@ -86,7 +77,6 @@ add("speedometer-35-invalid", ok_speed35, False)
 add("speedometer-inactive-gap", 360 - 240, 120)
 add("speedometer-major-label-count", len(list(range(0, 121, 20))), 7)
 
-# 25-44 policy/domain regression tokens.
 review = read("policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md")
 speed = read("domains/SPEEDOMETER_READING_ENGINE.md")
 uat = read("qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md")
@@ -99,8 +89,7 @@ for name, needle in [
     ("review-serialization-gate", "PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA"),
     ("review-ruler-10-11-9", "exactly 9 interior graduation positions"),
     ("review-artifact-boundary", "ARTIFACT_QA=NOT_YET_TESTED"),
-]:
-    token(name, review, needle)
+]: token(name, review, needle)
 
 for name, needle in [
     ("speed-open-arc", "OPEN_ARC_BOUNDED"),
@@ -110,8 +99,7 @@ for name, needle in [
     ("speed-angle-formula", "target_angle=(240 + 2*target_kmh) mod 360"),
     ("speed-no-rate-calc", "does **not** silently introduce the formula `speed=distance/time`"),
     ("speed-self-review", "Renderer self-review"),
-]:
-    token(name, speed, needle)
+]: token(name, speed, needle)
 
 for name, needle in [
     ("uat-critical", "CRITICAL_ACADEMIC"),
@@ -119,10 +107,8 @@ for name, needle in [
     ("uat-11-positions", "exactly 11 physical graduation positions"),
     ("uat-9-interior", "exactly 9 interior positions"),
     ("uat-edge-not-tick", "physical ruler border/outline is not an additional graduation"),
-]:
-    token(name, uat, needle)
+]: token(name, uat, needle)
 
-# 45-60 cross-system integration checks.
 w04 = read("workers/W04_LENGTH_DISTANCE.md")
 w05 = read("workers/W05_TEMPERATURE_CAPACITY_VOLUME.md")
 w07 = read("workers/W07_INSTRUMENT_AUDITOR.md")
@@ -150,10 +136,10 @@ integration = [
     ("manifest-three-profiles", "INSTRUMENT_REVIEW_REVISE_PROFILE.md" in manifest and "SCALE_LINE_INTEGRITY_PROFILE.md" in manifest),
     ("instrument-engine-review", "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON" in instrument and "speedometer" in instrument.lower()),
     ("builder-review-profile", "INSTRUMENT_REVIEW_REVISE_PROFILE.md" in builder),
-    ("builder-new-suite", "instrument_review_speedometer_regression_suite.py" in builder and "971/971 PASS" in builder),
-    ("validator-new-suite", "instrument_review_speedometer_regression_suite.py" in validator and "971" in validator),
+    ("builder-new-suite", "instrument_review_speedometer_regression_suite.py" in builder and "995/995 PASS" in builder),
+    ("validator-new-suite", "instrument_review_speedometer_regression_suite.py" in validator and "995" in validator),
     ("workflow-new-suite", "Instrument review + speedometer regression" in workflow and "60 cases" in workflow),
-    ("checklist-new-suite", "971/971 PASS" in checklist and "instrument_review_speedometer_regression_suite.py" in checklist),
+    ("checklist-new-suite", "995/995 PASS" in checklist and "instrument_review_speedometer_regression_suite.py" in checklist),
     ("core-review-protocol", "INSTRUMENT_REVIEW_REVISE_PROFILE.md" in core and "speedometer" in core.lower()),
     ("output-review-protocol", "INSTRUMENT_REVIEW_REVISE_PROTOCOL" in out and "NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON" in out),
 ]
@@ -164,8 +150,7 @@ assert len(CASES) == 60, len(CASES)
 failed = [c for c in CASES if not c[1]]
 if failed:
     print(f"INSTRUMENT REVIEW/SPEEDOMETER REGRESSION: FAIL ({len(failed)}/{len(CASES)})")
-    for name, _, detail in failed:
-        print("FAIL", name, detail)
+    for name, _, detail in failed: print("FAIL", name, detail)
     sys.exit(1)
 
 print("INSTRUMENT REVIEW/SPEEDOMETER REGRESSION: PASS")
