@@ -77,31 +77,29 @@ add('graph-equal-physical-step',len(set(coords[i+1]-coords[i] for i in range(4))
 add('graph-linear-mapping',all(coords[i]==2*vals[i] for i in range(5)))
 add('graph-bar-target-map',2*15==30)
 
-# 41-60 policy/worker audit tokens
+# 41-60 policy/worker audit — semantic, wording-stable evidence
 profile=read('policies/METROLOGY_ASSURANCE_PROFILE.md')
 w10=read('workers/W10_METROLOGY_ENGINEER.md')
-for name,needle in [
-('profile-one-wrong','ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER'),
-('profile-dual-audit','W07 INSTRUMENT GEOMETRY AUDIT → W10 INDEPENDENT METROLOGY AUDIT'),
-('profile-linear-oracle','intervals=(max-min)/minor_interval'),
-('profile-clock','60 intervals / 60 distinct positions / 6° per interval'),
-('profile-weight','50 active intervals / 51 active positions'),
-('profile-speed','12 active intervals / 13 active positions'),
-('profile-spacing-formula','tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)'),
-('profile-protractor-70','production minimum is `70 mm`'),
-('profile-thermo','liquid endpoint on the target graduation centerline'),
-('profile-container','meniscus'),
-('profile-graph','Equal numeric increments must map to equal physical distances'),
-('profile-render-gate','PROMPT_METROLOGY_RENDER_PATH_QA'),
-('profile-page-gate','PROMPT_METROLOGY_PAGE_FEASIBILITY_QA'),
-('profile-print-gate','PROMPT_METROLOGY_PRINT_FEASIBILITY_QA'),
-('w10-id','WORKER_ID=W10_METROLOGY_ENGINEER'),
-('w10-independence','recompute at least one independent quantitative oracle'),
-('w10-65-reject','Any proposed 65 mm diameter at 1° is rejected'),
-('w10-families','graduated container/meniscus'),
-('w10-state','METROLOGY_AUDIT_STATE'),
-('w10-artifact-boundary','ARTIFACT_QA=NOT_YET_TESTED')]:
-    add(name,needle in (w10 if name.startswith('w10-') else profile))
+add('profile-one-wrong','ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER' in profile)
+add('profile-dual-audit','W07 INSTRUMENT GEOMETRY AUDIT' in profile and 'W10 INDEPENDENT METROLOGY AUDIT' in profile)
+add('profile-linear-oracle','intervals=(max-min)/minor_interval' in profile and 'positions=intervals+1' in profile)
+add('profile-clock','60 intervals / 60 distinct positions / 6° per interval' in profile)
+add('profile-weight','Canonical weight dial 0–5 kg @0.1 kg' in profile and '50 active intervals' in profile and '51 positions' in profile and 'inactive open gap' in profile)
+add('profile-speed','Canonical speedometer 0–120 km/h @10 km/h' in profile and '12 active intervals' in profile and '13 positions' in profile and '120° inactive gap' in profile)
+add('profile-spacing-formula','tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)' in profile)
+add('profile-protractor-70','Canonical semicircular protractor 0–180° @1°' in profile and 'production width=70mm' in profile and '65mm-wide protractor fails' in profile)
+add('profile-thermo','Canonical thermometer 0–50°C @1°C' in profile and '50 intervals / 51 positions' in profile and 'pointer/hand/ray/level/meniscus/bar endpoint alignment' in profile)
+add('profile-container','Graduated container' in profile and 'meniscus' in profile)
+add('profile-graph','Graph axis' in profile and 'Equal numeric increments map to equal physical distances' in profile)
+add('profile-render-gate','PROMPT_METROLOGY_RENDER_PATH_QA' in profile)
+add('profile-page-gate','PROMPT_METROLOGY_PAGE_FEASIBILITY_QA' in profile)
+add('profile-print-gate','PROMPT_METROLOGY_PRINT_FEASIBILITY_QA' in profile)
+add('w10-id','WORKER_ID=W10_METROLOGY_ENGINEER' in w10)
+add('w10-independence','recompute at least one independent quantitative oracle' in w10)
+add('w10-65-reject','65 mm width at 1° is rejected' in w10 and 'minimum reading-ring diameter ≈ 68.76 mm' in w10 and 'production minimum width = 70 mm' in w10)
+add('w10-families','graduated container/meniscus' in w10)
+add('w10-state','METROLOGY_AUDIT_STATE' in w10)
+add('w10-artifact-boundary','ARTIFACT_QA=NOT_YET_TESTED' in w10)
 
 # 61-80 integration / package / release checks
 core=read('GEM_INSTRUCTIONS_PRODUCTION.md')
@@ -125,12 +123,12 @@ integ=[
 ('builder-w10','W10_METROLOGY_ENGINEER.txt' in builder),
 ('builder-four-profiles','METROLOGY_PROFILE' in builder),
 ('builder-metrology-suite','metrology_full_audit_regression_suite.py' in builder),
-('builder-total','1155/1155 PASS' in builder),
+('builder-total','1300/1300 PASS' in builder),
 ('validator-w10','W10_METROLOGY_ENGINEER' in validator),
 ('validator-suite','metrology_full_audit_regression_suite.py' in validator),
 ('workflow-suite','Full metrology audit — 80 cases' in workflow),
 ('workflow-10worker-artifact','10WORKERS' in workflow),
-('checklist-total','1155/1155 PASS' in checklist),
+('checklist-total','1300/1300 PASS' in checklist),
 ('checklist-w10','W10_METROLOGY_ENGINEER' in checklist),
 ('scale-metrology-link','METROLOGY_ASSURANCE_PROFILE.md' in scale),
 ('review-metrology-link','W10_METROLOGY_ENGINEER' in review),
