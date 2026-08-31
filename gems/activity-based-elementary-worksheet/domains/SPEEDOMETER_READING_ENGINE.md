@@ -1,6 +1,6 @@
 # SPEEDOMETER_READING_ENGINE — Vehicle Speedometer Reading
 
-Version: 1.0.0
+Version: 1.1.0
 Status: PRODUCTION_CANDIDATE
 Owning worker: `W04_LENGTH_DISTANCE`
 Visual auditor: `W07_INSTRUMENT_AUDITOR`
@@ -38,6 +38,11 @@ Unless the teacher explicitly requests another valid profile:
 `SPEEDOMETER_MINOR_INTERVAL_KMH=10`
 `UNIT=km/h`
 
+Angle convention for this family:
+
+`0° = top / 12 o'clock`
+`CLOCKWISE_POSITIVE=YES`
+
 This gives:
 
 - active range 0–120 km/h;
@@ -45,8 +50,8 @@ This gives:
 - 13 endpoint-inclusive active positions;
 - each 10 km/h interval = 20°;
 - major labels 0,20,40,60,80,100,120;
-- 120° inactive/non-scale gap;
-- zero value ticks inside the inactive gap.
+- 120° inactive/non-scale gap at the lower portion of the dial;
+- zero value ticks or radial pseudo-ticks inside the inactive gap.
 
 ## 4. Topology
 
@@ -81,13 +86,11 @@ For the canonical profile:
 
 `target_angle=(240 + 2*target_kmh) mod 360`
 
-because 240° / 120 km/h = 2° per km/h.
-
 Examples:
 
 - 0 km/h → 240°
 - 30 km/h → 300°
-- 60 km/h → 0°
+- 60 km/h → 0° = straight up
 - 90 km/h → 60°
 - 120 km/h → 120°
 
@@ -102,20 +105,44 @@ Require exact representability unless interpolation is explicitly part of the ob
 
 For canonical 10 km/h minor intervals, 35 km/h is invalid in default discrete mode; 30 or 40 km/h is valid.
 
-## 7. Mandatory geometry
+## 7. Mandatory common-center geometry — critical
+
+Every speedometer is generated from one authoritative center coordinate:
+
+`DIAL_CENTER=(cx,cy)`
+`ACTIVE_ARC_CENTER=DIAL_CENTER`
+`READING_RING_CENTER=DIAL_CENTER`
+`NEEDLE_PIVOT=DIAL_CENTER`
+
+The pivot is **not** an independent decorative point. It is the same exact coordinate used to construct the circular arc and every radial graduation.
+
+For each active tick angle θ:
+
+- outer tick point lies on the authoritative reading radius from `DIAL_CENTER`;
+- inner tick point lies on the same radial line;
+- the needle is a radial segment beginning exactly at `DIAL_CENTER`;
+- needle direction equals the target angle;
+- needle tip intersects the target graduation centerline/read ring.
+
+Required equality:
+
+`distance(NEEDLE_PIVOT,DIAL_CENTER)=0`
+
+Any visible pivot offset, even when the needle tip appears to touch the correct label/tick, is `CRITICAL_ACADEMIC` because the pointer is no longer a true radial reading.
+
+## 8. Mandatory geometry
 
 - one front-facing circular/arc dial housing;
-- one exact center pivot;
 - one instructional needle only;
 - active ticks share one authoritative reading ring;
-- needle endpoint reaches/intersects that reading ring at the exact target tick;
 - major ticks visibly stronger/longer than minor ticks;
-- labels align to major ticks;
-- no perspective/skew/ellipse that changes reading;
+- labels align to their exact major tick radial lines;
+- no perspective/skew/ellipse/non-uniform transform;
 - inactive arc remains visually non-scale;
-- no decorative dashboard marks resembling value ticks or a second needle.
+- no decorative dashboard marks resembling value ticks or a second needle;
+- template translation/uniform scaling may move the whole instrument but cannot move pivot, arc, ticks, labels, or needle origin independently.
 
-## 8. Renderer-only item state
+## 9. Renderer-only item state
 
 Each item must serialize an atomic renderer-only block containing:
 
@@ -123,21 +150,17 @@ Each item must serialize an atomic renderer-only block containing:
 `SEMANTIC_TARGET_SPEED_KMH`
 `TICK_INDEX`
 `TARGET_ANGLE_DEG`
+`DIAL_CENTER`
+`NEEDLE_PIVOT=DIAL_CENTER`
 `NEAREST_MAJOR_LABELS`
 `RELATIONAL_VERIFICATION`
 `ITEM_SPECIFIC_HARD_NEGATIVE`
 
-Example for 70 km/h canonical profile:
-
-- tick index = 7
-- target angle = 20°
-- between major labels 60 and 80
-- exactly halfway between 60 and 80
-- hard negative: do not point to 60, 80, or any inactive-gap position.
+Canonical angles should be normalized to `[0,360)` in machine-stable state. Expanded equivalents such as 380° may be explanatory metadata only, never the canonical geometry key.
 
 Mark renderer state `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
 
-## 9. Student-visible format
+## 10. Student-visible format
 
 Default learner view:
 
@@ -146,7 +169,7 @@ Default learner view:
 - no printed target speed or target angle;
 - canonical numeric labels remain visible.
 
-## 10. Grade/difficulty guidance
+## 11. Grade/difficulty guidance
 
 Conservative progression:
 
@@ -156,16 +179,20 @@ Conservative progression:
 
 Do not increase difficulty by making the scale visually ambiguous.
 
-## 11. Scale-line and self-review
+## 12. Renderer self-review
 
-The final prompt must inherit both:
+Renderer self-review must independently:
 
-- `SCALE_LINE_INTEGRITY_PROFILE.md`
-- `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
+1. recount 12 active intervals / 13 active positions for the canonical profile;
+2. verify 120° inactive gap contains zero scale-like radial marks;
+3. verify major/minor hierarchy and labels;
+4. recompute target angle;
+5. verify `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`;
+6. verify the needle is radial from that center and intersects the exact target tick;
+7. reject any ellipse/skew/pivot translation;
+8. regenerate and repeat the complete checklist after a failure.
 
-Renderer self-review must recount active positions, confirm inactive-gap integrity, verify label/tick alignment, recompute target angle, and confirm the needle endpoint intersects the exact target tick before finalization.
-
-## 12. QA
+## 13. QA
 
 `PROMPT_SPEEDOMETER_TOPOLOGY_QA`
 `PROMPT_SPEEDOMETER_RANGE_QA`
@@ -173,12 +200,14 @@ Renderer self-review must recount active positions, confirm inactive-gap integri
 `PROMPT_SPEEDOMETER_TARGET_REPRESENTABILITY_QA`
 `PROMPT_SPEEDOMETER_ANGLE_MAPPING_QA`
 `PROMPT_SPEEDOMETER_NEEDLE_ALIGNMENT_QA`
+`PROMPT_SPEEDOMETER_PIVOT_CENTER_QA`
+`PROMPT_SPEEDOMETER_RADIAL_COLLINEARITY_QA`
 `PROMPT_SPEEDOMETER_INACTIVE_GAP_QA`
 `PROMPT_SPEEDOMETER_LABEL_PRESERVATION_QA`
 `PROMPT_SPEEDOMETER_ONE_NEEDLE_QA`
 `PROMPT_SCALE_LINE_SPEC_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA`
 
-Any wrong active sweep, count, direction, target mapping, needle alignment, gap ticks, full-circle substitution, target leak, or missing self-review protocol blocks prompt release.
+Any wrong active sweep, count, direction, target mapping, off-center pivot, non-radial needle, gap ticks, full-circle substitution, target leak, or missing self-review protocol blocks prompt release.
 
 Artifact geometry remains `ARTIFACT_QA=NOT_YET_TESTED` until the rendered worksheet is inspected.
