@@ -57,6 +57,8 @@ Off-center pivot is an academic geometry failure even if the needle visually tou
 
 ## 5. Canonical 0–5 kg teaching dial — critical
 
+`TOPOLOGY_FAMILY=OPEN_ARC_BOUNDED`
+
 The canonical value scale is **not** a 360° full-circle graduated value scale.
 
 Angle convention:
