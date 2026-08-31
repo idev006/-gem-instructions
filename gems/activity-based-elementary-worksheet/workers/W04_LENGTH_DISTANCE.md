@@ -119,6 +119,30 @@ At 1°: 180 intervals / 181 endpoint-inclusive positions.
 
 Required geometry: exact center/origin, selected 0° baseline, exact target ray, explicit left-zero/right-zero direction, no perspective/skew, no decorative competing rays.
 
+For dense 1° learner-read protractors, scale placement is independently constrained by printed geometry:
+
+`tick_center_spacing_mm = reading_radius_mm × radians(1)`
+
+With default `MIN_TICK_CENTER_SPACING_MM=0.60`:
+
+`MIN_READING_RADIUS_MM ≈ 34.38`
+`MIN_READING_RING_DIAMETER_MM ≈ 68.76`
+`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
+
+A 65 mm protractor is invalid at 1° resolution because the 1° arc spacing is only about 0.567 mm. This is a release blocker, not a cosmetic warning.
+
+For 0–180° @1°:
+
+- final prompt must resolve the instrument to a deterministic vector geometry layer; unresolved `RENDER_PATH=AUTO` is not allowed;
+- use one clearly active 0→180 reading direction unless dual-scale reading is explicitly the lesson objective;
+- a competing mirrored inner scale is forbidden by default because it can make complementary readings such as 40°/140° ambiguous;
+- 10° marks are major;
+- when item verification uses 5° relations, 5° intermediate marks are REQUIRED, not optional, and occupy existing 1° positions;
+- 1° marks remain the smallest instructional graduation and must not be omitted or merged;
+- baseline ray and target ray start at the exact origin and intersect exact configured graduations.
+
+If a one-page lock cannot preserve the 70 mm minimum, label clearance, writable answer area and page margins for all items, return infeasible to W08/W09. Never shrink below the verified print-spacing minimum.
+
 ### Full-circle 0–360°
 
 Use only when explicitly requested/required.
@@ -206,6 +230,10 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_PROTRACTOR_TOPOLOGY_QA`
 `PROMPT_PROTRACTOR_BASELINE_QA`
 `PROMPT_PROTRACTOR_DIRECTION_QA`
+`PROMPT_PROTRACTOR_PRINT_SPACING_QA`
+`PROMPT_PROTRACTOR_ACTIVE_SCALE_QA`
+`PROMPT_PROTRACTOR_RENDER_PATH_QA`
+`PROMPT_PROTRACTOR_INTERMEDIATE_HIERARCHY_QA`
 `PROMPT_ANGLE_TARGET_QA`
 `PROMPT_PERIMETER_QA`
 `PROMPT_AREA_FORMULA_QA`
@@ -214,4 +242,4 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_CANONICAL_LABEL_PRESERVATION_QA`
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W04 instruments
 
-Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/needle, route relation, protractor geometry, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
+Wrong conversion/arithmetic, ruler subdivision, extra edge/tick, speedometer mapping/gap/needle, route relation, protractor geometry/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
