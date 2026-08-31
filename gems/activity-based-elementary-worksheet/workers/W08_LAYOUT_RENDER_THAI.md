@@ -19,6 +19,7 @@ Normalized spec, Student Blueprint, owning-worker minimum geometry sizes, `SCALE
 - theme/decorative separation
 - final worksheet visual hierarchy
 - serialization of mandatory renderer-side instrument review/revise protocol
+- serialization of verified local-span and reference/projection geometry
 - numeric physical page packing proof before any one-page/grid approval
 - shape-aware item bounding boxes
 - pagination fallback when `ONE_PAGE_LOCK=OFF`
@@ -116,6 +117,29 @@ For protractor geometry, W08 must preserve:
 - exact 180/181 topology;
 - 10° major / 5° intermediate / 1° minor hierarchy.
 
+### Ruler object-measurement layout
+
+For object-on-ruler tasks, reserve enough vertical space for the object, the ruler reading zone and two projection guides.
+
+The final prompt must serialize:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+`START_PROJECTION_GUIDE_X = OBJECT_START_X = START_GRADUATION_X`
+`END_PROJECTION_GUIDE_X = OBJECT_END_X = END_GRADUATION_X`
+
+Projection guides are thin dashed vertical helper lines, not ruler ticks. For `ZERO_START_MODE`, explicitly serialize `OBJECT_START_X == ZERO_GRADUATION_X` and a hard negative forbidding use of the physical ruler border as the origin when it differs from zero.
+
+### Weight-dial hierarchy serialization
+
+For canonical 0–5 kg @0.1 kg, preserve both global topology and every 1 kg local span:
+
+`INTERVALS_PER_KG=10`
+`INTERIOR_POSITIONS_PER_KG_SPAN=9`
+`HALF_KG_INTERMEDIATE_OFFSET=0.5`
+
+The +0.5 kg existing position is an intermediate tick, longer/more prominent than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks. Do not create an extra tick for hierarchy.
+
 ### Thermometer layout
 
 For a 0–50°C @1°C thermometer, the spacing-derived scale-length minimum is 30 mm at a 0.60 mm floor. A selected 60 mm scale has exactly 1.20 mm spacing but five 60 mm vertical scales consume 300 mm before other content. W08 may select a smaller size only if it remains above all W10/metrology/readability minima; otherwise paginate.
@@ -123,6 +147,16 @@ For a 0–50°C @1°C thermometer, the spacing-derived scale-length minimum is 3
 ### Graduated-container layout
 
 Include the complete item-box height and answer zone. Five 50 mm item boxes consume 250 mm before row gaps/header/margins, so no PASS is allowed without explicit numeric proof.
+
+For canonical 0–1000 mL @50 mL with 100 mL majors, the final prompt must serialize both global and local topology:
+
+`EXPECTED_INTERVAL_COUNT=20`
+`EXPECTED_POSITION_COUNT=21`
+`INTERVALS_PER_100ML=2`
+`INTERIOR_POSITIONS_PER_100ML_SPAN=1`
+`LOCAL_SPAN_RECOUNT_REQUIRED=YES`
+
+Every adjacent 100 mL major span must contain exactly one interior +50 mL tick. No extra pseudo-tick or decorative stroke may appear inside the span.
 
 ### Graph layout
 
@@ -137,12 +171,14 @@ W08 must preserve:
 - exact `SCALE_LINE_SPEC` fields from owning worker/W07;
 - authoritative baseline/ring/arc;
 - exact interval/position count;
+- local-span count/hierarchy when declared by the owner;
 - minimum tick-center separation;
 - computed `PRINT_SPACING_ORACLE` for dense scales;
 - major/intermediate/minor hierarchy;
 - label alignment/clearance/order;
 - target alignment zone;
 - common center/origin where radial/angular;
+- reference/projection geometry where object endpoints map to a ruler;
 - inactive-region integrity;
 - canonical template consistency.
 
@@ -162,13 +198,19 @@ and include:
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-The protocol must require deterministic recount, common-center/alignment checks, repair/regenerate on mismatch, and a complete recheck after repair.
+The protocol must require deterministic recount, local-span recount where applicable, common-center/alignment/reference checks, repair/regenerate on mismatch, and a complete recheck after repair.
 
-For ruler 1 cm @1 mm, explicitly require 10 intervals / 11 positions / 9 interior positions and prohibit counting the physical ruler edge as a graduation.
+For ruler 1 cm @1 mm, explicitly require 10 intervals / 11 positions / 9 interior positions and prohibit counting the physical ruler edge as a graduation. For object-on-ruler tasks additionally require both dashed endpoint projection guides and exact start/end graduation alignment.
 
 For a 1° protractor, explicitly require 180 intervals / 181 positions, printed tick-spacing oracle ≥0.60 mm, width ≥70 mm, one active scale direction, perfect semicircle, exact common origin/baseline/ray alignment, radial ticks and no unresolved AUTO render path.
 
 For a 0–50°C thermometer, require 50/51 plus the exact 6-major/5-intermediate/40-minor hierarchy. If the selected scale is exactly 60 mm, serialize spacing as exactly `1.20 mm`, therefore `>=1.20 mm` and `>0.60 mm`; never claim `>1.20 mm`.
+
+For canonical 0–5 kg @0.1 kg, explicitly require 10 intervals per kilogram and the existing +0.5 kg intermediate hierarchy tick.
+
+For canonical 0–1000 mL @50 mL, explicitly require 20/21 globally and exactly 2 intervals /1 interior +50 mL tick in every 100 mL span.
+
+For clocks, preserve exact numeric hand angles plus relational wording. For :45, explicitly verify the short hand is 75% of the way to the next hour and not pinned on the starting numeral.
 
 For speedometers/weight dials, explicitly serialize that the pointer pivot equals the reading-ring center.
 
@@ -230,6 +272,8 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_SCALE_PRINT_SEPARATION_QA` when learner-read scales apply
 `PROMPT_SCALE_PRINT_SPACING_ORACLE_QA` when dense learner-read scales apply
 `PROMPT_SCALE_LABEL_CLEARANCE_QA` when scale labels apply
+`PROMPT_LOCAL_SPAN_RECOUNT_QA` when a local span grammar applies
+`PROMPT_RULER_ENDPOINT_PROJECTION_GUIDE_QA` when object-on-ruler applies
 `PROMPT_INSTRUMENT_COMMON_CENTER_QA` when radial/angular
 `PROMPT_NO_FIRST_PASS_INSTRUMENT_RELEASE_QA` when learner-read instruments apply
 `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA` when learner-read instruments apply
@@ -240,4 +284,4 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
 `PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
-Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, off-center origin, distorted protractor, missing review protocol, ambiguous labels or theme interference blocks release.
+Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised global/local scale geometry, missing/misaligned reference projection, off-center origin, distorted protractor, missing review protocol, ambiguous labels or theme interference blocks release.
