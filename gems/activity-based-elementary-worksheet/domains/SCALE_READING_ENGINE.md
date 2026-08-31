@@ -1,6 +1,6 @@
 # SCALE_READING_ENGINE — Weight / Dial Scale Rules
 
-Version: 1.2.0
+Version: 1.3.0
 Status: PRODUCTION_CANDIDATE
 Owning worker: `W03_WEIGHT_SCALE`
 Requires `INSTRUMENT_READING_ENGINE.md` only when a learner reads a dial.
@@ -138,3 +138,50 @@ Prompt-phase gates:
 Artifact geometry is not PASS until the rendered worksheet is inspected.
 
 Any wrong conversion/arithmetic, full-circle substitution, ticks in inactive gap, wrong label geometry, nonrepresentable target, or wrong needle mapping blocks prompt release.
+
+## 12. Inactive-gap geometry contract — mandatory after 2026-08-31 artifact defect
+
+The inactive gap is not merely a semantic statement. It is a geometric exclusion zone that must be serialized and independently audited.
+
+Canonical 0–5 kg gap contract:
+
+`ACTIVE_START_ANGLE=240°`
+`ACTIVE_SWEEP_DEG=300°`
+`ACTIVE_END_ANGLE=180°`
+`INACTIVE_GAP_SWEEP_DEG=60°`
+`INACTIVE_GAP_START_ANGLE=180°`
+`INACTIVE_GAP_END_ANGLE=240°`
+`INACTIVE_GAP_TICK_COUNT=0`
+`INACTIVE_GAP_RADIAL_MARK_COUNT=0`
+
+The active tick positions are generated only by:
+
+`active_tick_angle(i)=(240 + 6*i) mod 360, i=0..50`
+
+There are exactly 51 active tick positions. No additional radial line may be inserted between the active endpoint at 5 and the active endpoint at 0.
+
+Inside the open 60° inactive arc, forbid all scale-like radial marks, including:
+
+- minor or major value ticks;
+- unlabeled pseudo-ticks;
+- decorative rays, hatch marks or repeated short strokes;
+- border embellishments that visually continue the scale;
+- duplicate endpoint ticks displaced into the gap.
+
+The circular outline may continue through the gap, but the outline is not a graduation. Labels and theme art must not create radial scale-like strokes there.
+
+The canonical numeric label angles are locked to the canonical template and must be serialized exactly:
+
+`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+
+Rotating/rearranging the labels without rotating the entire canonical scale state is a template failure. A renderer must not independently invent a visually familiar 0-at-top layout when the supplied canonical template uses another orientation.
+
+Mandatory additional gates:
+
+`PROMPT_DIAL_GAP_GEOMETRY_SERIALIZATION_QA`
+`PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA`
+`PROMPT_DIAL_ACTIVE_TICK_SET_QA`
+`PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA`
+`PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
+
+Artifact rule: one visible radial scale-like mark in the inactive gap is `P0_CRITICAL_ACADEMIC`, sets `ARTIFACT_QA=FAIL`, and blocks `CLASSROOM_RELEASE`.
