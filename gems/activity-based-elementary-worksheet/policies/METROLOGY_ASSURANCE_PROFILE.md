@@ -1,19 +1,19 @@
 # Metrology Assurance Profile — Learner-Read Measurement Instruments
 
-Version: 1.1.0
+Version: 1.2.0
 Status: Mandatory independent measurement-safety contract
 Compatible Gem baseline: 2.6.x
 Independent owner: `W10_METROLOGY_ENGINEER`
 
 ## Mission
 
-A learner-read measuring instrument is not decorative art. Its visible graduations, labels, reference line, pointer/hand/ray/liquid endpoint and geometric spacing are academic data from which a child learns measurement concepts.
+A learner-read measuring instrument is not decorative art. Its visible graduations, labels, reference line, pointer/hand/ray/liquid endpoint, common center/origin, shape and geometric spacing are academic data from which a child learns measurement concepts.
 
 `ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER`
 
 This profile provides an independent second audit after the owning academic worker and W07 geometry audit. W10 does not create target values or override domain formulas. W10 independently verifies that the specified instrument can physically and visually encode those values correctly at final print size.
 
-This profile inherits `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md` for page-packing evidence.
+This profile inherits `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md` for shape-aware page-packing evidence.
 
 ## Mandatory dual-audit chain
 
@@ -32,21 +32,24 @@ W10 independently checks:
 3. exact physical position count;
 4. endpoint/wrap semantics;
 5. zero/reference/baseline/origin correctness;
-6. scale direction and monotonicity;
-7. uniform geometric spacing for equal value intervals;
-8. final printed tick-center spacing;
-9. major/intermediate/minor hierarchy without creating extra positions;
-10. tick anchoring to one authoritative baseline/ring/arc/axis;
-11. label-to-tick association and clearance;
-12. target representability in discrete-reading mode;
-13. pointer/hand/ray/level/meniscus/bar endpoint alignment;
-14. inactive-region integrity;
-15. absence of decoration that can be mistaken for a graduation;
-16. repeated-template consistency;
-17. photocopy/print distinguishability;
-18. true metrology minimum size and its oracle source;
-19. selected render size distinguished from minimum size;
-20. numeric dimensional feasibility under complete page constraints.
+6. common-center/common-origin coincidence for radial/angular instruments;
+7. scale direction and monotonicity;
+8. uniform geometric spacing for equal value intervals;
+9. final printed tick-center spacing;
+10. major/intermediate/minor hierarchy without creating extra positions;
+11. tick anchoring to one authoritative baseline/ring/arc/axis;
+12. label-to-tick association, clearance and numeric order;
+13. target representability in discrete-reading mode;
+14. pointer/hand/ray/level/meniscus/bar endpoint alignment;
+15. radial pointer/ray collinearity from the common center;
+16. inactive-region integrity;
+17. absence of decoration that can be mistaken for a graduation;
+18. repeated-template consistency;
+19. shape/aspect-ratio integrity without perspective/shear/non-uniform scaling;
+20. photocopy/print distinguishability;
+21. true metrology minimum size and its oracle source;
+22. selected render size distinguished from minimum size;
+23. numeric dimensional feasibility under complete shape-aware page constraints.
 
 ## Independent quantitative oracles
 
@@ -60,9 +63,19 @@ Canonical ruler 1 cm @1 mm:
 `10 intervals / 11 positions / 9 interior positions`.
 The physical ruler edge is not an extra graduation.
 
-For a printed linear scale of length `L`:
+For printed linear scale length `L`:
 `tick_center_spacing_mm = L / intervals`.
 The comparison operator in prose must agree with the computed result.
+
+Canonical thermometer 0–50°C @1°C:
+- 50 intervals / 51 positions;
+- 6 major positions at multiples of10;
+- 5 intermediate positions at 5,15,25,35,45;
+- 40 ordinary minor positions;
+- each 10°C span =10 intervals /9 interior positions;
+- spacing-derived minimum length at 0.60mm floor =30mm.
+
+For selected 60mm length: `60/50=1.20mm` exactly. `>1.20mm` is false.
 
 ### Cyclic full-circle scales
 
@@ -70,17 +83,29 @@ N equal intervals have N distinct physical positions because the wrap endpoint i
 
 Canonical clock minute ring:
 `60 intervals / 60 distinct positions / 6° per interval`.
+Clock hands share one exact pivot.
 
 ### Open-arc bounded scales
 
 `active_positions=active_intervals+1`.
-No value tick may appear in the inactive gap unless the owning domain explicitly defines one.
+No value tick or scale-like radial pseudo-tick may appear in inactive gap unless owning domain explicitly defines one.
 
 Canonical weight dial 0–5 kg @0.1 kg:
-`50 active intervals / 51 active positions`.
+- angle convention 0° top, clockwise positive;
+- 50 active intervals /51 positions;
+- active positions `angle(i)=6*i`, i=0..50;
+- labels `{0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`;
+- clockwise label order `[0,1,2,3,4,5]`;
+- inactive open gap `(300°,360°)`;
+- zero gap radial marks;
+- needle pivot equals reading-ring center.
 
 Canonical speedometer 0–120 km/h @10 km/h:
-`12 active intervals / 13 active positions`.
+- 12 active intervals /13 positions;
+- `target_angle=(240+2*target_kmh) mod 360`;
+- 60 km/h→0°→straight up under its angle convention;
+- 120° inactive gap;
+- needle pivot equals reading-ring center.
 
 ### Angular scale print-spacing oracle
 
@@ -88,47 +113,54 @@ For radial/angular scales:
 
 `tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`
 
-The result must satisfy the configured print floor. Default:
-`MIN_TICK_CENTER_SPACING_MM >= 0.60`.
+Default floor: `MIN_TICK_CENTER_SPACING_MM >= 0.60`.
 
-Canonical semicircular protractor 0–180° @1° therefore requires:
-`reading_radius >= 34.38 mm`
-and a reading-ring diameter of at least `68.76 mm`; production minimum is `70 mm`.
+Canonical semicircular protractor 0–180° @1° requires:
+`reading_radius >=34.38mm`, reading-ring diameter >=68.76mm; production width=70mm.
 
-### Thermometer / vertical linear scale
+A 65mm-wide protractor fails the default spacing oracle.
 
-`intervals=(max-min)/minor_interval`, endpoint-inclusive positions, monotonic vertical mapping, exact target representability, and liquid endpoint on the target graduation centerline.
+### Protractor shape/origin oracle
 
-For 0–50°C @1°C using a 60 mm printed scale:
-`60/50 = 1.20 mm` exactly. Valid statements include `spacing=1.20 mm`, `spacing>=1.20 mm`, or `spacing>0.60 mm`; `spacing>1.20 mm` is false for that exact geometry.
+For perfect upper semicircle width `W=2R`:
+
+`PROTRACTOR_CENTER=(cx,cy)`
+`BASELINE_LEFT=(cx-R,cy)`
+`BASELINE_RIGHT=(cx+R,cy)`
+`OUTER(theta)=(cx+R*cos(theta), cy-R*sin(theta))`
+
+0° right, 90° top, 180° left.
+
+Required identity:
+
+`ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER`
+
+Every graduation/ray is radial from this center. One active numeric scale is default. No ellipse, shear, perspective, non-uniform stretch or warped arc.
+
+Shape-aware body dimensions:
+
+`PROTRACTOR_BODY_WIDTH=W`
+`PROTRACTOR_BODY_HEIGHT=R=W/2`
+
+Thus 70mm width gives 35mm semicircle body height before label/answer reserves. Width must never be substituted as vertical body height in page packing.
 
 ### Graduated container
 
-Exact interval/position count plus a single declared read convention (`SIMPLE_FLAT`, concave-bottom, or convex-top as configured). The level/meniscus read point must map exactly to the target value.
+Exact interval/position count plus one declared read convention (`SIMPLE_FLAT`, concave-bottom, or convex-top). Read point maps exactly to target.
 
 ### Graph axis
 
-Equal numeric increments must map to equal physical distances. Bar/data endpoints must map to the canonical dataset and configured axis scale.
+Equal numeric increments map to equal physical distances. Bar/data endpoints map to canonical dataset and configured scale.
 
 ## Instrument-family audit matrix
 
-W10 audit is mandatory for:
-
-- analog clocks;
-- weight/spring/dial scales;
-- rulers and linear scales;
-- speedometers;
-- semicircular and full-circle protractors;
-- thermometers;
-- graduated cylinders/containers and meniscus tasks;
-- learner-read graph axes;
-- any future instrument where a student reads a graduated visual scale.
+W10 audit is mandatory for analog clocks, weight/spring/dial scales, rulers, speedometers, protractors, thermometers, graduated containers/meniscus, learner-read graph axes, and any future graduated visual instrument.
 
 ## Render-path safety
 
-If scale correctness depends on exact geometry, `RENDER_PATH=AUTO` may exist only before resolution. The final prompt must resolve to `DETERMINISTIC_VECTOR` or `HYBRID` with deterministic instrument geometry. `IMAGE_ONLY` is forbidden when nondeterministic drawing can alter learner-read graduation geometry.
+If scale correctness depends on exact geometry, `RENDER_PATH=AUTO` may exist only before resolution. Final prompt resolves to `DETERMINISTIC_VECTOR` or `HYBRID` with deterministic instrument geometry. `IMAGE_ONLY` is forbidden when nondeterminism can alter learner-read graduations.
 
-`OUTPUT_MODE` is a separate contract field; a render-path enum in `OUTPUT_MODE` is invalid.
+`OUTPUT_MODE` is separate; a render-path enum in `OUTPUT_MODE` is invalid.
 
 Gates:
 `PROMPT_METROLOGY_RENDER_PATH_QA`
@@ -137,42 +169,35 @@ Gates:
 
 ## Minimum-size semantics
 
-W10 output must distinguish:
+W10 output distinguishes:
 
 `METROLOGY_MINIMUM_SIZE_MM`
 `SELECTED_RENDER_SIZE_MM`
 `SIZE_ORACLE_SOURCE`
 
-A selected size larger than necessary may not be relabeled as the metrology minimum without a stronger domain or user-explicit requirement.
+A selected size larger than necessary may not be relabeled as metrology minimum without stronger domain/user requirement.
 
 ## Page-pressure and physical packing rule
 
-Page count, theme, card density and decoration may never force an instrument below its audited minimum geometry.
+Tick-spacing PASS does **not** imply page-feasibility PASS.
 
-More importantly, tick-spacing PASS does **not** imply page-feasibility PASS.
+Before page feasibility PASS, W10 provides complete numeric `PHYSICAL_PAGE_STATE` from `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`, including page dimensions, margins, header/title/directions, rows/columns, complete shape-aware item bounding boxes, gaps and answer zones.
 
-Before `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA=PASS`, W10 must provide the complete numeric `PHYSICAL_PAGE_STATE` required by `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`, including page dimensions, margins, header/title/directions reserve, rows/columns, complete item bounding boxes, gaps and answer zones.
+For A4 portrait: width210mm, height297mm.
 
-For A4 portrait:
-- width = 210 mm
-- height = 297 mm
+Examples:
+- circular dial selected diameter80mm ×5 rows → circular bodies alone400mm high → impossible;
+- thermometer selected scale length60mm ×5 rows → scale bodies alone300mm → impossible before other content;
+- five container item boxes of50mm →250mm before other reserves → requires full proof;
+- protractor width70mm means body height35mm, **not70mm**; five such bodies=175mm before labels/answers/gaps/header. The complete 2×5 plan must be numerically proved, not automatically rejected or accepted.
 
-Immediate lower-bound examples:
-- 5 × 80 mm dial rows = 400 mm → impossible on A4 portrait even before other content;
-- 5 × 70 mm protractor rows = 350 mm → impossible;
-- 5 × 60 mm thermometer scale rows = 300 mm → impossible before other content;
-- 5 × 50 mm container item boxes = 250 mm → remaining content must be explicitly budgeted, not assumed.
+If candidate plan fails and `ONE_PAGE_LOCK=OFF`, W08 paginates/recomputes. If lock ON conflicts with safe geometry, prompt release is blocked rather than degrading instrument.
 
-If a candidate plan fails and `ONE_PAGE_LOCK=OFF`, W08 must paginate and return a new physical packing state for re-audit.
-
-If `ONE_PAGE_LOCK=ON` conflicts with safe geometry, prompt release is blocked rather than shrinking, deleting, merging or compressing graduations.
-
-Gate:
-`PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`.
+Gate: `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`.
 
 ## Mandatory W10 output
 
-For each canonical learner-read instrument template, W10 returns an independent `METROLOGY_AUDIT_STATE` containing:
+For each canonical learner-read template, W10 returns `METROLOGY_AUDIT_STATE` containing:
 
 - `INSTRUMENT_FAMILY`
 - `TOPOLOGY_CHECK`
@@ -182,14 +207,21 @@ For each canonical learner-read instrument template, W10 returns an independent 
 - `SELECTED_RENDER_SIZE_MM`
 - `SIZE_ORACLE_SOURCE`
 - `REFERENCE_ORIGIN_CHECK`
-- `TARGET_ALIGNMENT_CHECK`
+- `COMMON_CENTER_CHECK` when radial/angular
+- `POINTER_ORIGIN_COINCIDENCE_CHECK` when pointer/ray exists
+- `RADIAL_COLLINEARITY_CHECK` when radial/angular
+- `DIRECTION_MONOTONICITY_CHECK`
+- `HIERARCHY_CHECK`
 - `LABEL_ASSOCIATION_CHECK`
+- `LABEL_ORDER_CHECK` when ordered labels apply
+- `TARGET_ALIGNMENT_CHECK`
 - `INACTIVE_REGION_CHECK` when applicable
+- `SHAPE_INTEGRITY_CHECK` when applicable
 - `PHYSICAL_PAGE_STATE`
 - `PRINT_FEASIBILITY_CHECK`
 - `INDEPENDENT_VERDICT=PASS|FAIL`
 
-The audit state is teacher/runtime metadata and must never be printed on the student worksheet.
+Audit state is teacher/runtime metadata and never printed on student worksheet.
 
 ## Mandatory QA gates
 
@@ -198,26 +230,31 @@ The audit state is teacher/runtime metadata and must never be printed on the stu
 `PROMPT_METROLOGY_INTERVAL_COUNT_QA`
 `PROMPT_METROLOGY_POSITION_COUNT_QA`
 `PROMPT_METROLOGY_REFERENCE_QA`
+`PROMPT_METROLOGY_COMMON_CENTER_QA` when radial/angular
+`PROMPT_METROLOGY_RADIAL_COLLINEARITY_QA` when radial/angular
 `PROMPT_METROLOGY_SPACING_ORACLE_QA`
 `PROMPT_METROLOGY_HIERARCHY_QA`
 `PROMPT_METROLOGY_LABEL_ASSOCIATION_QA`
+`PROMPT_METROLOGY_LABEL_ORDER_QA` when applicable
 `PROMPT_METROLOGY_TARGET_ALIGNMENT_QA`
 `PROMPT_METROLOGY_INACTIVE_REGION_QA` when applicable
 `PROMPT_METROLOGY_TEMPLATE_CONSISTENCY_QA`
+`PROMPT_METROLOGY_SHAPE_INTEGRITY_QA` when applicable
 `PROMPT_METROLOGY_RENDER_PATH_QA`
 `PROMPT_METROLOGY_SIZE_ORACLE_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
 `PROMPT_PHYSICAL_PAGE_STATE_QA`
+`PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA`
 `PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
 
-Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED` for the current compiled plan.
+Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED` for current compiled plan.
 
 ## Artifact boundary
 
-W10 prompt-phase verification does not prove downstream pixels. Before actual image inspection:
+W10 prompt verification does not prove downstream pixels. Before actual image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-When an artifact is supplied, each learner-read instrument must be visually inspected against the same metrology oracles. One wrong scale blocks classroom release and becomes a permanent regression.
+When artifact is supplied, inspect each learner-read instrument against same metrology oracles, including common center/origin, label order, hierarchy and shape integrity. One wrong scale blocks classroom release and becomes permanent regression.
