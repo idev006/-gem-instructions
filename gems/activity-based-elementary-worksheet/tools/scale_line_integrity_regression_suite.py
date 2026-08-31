@@ -31,7 +31,6 @@ validator = read("tools/validate_ssot.py")
 checklist = read("qa/BASELINE_2_6_2_RELEASE_CHECKLIST.md")
 workflow = (REPO / ".github/workflows/activity-based-elementary-worksheet-gem-ssot.yml").read_text(encoding="utf-8")
 
-# 1-13 mandatory QA family.
 qa_tokens = [
     "PROMPT_SCALE_LINE_SPEC_QA",
     "PROMPT_SCALE_TICK_ANCHOR_QA",
@@ -50,7 +49,6 @@ qa_tokens = [
 for token in qa_tokens:
     add(f"profile-{token}", token in profile)
 
-# 14-20 domain coverage in shared profile. Check semantic domain presence rather than brittle exact heading text.
 domain_checks = [
     ("clock", "Clock" in profile),
     ("dial-scale", "dial scale" in profile.lower()),
@@ -63,7 +61,6 @@ domain_checks = [
 for label, ok in domain_checks:
     add(f"domain-{label}", ok)
 
-# 21-28 topology/readability invariants.
 checks = [
     ("profile-scale-line-spec", "SCALE_LINE_SPEC" in profile and "MIN_TICK_CENTER_SPACING_MM" in profile),
     ("profile-min-spacing", "0.60 mm" in profile),
@@ -77,7 +74,6 @@ checks = [
 for name, ok in checks:
     add(name, ok)
 
-# 29-34 domain-engine inheritance / existing exact topology.
 add("shared-engine-inherits-scale-profile", "SCALE_LINE_INTEGRITY_PROFILE.md" in shared)
 add("clock-60-positions", "60 distinct minute positions" in clock and "6° spacing" in clock)
 add("dial-open-arc", "50 active intervals" in dial and "60° inactive gap" in dial)
@@ -85,13 +81,12 @@ add("ruler-endpoint-inclusive", "11 graduation positions" in ruler and "cm marks
 add("thermometer-linear-scale", "uniform graduations" in temp and "labels aligned to major ticks" in temp)
 add("capacity-linear-scale", "uniform graduations" in capacity and "no decorative waves/bubbles/tick-like lines" in capacity)
 
-# 35-40 system/runtime/release integration.
 add("graph-scale-profile", "SCALE_LINE_INTEGRITY_PROFILE.md" in graph)
 add("system-profile-inherits-scale-profile", "SCALE_LINE_INTEGRITY_PROFILE.md" in system_profile)
 add("builder-embeds-scale-profile", "SCALE_LINE_PROFILE" in builder and "policies/SCALE_LINE_INTEGRITY_PROFILE.md" in builder)
-add("builder-runs-scale-suite", "scale_line_integrity_regression_suite.py" in builder and "971/971 PASS" in builder)
+add("builder-runs-scale-suite", "scale_line_integrity_regression_suite.py" in builder and "995/995 PASS" in builder)
 add("workflow-runs-scale-suite", "Scale-line integrity regression" in workflow and "40 cases" in workflow)
-add("validator-release-971", "scale_line_integrity_regression_suite.py" in validator and "971" in validator and "971/971 PASS" in checklist)
+add("validator-release-995", "scale_line_integrity_regression_suite.py" in validator and "995" in validator and "995/995 PASS" in checklist)
 
 assert len(CASES) == 40, len(CASES)
 failed = [case for case in CASES if not case[1]]
