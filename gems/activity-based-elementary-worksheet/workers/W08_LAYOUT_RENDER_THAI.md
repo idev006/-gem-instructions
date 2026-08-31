@@ -19,14 +19,19 @@ Normalized spec, Student Blueprint, owning-worker minimum geometry sizes, `SCALE
 - theme/decorative separation
 - final worksheet visual hierarchy
 - serialization of mandatory renderer-side instrument review/revise protocol
+- numeric physical page packing proof before any one-page/grid approval
+- pagination fallback when `ONE_PAGE_LOCK=OFF`
+- strict separation of `OUTPUT_MODE` from `RENDER_PATH`
 
 ## RETURNS
 
-One resolved render path, layout blueprint, minimum dimensions, safe-margin/page plan, theme/art rules, Thai/text constraints, scale-readability constraints, and layout/render QA requirements.
+One resolved render path, layout blueprint, minimum dimensions, safe-margin/page plan, theme/art rules, Thai/text constraints, scale-readability constraints, numeric `PHYSICAL_PAGE_STATE`, and layout/render QA requirements.
 
 ## MUST_NOT_DECIDE
 
 Academic target values, arithmetic results, clock/dial/ruler/protractor/speedometer/area/volume formulas, domain maturity, prompt release approval.
+
+W08 inherits mandatory `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`.
 
 ## Render path
 
@@ -40,6 +45,8 @@ Resolve AUTO to exactly one:
 - IMAGE_ONLY only when nondeterminism cannot threaten required academic/text fidelity or explicitly requested
 
 Never emit unresolved alternatives.
+
+`OUTPUT_MODE` and `RENDER_PATH` are different fields. For the normal prompt-package workflow, preserve `OUTPUT_MODE=PROMPT_PACKAGE` while independently resolving `RENDER_PATH`. Never emit `OUTPUT_MODE=DETERMINISTIC_VECTOR`.
 
 For a learner-read semicircular protractor at 1° resolution, the instrument geometry must be deterministic vector geometry. The final prompt must not contain unresolved `RENDER_PATH=AUTO`. If theme art is used, it remains a separate decorative layer and may not own the protractor ticks, labels, origin or rays.
 
@@ -60,9 +67,17 @@ Preserve, in order:
 9. shortened nonessential instruction/spacing;
 10. pagination if unlocked.
 
+No one-page/grid plan may PASS from verbal judgment such as `fits safely`. W08 must construct the numeric `PHYSICAL_PAGE_STATE` defined in `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md` and prove both width and height inequalities.
+
+For A4 portrait use physical dimensions `210 mm × 297 mm`. Required grid height includes every item bounding box, row gap, header/title/directions reserve, margins and answer zone. Required grid width includes item widths, column gaps and margins.
+
+If any required dimension is unknown, `PROMPT_PHYSICAL_PAGE_STATE_QA=NOT_RUN` and release cannot be approved.
+
 If `ONE_PAGE_LOCK=ON` and unsafe, return FAIL. Do not silently shrink/crop/reduce count/merge graduations/paginate.
 
-When `ONE_PAGE_LOCK=OFF`, preserve safe pagination wording; never compile a preference into a hard one-page mandate.
+When `ONE_PAGE_LOCK=OFF`, preserve safe pagination wording; never compile a preference into a hard one-page mandate. If a candidate `2×5` plan fails numeric packing, paginate and recompute the new page plan.
+
+A hard-coded layout such as `2 columns × 5 rows` is allowed in the final prompt only after numeric packing proof passes for that exact plan.
 
 ## Layout families
 
@@ -77,7 +92,13 @@ When `ONE_PAGE_LOCK=OFF`, preserve safe pagination wording; never compile a pref
 
 Do not mechanically force 2×5 when the smallest graduation becomes ambiguous. Reduce decoration or paginate before shrinking scale geometry below minimums.
 
-For 0–180° @1° protractors with `MIN_TICK_CENTER_SPACING_MM=0.60`, use the geometric oracle from the shared scale profile. `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`. A proposed 65 mm protractor is invalid because 1° tick spacing is approximately 0.567 mm. If 10 items plus answer space cannot fit at or above 70 mm under a user-explicit one-page lock, return `PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`; never reduce tick count or physical spacing to satisfy the lock.
+For 0–180° @1° protractors with `MIN_TICK_CENTER_SPACING_MM=0.60`, use the geometric oracle from the shared scale profile. `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`. A proposed 65 mm protractor is invalid because 1° tick spacing is approximately 0.567 mm. Five vertical rows of 70 mm instruments already require at least 350 mm before header, margins or answer zones, so an A4 portrait 2×5 plan cannot PASS; with `ONE_PAGE_LOCK=OFF`, paginate.
+
+For a thermometer with a 60 mm vertical 0→50 scale, five rows consume at least 300 mm before header, margins or answer zones. A one-page five-row plan cannot PASS. If 60 mm is only a selected render size rather than a domain/metrology minimum, W08 may choose another size only if W10 confirms it remains at or above the true audited minimum; otherwise paginate.
+
+For graduated-container cards, include the complete item-box height and answer zone. Five 50 mm item boxes consume 250 mm before row gaps/header/margins, so no PASS is allowed without explicit numeric proof.
+
+For graph worksheets, axis height alone does not prove fit. Include graph title, axis/category labels, questions and answer lines in the physical content stack.
 
 ## Scale-line layout integrity
 
@@ -120,6 +141,8 @@ For ruler 1 cm @1 mm, explicitly require 10 intervals / 11 positions / 9 interio
 
 For a 1° protractor, explicitly require 180 intervals / 181 positions, printed tick-spacing oracle ≥0.60 mm, width ≥70 mm under the default profile, one active reading direction, exact origin/baseline/ray alignment, and no unresolved AUTO render path.
 
+For a 0–50°C thermometer whose scale is exactly 60 mm long, serialize spacing as exactly `1.20 mm`, therefore `>=1.20 mm` and `>0.60 mm`; never claim `>1.20 mm`.
+
 W08 must not claim that renderer self-review equals artifact QA.
 
 ## Thai text
@@ -155,7 +178,17 @@ No theme element may cover question text, answer area, learner-read instrument, 
 ## QA
 
 `RENDER_PATH_RESOLVED_QA`
+`PROMPT_OUTPUT_MODE_QA`
+`PROMPT_FIELD_SEMANTICS_QA`
 `PROMPT_ONE_PAGE_FEASIBILITY_QA`
+`PROMPT_PHYSICAL_PAGE_STATE_QA`
+`PROMPT_PHYSICAL_WIDTH_FEASIBILITY_QA`
+`PROMPT_PHYSICAL_HEIGHT_FEASIBILITY_QA`
+`PROMPT_ITEM_BOUNDING_BOX_QA`
+`PROMPT_ANSWER_ZONE_PRESERVATION_QA`
+`PROMPT_PAGINATION_FALLBACK_QA`
+`PROMPT_PAGE_POLICY_SERIALIZATION_QA`
+`PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
 `PROMPT_LAYOUT_QA`
 `PROMPT_READABILITY_QA`
 `PROMPT_ANSWER_SPACE_QA`
@@ -174,4 +207,4 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
 `PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
-Unresolved render path, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, missing review protocol, ambiguous labels or theme interference blocks release.
+Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, missing review protocol, ambiguous labels or theme interference blocks release.
