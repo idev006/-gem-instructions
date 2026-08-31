@@ -8,7 +8,9 @@ Compatible worker baseline: 2.6.x / schema 1
 
 2.6.3-LTS promotes independent metrology engineering into the base architecture. The objective is educational safety: every learner-read measuring instrument must be quantitatively correct before prompt release, and actual rendered pixels still require artifact inspection before classroom release.
 
-The 2026-08-31 actual weight-dial inactive-gap defect is now permanent negative evidence. A continuous-looking 360° tick ring on the canonical 0–5 kg dial is release-blocking even when the active interval count elsewhere is numerically correct.
+The 2026-08-31 actual weight-dial inactive-gap defect is permanent negative evidence. The later consolidated UAT reports also established a second systemic invariant: a locally readable instrument does not prove that the full worksheet physically fits the claimed page.
+
+`NO NUMERIC PACKING PROOF = NO PAGE-FEASIBILITY PASS`.
 
 ## Required base workers
 
@@ -35,6 +37,7 @@ Every W01–W10 runtime bundle embeds:
 2. `SCALE_LINE_INTEGRITY_PROFILE.md`
 3. `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 4. `METROLOGY_ASSURANCE_PROFILE.md`
+5. `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
 ## Mandatory learner-read chain
 
@@ -42,33 +45,42 @@ Every W01–W10 runtime bundle embeds:
 
 W10 must independently recompute quantitative evidence rather than repeat W07.
 
-Required W10 state: `METROLOGY_AUDIT_STATE` with count, spacing, reference, target alignment, label association, inactive region when applicable, print feasibility and independent verdict.
+Required W10 state includes count, spacing, reference, target alignment, label association, inactive region when applicable, true minimum size, selected render size, numeric `PHYSICAL_PAGE_STATE`, print feasibility and independent verdict.
 
 Missing W10 evidence = `PROMPT_METROLOGY_AUDIT_REQUIRED_QA=FAIL` and `PROMPT_RELEASE=BLOCKED`.
 
 ## Universal scale audit
 
-For every learner-read clock, dial, ruler, speedometer, protractor, thermometer, graduated container or graph axis verify:
-
-- topology and active range;
-- exact interval count;
-- exact position count;
-- zero/origin/reference/baseline;
-- direction/monotonicity;
-- uniform geometric spacing;
-- print spacing at actual scale;
-- major/intermediate/minor hierarchy without extra positions;
-- common tick anchoring;
-- label association/clearance;
-- target representability;
-- pointer/hand/ray/liquid/meniscus/bar endpoint alignment;
-- inactive-region integrity;
-- decoration isolation;
-- canonical-template consistency;
-- print/photocopy readability;
-- page feasibility.
+For every learner-read clock, dial, ruler, speedometer, protractor, thermometer, graduated container or graph axis verify topology/range, exact interval/position counts, reference, direction, spacing, hierarchy, anchoring, labels, target alignment, inactive region, decoration isolation, template consistency, print readability and numeric page feasibility.
 
 `ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER`.
+
+## Physical page feasibility audit
+
+For A4 portrait use physical page dimensions 210 × 297 mm before margins.
+
+Before one-page feasibility can PASS, serialize numeric proof for margins, header/title/directions reserve, complete item bounding boxes, rows/columns, row/column gaps, answer zones, usable width/height and required grid width/height.
+
+PASS requires:
+
+`REQUIRED_GRID_WIDTH_MM <= USABLE_WIDTH_MM`
+
+and
+
+`REQUIRED_GRID_HEIGHT_MM <= USABLE_HEIGHT_MM`.
+
+`ONE_PAGE_PREFERRED != ONE_PAGE_LOCKED`.
+
+If `ONE_PAGE_LOCK=OFF` and the preferred one-page plan fails, paginate and re-audit. Do not hard-code `1 PAGE` or `2×5` after a failed packing proof.
+
+Permanent lower-bound regression examples:
+- weight dial: 5×80 mm = 400 mm → impossible on A4 portrait;
+- protractor: 5×70 mm = 350 mm → impossible;
+- thermometer: 5×60 mm = 300 mm before other content → impossible;
+- graduated container: 5×50 mm = 250 mm before gaps/header/margins → requires full proof, no assumed PASS;
+- graph worksheet: axis height alone never proves full-page fit because graph titles and ten question/answer lines also consume height.
+
+W10 must distinguish `METROLOGY_MINIMUM_SIZE_MM` from `SELECTED_RENDER_SIZE_MM` and provide `SIZE_ORACLE_SOURCE`.
 
 ## Known-answer metrology oracles
 
@@ -80,43 +92,34 @@ Clock:
 Weight dial:
 - 0–5 kg @0.1 kg → 50 active intervals / 51 positions;
 - canonical active sweep 300°, inactive gap 60°;
-- canonical start/end: 240° → 180° through the 300° active sweep;
-- inactive open arc: 180° → 240°;
+- inactive open arc 180°→240°;
 - `INACTIVE_GAP_TICK_COUNT=0`;
 - `INACTIVE_GAP_RADIAL_MARK_COUNT=0`;
-- active ticks only from `active_tick_angle(i)=(240+6*i) mod 360, i=0..50`;
-- canonical label angles: `{0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`;
-- one radial scale-like mark inside the inactive gap is `P0_CRITICAL_ACADEMIC`.
+- canonical label angles `{0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`.
 
 Ruler:
 - 1 cm @1 mm → 10 intervals / 11 positions / 9 interior positions;
-- `PHYSICAL_EDGE_IS_GRADUATION=NO`;
-- 5 mm hierarchy mark is an existing position.
+- `PHYSICAL_EDGE_IS_GRADUATION=NO`.
 
 Speedometer:
 - 0–120 km/h @10 → 12 intervals / 13 positions;
 - 240° active / 120° inactive gap;
-- 60 km/h → 0° in canonical mapping;
+- canonical convention has 0° at top; 60 km/h → 0° → straight up;
 - 35 km/h is not representable in discrete 10 km/h mode.
 
 Protractor:
 - 0–180° @1° → 180 intervals / 181 positions;
 - `tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`;
-- 0.60 mm floor → minimum radius ≈34.38 mm, diameter ≈68.76 mm, production width 70 mm;
-- 65 mm is rejected;
-- final render path must use deterministic instrument geometry;
-- mirrored competing scale forbidden unless dual-scale interpretation is explicitly taught.
+- production width 70 mm; 65 mm rejected.
 
 Thermometer:
 - 0–50°C @1°C → 50/51;
-- 0–100°C @5°C → 20/21;
-- -10–40°C @1°C → zero index 10;
+- 60 mm / 50 = exactly 1.20 mm spacing;
 - liquid endpoint on target graduation centerline.
 
 Graduated container:
 - endpoint-inclusive count from configured range/interval;
-- target level/meniscus read convention exact;
-- no decorative competing scale.
+- target level/read convention exact.
 
 Graph axis:
 - equal numeric increments → equal physical increments;
@@ -136,27 +139,22 @@ Renderer self-review is prevention only, not artifact proof.
 
 ## Release gates
 
-Applicable metrology gates include:
+Applicable gates include the existing academic/scale/metrology gates plus:
 
-`PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
-`PROMPT_METROLOGY_INDEPENDENCE_QA`
-`PROMPT_METROLOGY_INTERVAL_COUNT_QA`
-`PROMPT_METROLOGY_POSITION_COUNT_QA`
-`PROMPT_METROLOGY_REFERENCE_QA`
-`PROMPT_METROLOGY_SPACING_ORACLE_QA`
-`PROMPT_METROLOGY_HIERARCHY_QA`
-`PROMPT_METROLOGY_LABEL_ASSOCIATION_QA`
-`PROMPT_METROLOGY_TARGET_ALIGNMENT_QA`
-`PROMPT_METROLOGY_INACTIVE_REGION_QA`
-`PROMPT_METROLOGY_TEMPLATE_CONSISTENCY_QA`
-`PROMPT_METROLOGY_RENDER_PATH_QA`
-`PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
-`PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
-`PROMPT_METROLOGY_DIAL_ACTIVE_TICK_SET_QA`
-`PROMPT_METROLOGY_DIAL_GAP_RADIAL_MARK_ZERO_QA`
-`PROMPT_METROLOGY_DIAL_LABEL_ANGLE_QA`
+`PROMPT_METROLOGY_SIZE_ORACLE_QA`
+`PROMPT_PHYSICAL_PAGE_STATE_QA`
+`PROMPT_PHYSICAL_WIDTH_FEASIBILITY_QA`
+`PROMPT_PHYSICAL_HEIGHT_FEASIBILITY_QA`
+`PROMPT_ITEM_BOUNDING_BOX_QA`
+`PROMPT_ANSWER_ZONE_PRESERVATION_QA`
+`PROMPT_PAGINATION_FALLBACK_QA`
+`PROMPT_PAGE_POLICY_SERIALIZATION_QA`
+`PROMPT_NUMERIC_INEQUALITY_CONSISTENCY_QA`
+`PROMPT_OUTPUT_MODE_QA`
+`PROMPT_FIELD_SEMANTICS_QA`
+`PROMPT_QA_EVIDENCE_CONSISTENCY_QA`
 
-Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
+Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED` for the current compiled plan.
 
 ## Executable release gate
 
@@ -172,12 +170,13 @@ All prior tests remain. Counts may only increase.
 8. protractor scale safety: 24
 9. full metrology audit: 80
 10. actual weight-dial inactive-gap regression: 32
+11. physical page feasibility regression: 48
 
 Combined:
 
-`1107/1107 PASS`
+`1155/1155 PASS`
 
-The additive suites include `tools/metrology_full_audit_regression_suite.py` and `tools/weight_dial_inactive_gap_regression_suite.py`. The latter protects the actual user-supplied 2026-08-31 defect and must never be removed or weakened to a generic visual check.
+The newest suite is `tools/physical_page_feasibility_regression_suite.py`, derived directly from the consolidated user-supplied UAT reports. It must never be removed or weakened into a generic visual check.
 
 ## Package audit
 
@@ -188,11 +187,10 @@ Release package:
 Must contain:
 - one main Instructions TXT;
 - exactly ten worker Knowledge TXT files;
-- all four mandatory shared profiles embedded in main and worker bundles;
+- all five mandatory shared profiles embedded in main and worker bundles;
 - W10 metrology worker;
-- full metrology audit report;
-- actual weight-dial inactive-gap regression evidence/report;
-- all previous regression reports;
+- all regression reports including 32-case weight-gap and 48-case physical-page suites;
+- actual-defect evidence documents;
 - classroom artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
@@ -201,7 +199,7 @@ Build only from GitHub SSOT after all gates pass. Use the exact CI artifact; do 
 
 ## Prompt/artifact boundary
 
-Passing `1107/1107` establishes prompt-system/package coherence only.
+Passing `1155/1155` establishes prompt-system/package coherence only.
 
 Before actual rendered image inspection:
 
