@@ -12,6 +12,7 @@ Applies to: `activity-based-elementary-worksheet` baseline 2.6.x
 - `KB_MANIFEST.md` — 2.6.0-LTS
 - `policies/PARAMETER_POLICY.md` — 2.6.0-LTS
 - `policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
+- `policies/SYSTEM_WIDE_QUALITY_PROFILE.md`
 - `domains/DOMAIN_REGISTRY.md` — 2.6.0-LTS
 - `domains/MEASUREMENT_COVERAGE_P1_P6.md`
 - W01..W09 worker contracts
@@ -25,6 +26,7 @@ Applies to: `activity-based-elementary-worksheet` baseline 2.6.x
 - `tools/full_skill_matrix_suite.py`
 - `tools/runtime_uat_regression_suite.py`
 - `tools/semantic_oracle_regression_suite.py`
+- `tools/system_wide_quality_regression_suite.py`
 - `examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 
 ## Worker audit
@@ -41,35 +43,50 @@ Exactly 9 base workers:
 `W08_LAYOUT_RENDER_THAI`
 `W09_QA_RELEASE`
 
-Each declares:
+Each declares `BASELINE_COMPATIBILITY=2.6.x` and `WORKER_SCHEMA_VERSION=1`. Worker IDs must be unique.
 
-`BASELINE_COMPATIBILITY=2.6.x`
-`WORKER_SCHEMA_VERSION=1`
-
-Worker IDs must be unique.
+At runtime every W01–W09 bundle must inherit `policies/SYSTEM_WIDE_QUALITY_PROFILE.md` before worker/domain-specific SSOT.
 
 ## Core architecture audit
 
-Verify core contains:
-
-- Orchestrator role
-- worker routing and ownership contract
-- three visibility scopes
-- Student Blueprint target-leak prohibition
-- measurement P1–P6 coverage
-- exact unit conversion rules
-- high-risk visual serialization
-- canonical-label preservation
-- single render-path rule
-- one-page-first policy
-- Thai/theme policy
-- answer-key behavior
-- prompt/artifact QA distinction
-- runtime-critical instruction profiles
-- health check
-- hotfix slot 10 policy
+Verify core contains Orchestrator role, worker routing/ownership, three visibility scopes, Student Blueprint target isolation, measurement P1–P6 coverage, exact relations/formulas, high-risk visual serialization, canonical-label preservation, single render path, one-page-first semantics, Thai/theme separation, answer-key behavior, prompt/artifact QA distinction, health check and hotfix policy.
 
 Missing a major contract = FAIL.
+
+## System-wide quality audit
+
+All production skills inherit the shared quality profile. Verify:
+
+- ownership conflicts are resolved by SSOT ownership, not final-prose overrides;
+- material non-default parameters have provenance;
+- generated academic states have independent verification, not tautological checks only;
+- exact requested item count is preserved in student and renderer states;
+- difficulty is not silently weakened to simplify layout/generation;
+- accidental degenerate target sets are rejected when variety is part of the objective;
+- Student Blueprint and renderer metadata remain structurally isolated;
+- high-risk per-item renderer state is serialized atomically with explicit fields;
+- wide Markdown tables are not used where wrapping/column drift can change renderer-state meaning;
+- `ONE_PAGE_LOCK=OFF` never compiles to hard `exactly one page` wording;
+- final prompt is self-contained;
+- QA PASS must match the actual compiled structure;
+- prompt QA never claims downstream artifact correctness.
+
+Applicable shared gates:
+
+`SYSTEM_OWNERSHIP_INTEGRITY_QA`
+`SYSTEM_PARAMETER_PROVENANCE_QA`
+`SYSTEM_INDEPENDENT_ORACLE_QA`
+`SYSTEM_ITEM_COUNT_QA`
+`SYSTEM_DIFFICULTY_FIDELITY_QA`
+`SYSTEM_TARGET_DISTRIBUTION_QA`
+`SYSTEM_VISIBILITY_ISOLATION_QA`
+`PROMPT_RENDER_STATE_SERIALIZATION_QA`
+`PROMPT_PAGE_POLICY_WORDING_QA`
+`SYSTEM_FINAL_PROMPT_SELF_CONTAINED_QA`
+`PROMPT_QA_EVIDENCE_CONSISTENCY_QA`
+`SYSTEM_PHASE_BOUNDARY_QA`
+
+Any applicable FAIL blocks prompt release.
 
 ## Thai P3 analog-clock runtime audit
 
@@ -85,48 +102,13 @@ For Thai Grade 3 analog-clock AUTO requests, verify:
 - Student Blueprint contains no target time, answer pair or angles
 - `ONE_PAGE_LOCK=OFF` unless exact-one-page intent is explicit
 - canonical clock topology is not degraded to force page fit
+- renderer state uses atomic per-item blocks so angle/relation/hard-negative fields cannot drift across columns
 
 Any violation = FAIL and `PROMPT_RELEASE=BLOCKED`.
 
 ## Measurement capability audit
 
-Verify deterministic rules for:
-
-### Time/clock
-- hours/minutes/seconds relations
-- elapsed/start/end/duration
-- clock interpolation
-- seconds hand only when explicitly taught
-
-### Length/distance
-- ruler zero/nonzero start
-- mm/cm/m/km conversion
-- length arithmetic/comparison
-- distance total/difference/round trip/multi-segment/route comparison
-- no silent speed inference
-
-### Angle/perimeter/area
-- protractor 0° baseline and active scale direction
-- exact target graduation
-- perimeter formulas
-- supported area formulas
-- perpendicular height semantics
-- squared-unit conversion
-- one consistent `PI_POLICY` for circle tasks
-
-### Weight
-- g/kg/ขีด relations
-- weight arithmetic/conversion
-- canonical dial topology
-
-### Temperature/capacity/volume
-- thermometer representability/alignment specification
-- mL/L arithmetic/conversion
-- meniscus convention
-- rectangular-prism volume
-- simple composite rectangular-prism volume
-- cm³/dm³/m³ conversion
-- capacity-volume relation only when explicitly taught
+Verify deterministic rules for time/clock, length/distance, angle/perimeter/area, weight/scale, temperature/capacity/volume, money/calendar/data and every declared visual/data mapping. Grade progression and explicit user objective control difficulty; layout pressure never changes academic meaning.
 
 ## Required integration gates
 
@@ -159,7 +141,7 @@ Verify deterministic rules for:
 `STUDENT_VISIBLE_ANSWER_LEAK_QA`
 `STUDENT_VISIBLE_TARGET_TEXT_LEAK_QA`
 `CANONICAL_LABEL_PRESERVATION_QA`
-plus owning-worker/domain gates.
+plus all applicable shared system-wide and owning-worker/domain gates.
 
 ## Executable release gate
 
@@ -169,14 +151,15 @@ A build candidate is eligible only when all current suites pass:
 2. `tools/full_skill_matrix_suite.py` → `360/360 PASS`
 3. `tools/runtime_uat_regression_suite.py` → `12/12 PASS`
 4. `tools/semantic_oracle_regression_suite.py` → `20/20 PASS`
+5. `tools/system_wide_quality_regression_suite.py` → `30/30 PASS`
 
-The semantic-oracle suite uses fixed known-answer expectations so the release gate is not composed only of contract-token checks or formula-vs-itself identities.
+The semantic-oracle suite uses fixed known-answer expectations so the release gate is not composed only of token or formula-vs-itself checks. The system-wide suite validates cross-worker contracts and verifies that the shared quality profile is shipped as mandatory runtime knowledge to all workers.
 
 Combined minimum:
 
-`841/841 PASS`
+`871/871 PASS`
 
-A real UAT or QA-architecture defect must be represented by a permanent regression before the next accepted release artifact. Never lower the case count to make a release pass.
+A real UAT, domain or QA-architecture defect must be represented by a permanent regression before the next accepted release artifact. Never lower the case count to make a release pass.
 
 ## High-risk smoke tests
 
@@ -190,17 +173,20 @@ A real UAT or QA-architecture defect must be represented by a permanent regressi
 8. Protractor 0–180° @1° → 180 intervals/181 positions; active baseline/scale explicit.
 9. Triangle area → use perpendicular height.
 10. 1 m² → 10,000 cm²; reject ×100.
-11. 20–120°F @2°F → only 20+2k discrete targets.
+11. Discrete thermometer target → represented exactly on a valid graduation.
 12. Bottom/top meniscus → designated read point exact and no target-number annotation.
 13. Rectangular prism → compatible units before `l×w×h`.
 14. 1 m³ → 1,000,000 cm³; reject linear-factor conversion.
 15. Student Blueprint → no renderer target values.
-16. Final prompt → one resolved render path.
-17. Before image inspection → `ARTIFACT_QA=NOT_YET_TESTED`.
+16. Final prompt → one resolved render path and every required item state.
+17. High-risk item serialization → atomic labeled block, no column drift.
+18. `ONE_PAGE_LOCK=OFF` → preferred-one-page wording with safe pagination preserved.
+19. QA report → cannot PASS a gate contradicted by compiled prompt structure.
+20. Before image inspection → `ARTIFACT_QA=NOT_YET_TESTED`.
 
 ## Prompt/artifact boundary
 
-Passing this checklist means the **prompt-generation baseline** is internally coherent. It does not mean third-party rendered worksheets are classroom-ready.
+Passing this checklist means the prompt-generation baseline is internally coherent. It does not mean third-party rendered worksheets are classroom-ready.
 
 Before artifact inspection:
 
@@ -213,18 +199,19 @@ Compact package must contain:
 
 - one main Instructions `.txt`
 - exactly nine worker `.txt` Knowledge files
+- mandatory system-wide quality profile embedded in main instructions and every worker Knowledge bundle
 - no `.md` dependency required for Gemini upload
 - install/health-check guide
-- smoke tests
 - SSOT validation report
 - core dry-run report
 - full skill-matrix report
 - runtime UAT regression report
 - semantic-oracle regression report
+- system-wide quality regression report
 - checksum manifest
 
 Knowledge slot 10 remains free unless an approved narrow hotfix is shipped.
 
 ## Release decision
 
-Baseline 2.6.0 prompt-generation release may be marked READY only when static consistency, worker compatibility, all `841` current regression cases, package integrity and SSOT/package coherence pass with zero critical blockers.
+Baseline 2.6.0 prompt-generation release may be marked READY only when static consistency, worker compatibility, all `871` current regression cases, package integrity and SSOT/package coherence pass with zero critical blockers.
