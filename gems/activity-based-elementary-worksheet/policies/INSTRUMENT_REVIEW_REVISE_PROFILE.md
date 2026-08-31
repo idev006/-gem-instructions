@@ -1,10 +1,11 @@
 # Instrument Review–Revise Profile — Mandatory Renderer Self-Check
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
 Applies to: every learner-read instrument/scale and every final image-generation prompt
-Primary auditors: `W07_INSTRUMENT_AUDITOR + W08_LAYOUT_RENDER_THAI + W09_QA_RELEASE`
+Primary auditors: `W07_INSTRUMENT_AUDITOR + W10_METROLOGY_ENGINEER + W08_LAYOUT_RENDER_THAI + W09_QA_RELEASE`
+Companion independent audit: `policies/METROLOGY_ASSURANCE_PROFILE.md`
 
 ## 1. Educational safety principle
 
@@ -77,6 +78,8 @@ Canonical ruler example, 1 cm at 1 mm:
 
 Gate: `PROMPT_INSTRUMENT_INDEPENDENT_RECOUNT_QA`.
 
+W10 must perform a second independent metrology recomputation rather than copy W07's conclusion.
+
 ## 6. Repair behavior
 
 If any self-review item fails, the renderer must repair the instrument rather than preserve an attractive but wrong drawing.
@@ -139,7 +142,8 @@ Gate: `PROMPT_INSTRUMENT_REVIEW_EVIDENCE_QA`.
 ### Protractor
 - origin/baseline/direction exact;
 - expected graduation count exact;
-- target ray intersects the intended graduation.
+- target ray intersects the intended graduation;
+- W10 independently verifies printed arc spacing with `tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)`.
 
 ### Graduated container
 - exact interval/position count;
@@ -164,15 +168,18 @@ When learner-read instruments exist, the standalone final prompt must include a 
 
 Gate: `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA`.
 
-## 10. W07 / W08 / W09 ownership
+## 10. W07 / W10 / W08 / W09 ownership
 
-- W07 defines/audits the canonical geometry and review checklist.
-- W08 ensures layout/render decisions do not make the checklist impossible and serializes the review protocol into the final prompt.
-- W09 verifies the protocol is present and consistent with all applicable instrument gates; any missing/contradictory review instruction blocks prompt release.
+- W07 defines/audits canonical instrument geometry and the review checklist.
+- W10 independently verifies metrology, printed spacing, reference correctness, representability and measurement feasibility using quantitative oracles.
+- W08 ensures layout/render decisions do not make either audit impossible and serializes the review protocol into the final prompt.
+- W09 verifies both W07 and W10 audit evidence are present and consistent with all applicable instrument gates; any missing/contradictory audit blocks prompt release.
+
+Mandatory learner-read route therefore includes `W07 + W10 + W08 + W09` in addition to the owning academic worker.
 
 ## 11. Artifact boundary
 
-Even when renderer self-review is mandatory:
+Even when renderer self-review and W10 metrology audit are mandatory:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
@@ -194,5 +201,7 @@ and convert the defect into a permanent regression before the next accepted rele
 `PROMPT_INSTRUMENT_REVISE_UNTIL_PASS_QA`
 `PROMPT_INSTRUMENT_REVIEW_EVIDENCE_QA`
 `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA`
+`PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
+`PROMPT_METROLOGY_INDEPENDENCE_QA`
 
 Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
