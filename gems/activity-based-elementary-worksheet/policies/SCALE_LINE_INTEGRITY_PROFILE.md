@@ -1,25 +1,15 @@
 # Scale-Line Integrity Profile — All Learner-Read Scales
 
-Version: 1.3.0
+Version: 1.4.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
 Primary geometry auditor: `W07_INSTRUMENT_AUDITOR`
 Independent metrology auditor: `W10_METROLOGY_ENGINEER`
 Companion prevention profile: `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 Companion independent audit: `policies/METROLOGY_ASSURANCE_PROFILE.md`
+Companion packing audit: `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
-Applies whenever a learner reads graduations, ticks, marks, grid/axis intervals, or a pointer/level against a scale, including:
-
-- analog clock minute/hour marks
-- weight/dial scales
-- rulers and linear measuring scales
-- **vehicle speedometers / open-arc speed dials**
-- thermometers
-- graduated capacity containers
-- semicircular/full-circle protractors
-- learner-read graph axes
-
-This profile complements domain formulas. Owning domain workers define values/topology; W07 protects geometric construction; W10 independently verifies metrology feasibility and quantitative scale evidence; the review-revise profile requires the downstream renderer to recount and repair learner-read instruments before finalization.
+Applies whenever a learner reads graduations, ticks, marks, grid/axis intervals, or a pointer/level against a scale, including analog clocks, weight/dial scales, rulers, speedometers, thermometers, graduated capacity containers, protractors, and learner-read graph axes.
 
 ## 1. Core rule
 
@@ -27,9 +17,9 @@ A scale line is academic data.
 
 `SCALE_LINE_INTEGRITY > THEME_ART > DECORATION`
 
-Missing, extra, merged, floating, uneven, misaligned, reversed, occluded, or visually ambiguous graduations are critical academic defects when the learner must read them.
+Missing, extra, merged, floating, uneven, misaligned, reversed, occluded, off-center, distorted, or visually ambiguous graduations are critical academic defects when the learner must read them.
 
-A scale is not valid merely because its interval count is numerically correct. The final printed geometry must also preserve independently verifiable spacing, anchoring, hierarchy, direction, labels, target alignment, and metrology feasibility.
+A scale is not valid merely because its interval count is numerically correct. Final geometry must also preserve spacing, anchoring, hierarchy, direction, label association/order, common center/origin where applicable, target alignment, shape integrity, and metrology feasibility.
 
 ## 2. Mandatory scale-line specification
 
@@ -38,6 +28,7 @@ Every learner-read scale must resolve a `SCALE_LINE_SPEC` before prompt release 
 - `TOPOLOGY_FAMILY`
 - `ACTIVE_RANGE`
 - `MINOR_INTERVAL`
+- `INTERMEDIATE_INTERVAL` when applicable
 - `MAJOR_INTERVAL`
 - `EXPECTED_INTERVAL_COUNT`
 - `EXPECTED_POSITION_COUNT`
@@ -47,15 +38,15 @@ Every learner-read scale must resolve a `SCALE_LINE_SPEC` before prompt release 
 - `MAJOR_MINOR_HIERARCHY`
 - `ENDPOINT_BEHAVIOR`
 - `INACTIVE_REGION_RULE` when applicable
-- `MIN_PRINTED_INSTRUMENT_SIZE`
+- `METROLOGY_MINIMUM_SIZE_MM`
+- `SELECTED_RENDER_SIZE_MM`
 - `MIN_TICK_CENTER_SPACING_MM`
 - `PRINT_SPACING_ORACLE` for dense learner-read scales
+- authoritative center/origin fields for radial/angular instruments.
 
-If any required field is unresolved for a learner-read scale, `PROMPT_SCALE_LINE_SPEC_QA=FAIL`.
+If any required field is unresolved, `PROMPT_SCALE_LINE_SPEC_QA=FAIL`.
 
 ## 3. Exact count and topology
-
-The smallest instructional graduation defines the count.
 
 ### LINEAR_ENDPOINT_INCLUSIVE
 
@@ -63,14 +54,18 @@ The smallest instructional graduation defines the count.
 `EXPECTED_POSITION_COUNT=EXPECTED_INTERVAL_COUNT+1`
 `EXPECTED_INTERIOR_POSITION_COUNT=max(EXPECTED_POSITION_COUNT-2,0)`
 
-Both endpoints are physical scale positions.
-
 Canonical ruler 1 cm @1 mm:
-
 - 10 intervals
 - 11 endpoint-inclusive positions
 - 9 interior positions
-- physical ruler edge is not an extra graduation
+- physical ruler edge is not an extra graduation.
+
+Canonical thermometer 0–50°C @1°C:
+- 50 intervals / 51 positions;
+- 6 major positions at 0,10,20,30,40,50;
+- 5 intermediate positions at 5,15,25,35,45;
+- 40 ordinary minor positions;
+- every 10°C span has 10 intervals / 9 interior positions.
 
 ### CYCLIC_FULL_CIRCLE
 
@@ -80,9 +75,14 @@ Analog clock full minute face: exactly 60 intervals / 60 positions.
 
 ### OPEN_ARC_BOUNDED
 
-The active arc is endpoint-inclusive; the inactive/non-scale region contains no value ticks unless the owning domain explicitly defines otherwise.
+The active arc is endpoint-inclusive; the inactive/non-scale region contains no value ticks or tick-like radial marks unless the owning domain explicitly defines otherwise.
 
-Canonical 0–5 kg teaching dial: 50 active intervals / 51 active positions plus a 60° inactive gap.
+Canonical 0–5 kg teaching dial:
+- angle convention 0° top, clockwise positive;
+- labels `0@0°,1@60°,2@120°,3@180°,4@240°,5@300°`;
+- 50 active intervals / 51 positions;
+- inactive open gap `(300°,360°)`;
+- clockwise major-label order `[0,1,2,3,4,5]`.
 
 Canonical 0–120 km/h speedometer with 10 km/h minor interval: 12 active intervals / 13 active positions plus a 120° inactive gap.
 
@@ -95,249 +95,224 @@ For 0–180° at minor interval d:
 
 At 1°: 180 intervals / 181 positions.
 
-## 4. Tick anchoring — mandatory
+Canonical teaching orientation: perfect upper semicircle; 0° right, 90° top, 180° left; one active numeric scale by default.
+
+## 4. Tick anchoring and common center
 
 All graduations must be anchored to one authoritative baseline/ring/arc.
 
-- radial scales: every tick touches the same reference ring/arc and extends consistently inward or outward;
-- linear scales: every tick starts from the same authoritative baseline/scale edge;
-- graph axes: tick marks intersect the axis line at their exact data position;
-- no floating ticks;
-- no detached tick fragments;
-- no alternating anchor direction unless the configured instrument explicitly requires it;
-- no perspective transform that changes tick spacing or angle.
+For radial dials/clocks/speedometers:
 
-`PROMPT_SCALE_TICK_ANCHOR_QA` is mandatory for learner-read scales.
+`PIVOT_CENTER == READING_RING_CENTER == TICK_RADIAL_CENTER`
 
-## 5. Major / minor hierarchy
+For protractors:
 
-Major marks must be visibly and consistently stronger than minor marks without creating extra positions.
+`ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER`
+
+Every radial tick, pointer, hand, or ray must be geometrically radial/collinear from that exact common center. A pointer that visually reaches a target tick from an offset pivot is invalid.
+
+Linear scales: every tick starts from one authoritative baseline/scale edge. Graph ticks intersect the axis at exact data positions.
+
+No floating/detached tick fragments or independent center translations.
+
+Required gates:
+`PROMPT_SCALE_TICK_ANCHOR_QA`
+`PROMPT_INSTRUMENT_COMMON_CENTER_QA` when radial/angular
+`PROMPT_POINTER_ORIGIN_COINCIDENCE_QA` when pointer/ray exists
+`PROMPT_RADIAL_COLLINEARITY_QA` when radial/angular.
+
+## 5. Major / intermediate / minor hierarchy
+
+Hierarchy classes reuse existing positions and never add positions.
 
 Default print-safe hierarchy unless a domain specifies stronger values:
+- minor tick stroke width >=0.25 mm;
+- major tick stroke width >=0.35 mm and not thinner than minor;
+- major tick length >=1.5× minor length;
+- optional/required intermediate ticks use one consistent level between major and minor;
+- identical semantic levels use identical geometry throughout the template.
 
-- minor tick stroke width: at least 0.25 mm at final print size;
-- major tick stroke width: at least 0.35 mm and not thinner than minor ticks;
-- major tick length: at least 1.5× minor tick length;
-- optional intermediate marks must have one consistent level between major and minor and must correspond to a real configured subdivision;
-- when per-item verification references an intermediate mark such as a 5° protractor mark, that intermediate hierarchy becomes REQUIRED for the canonical template rather than optional;
-- identical semantic levels use identical length/weight throughout one canonical template;
-- do not use decorative stroke variation as if it were an instructional hierarchy.
+Mutually exclusive classification is required when divisibility overlaps. Example thermometer 0–50 @1:
+- major: `i%10==0`;
+- intermediate: `i%5==0 AND i%10!=0`;
+- minor: all remaining positions.
 
-If the renderer cannot maintain this hierarchy at the planned size, increase the instrument size or paginate; never delete minor marks to compensate.
+Never draw both major and intermediate strokes as separate ticks at one physical position.
 
 `PROMPT_SCALE_MAJOR_MINOR_HIERARCHY_QA` is mandatory.
 
 ## 6. Spacing and print readability
 
 At final intended print size:
+- adjacent smallest instructional tick centers satisfy the resolved minimum spacing oracle; default >=0.60 mm;
+- ticks remain individually distinguishable after B&W photocopying;
+- required marks cannot rely on gray-only strokes;
+- dense scales enlarge or paginate before tick identity is compromised.
 
-- adjacent smallest instructional tick centers must satisfy the resolved minimum spacing oracle; default lower bound is at least 0.60 mm;
-- ticks must remain individually distinguishable after black-and-white photocopying;
-- two adjacent ticks must not merge into one dark block;
-- no tick may be so faint/thin that photocopy loss is likely;
-- no gray-only scale lines for required graduations;
-- dense scales must increase instrument size or paginate before compromising tick identity.
-
-`MIN_TICK_CENTER_SPACING_MM=0.60` is the default lower bound; a domain may require more, never less without explicit audited justification.
-
-For radial scales, do not estimate spacing from overall page width. Compute it at the authoritative reading/tick ring:
+Radial/angular spacing:
 
 `tick_center_spacing_mm = reading_radius_mm × radians(MINOR_INTERVAL_DEG)`
 
-For a 0–180° protractor at 1° resolution and the default 0.60 mm minimum:
+For 0–180° @1° and 0.60 mm floor:
 
-`MIN_READING_RADIUS_MM = 0.60 / radians(1) ≈ 34.38 mm`
-`MIN_READING_RING_DIAMETER_MM ≈ 68.76 mm`
-`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM = 70 mm`
+`MIN_READING_RADIUS_MM≈34.38`
+`MIN_READING_RING_DIAMETER_MM≈68.76`
+`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
 
-A 65 mm diameter protractor fails this spacing oracle because its 1° arc spacing is only about 0.567 mm. It must not pass `PROMPT_SCALE_PRINT_SEPARATION_QA`.
+65 mm width fails (~0.567 mm spacing).
 
-W10 independently recomputes the print-spacing oracle and returns `PROMPT_METROLOGY_SPACING_ORACLE_QA` evidence; copying W07's value is insufficient.
+Linear spacing:
 
-`PROMPT_SCALE_PRINT_SEPARATION_QA` is mandatory.
+`tick_center_spacing_mm = printed_scale_length_mm / interval_count`
 
-## 7. Uniformity and monotonicity
+For thermometer 0–50 @1 using 60 mm selected scale length, spacing is exactly 1.20 mm. `>1.20 mm` is false for that exact geometry.
+
+W10 independently recomputes spacing evidence.
+
+## 7. Uniformity, monotonicity, and label order
 
 Within every uniform scale segment:
-
 - equal value intervals have equal geometric spacing;
-- scale values progress monotonically in the configured direction;
-- no local compression/expansion;
-- no reversed subsection;
-- no duplicated physical position for two different non-wrap values;
-- no missing value position;
-- no extra unlabeled instructional-looking graduation.
+- values progress monotonically in the configured direction;
+- no local compression/expansion/reversal;
+- no missing/extra physical value position;
+- ordered major labels preserve the owning-domain sequence.
 
-`PROMPT_SCALE_UNIFORM_SPACING_QA` and `PROMPT_SCALE_DIRECTION_QA` are mandatory.
+For canonical weight dial, clockwise labels must be exactly `[0,1,2,3,4,5]` associated with `0°,60°,120°,180°,240°,300°`.
+
+`PROMPT_SCALE_UNIFORM_SPACING_QA`, `PROMPT_SCALE_DIRECTION_QA`, and `PROMPT_SCALE_LABEL_ORDER_QA` when applicable are mandatory.
 
 ## 8. Labels and scale lines
 
-Labels are subordinate to scale geometry and must not alter it.
-
 - every major numeric label aligns unambiguously with its intended major graduation;
-- labels must not cover, erase, shorten, bend, or displace ticks;
-- labels must not sit so close to adjacent ticks that association becomes ambiguous;
-- no decorative numeral may resemble a scale label;
-- negative signs, degree symbols, decimal points, units, and zero labels must remain legible where configured;
-- label omission is allowed only when the domain/grade profile intentionally defines an unlabeled minor mark, never because layout is crowded.
+- labels must not cover/erase/bend/displace ticks;
+- label association must not be ambiguous;
+- degree symbols, minus signs, decimal points and units remain legible;
+- label omission is permitted only by configured pedagogy, never because layout is crowded.
 
-`PROMPT_SCALE_LABEL_ALIGNMENT_QA` and `PROMPT_SCALE_LABEL_CLEARANCE_QA` are mandatory when labels are present.
+`PROMPT_SCALE_LABEL_ALIGNMENT_QA` and `PROMPT_SCALE_LABEL_CLEARANCE_QA` are mandatory when labels exist.
 
 ## 9. Pointer / level / endpoint alignment
 
 When a pointer, hand, ray, liquid level, object endpoint, or bar height is read against a scale:
-
-- the designated reading endpoint must terminate/intersect the authoritative reading ring/baseline/centerline at the exact target position;
-- the pointer must not terminate between ticks in exact-reading mode;
-- the pointer/level must not hide enough neighboring ticks to make the local scale unreadable;
-- pointer thickness must not create two plausible target ticks;
-- the center pivot/origin/baseline must remain exact for radial/angular instruments;
-- the renderer-only state must specify both semantic target and exact geometric target.
+- designated reading endpoint terminates/intersects the authoritative target position;
+- exact-reading pointers never sit between ticks;
+- pointer thickness does not create two plausible readings;
+- radial pointers originate at the exact common center;
+- protractor rays originate exactly at baseline midpoint/arc center;
+- liquid endpoint lies on the target graduation centerline.
 
 `PROMPT_SCALE_TARGET_ALIGNMENT_QA` is mandatory.
 
-## 10. Inactive and non-scale regions
+## 10. Shape integrity
+
+Geometry carrying academic meaning may not be warped for composition.
+
+Forbidden:
+- perspective transform of learner-read scale;
+- ellipse substitution for a required circle/semicircle;
+- shear;
+- non-uniform scaling;
+- local arc deformation;
+- moving center, baseline, ticks, labels, or pointer independently after template construction.
+
+Canonical protractor uses a perfect upper semicircle. For width `W=2R`, semicircle body height is `R=W/2`.
+
+Gate: `PROMPT_INSTRUMENT_SHAPE_INTEGRITY_QA`; protractor also uses `PROMPT_PROTRACTOR_SHAPE_INTEGRITY_QA`.
+
+## 11. Inactive and non-scale regions
 
 For instruments with inactive regions/gaps:
+- zero instructional value ticks inside inactive region;
+- zero radial pseudo-ticks/decoration that continues the active scale;
+- active endpoints remain distinct;
+- open-arc scales are not closed into false full-circle value scales.
 
-- zero instructional value ticks inside the inactive region unless explicitly defined by domain;
-- decoration in the gap must not resemble ticks, labels, pointer positions, or continuation of the active scale;
-- active endpoints remain visually distinct;
-- do not close an open-arc scale into a false full-circle scale.
+`PROMPT_SCALE_INACTIVE_REGION_QA` is mandatory when applicable.
 
-`PROMPT_SCALE_INACTIVE_REGION_QA` is mandatory when an inactive region exists.
+## 12. Decoration isolation
 
-## 11. Decoration isolation
-
-Theme/context artwork must not create scale-like ambiguity.
-
-Inside or immediately adjacent to an instructional instrument:
-
+Inside/immediately adjacent to an instructional instrument:
 - no decorative radial rays near radial scales;
-- no short repeated decorative strokes parallel to ruler/thermometer/container graduations;
-- no stars/dots/texture placed on tick positions;
-- no border pattern that visually continues a scale;
-- no shading/texture that hides minor ticks;
-- no decorative pointer-like line from the center pivot.
+- no repeated strokes parallel to ruler/thermometer/container graduations;
+- no stars/dots/texture on tick positions;
+- no border pattern continuing a scale;
+- no decorative pointer-like line from center.
 
 `PROMPT_SCALE_DECORATION_ISOLATION_QA` is mandatory.
 
-## 12. Canonical template consistency
+## 13. Canonical template consistency
 
-Repeated instruments sharing the same configured scale must use one canonical `SCALE_LINE_SPEC`.
-
-Across those items, do not change count, spacing, hierarchy, label positions, active range, direction, reference ring/baseline, stroke hierarchy or inactive-region geometry.
-
-Only the intended item state (pointer/hand/level/endpoints/data value) may change.
+Repeated instruments with the same configured scale use one canonical template. Across items do not change count, spacing, hierarchy, label positions/order, active range, direction, reference, common center, aspect ratio or inactive-region geometry. Only intended item state may change.
 
 `PROMPT_SCALE_TEMPLATE_CONSISTENCY_QA` is mandatory.
 
-## 13. Domain-specific minimums
+## 14. Domain-specific minimums
 
 ### Clock
-- 60 distinct minute positions when a full minute face is required;
-- 12 major hour positions exactly every fifth minute mark;
-- major hour marks stronger than minute marks but do not add positions;
-- all radial ticks share one ring and consistent orientation.
+60 minute positions when full minute face is required; 12 major hour positions reuse minute positions; hands share one pivot.
 
 ### Weight dial
-- honor owning-domain active sweep and inactive gap;
-- all active ticks lie on the same arc/ring;
-- endpoint ticks are present exactly once;
-- no gap ticks.
+0–5 kg canonical top-zero clockwise orientation; 50/51; gap `(300°,360°)`; clockwise labels `[0,1,2,3,4,5]`; pivot=center.
 
 ### Ruler
-- every graduation begins on the authoritative ruler baseline/edge;
-- cm marks stronger/longer than mm marks;
-- physical ruler edge must not substitute for or add to the zero graduation;
-- at 1 mm resolution every 1 cm span has exactly 10 intervals / 11 positions / 9 interior positions;
-- a 5 mm hierarchy mark occupies an existing position and never adds a new one.
+Each 1 cm @1 mm span =10 intervals/11 positions/9 interior; physical edge not tick; 5 mm hierarchy reuses position.
 
 ### Speedometer
-- topology is the owning-domain open arc, not an invented full circle;
-- all active ticks share one reading ring;
-- canonical 0–120 km/h profile has 12 intervals / 13 positions and a 120° inactive gap;
-- one instructional needle only;
-- needle endpoint intersects the exact target tick on the reading ring;
-- no value ticks in the inactive gap.
+Canonical 0–120 profile =12/13, 120° inactive gap, one needle; `NEEDLE_PIVOT==DIAL_CENTER==READING_RING_CENTER`.
 
 ### Thermometer
-- graduations are perpendicular to one straight scale axis;
-- labels align to configured major ticks;
-- liquid endpoint aligns to the target graduation centerline;
-- discrete targets do not sit between ticks.
+0–50 @1 =50/51; 6 major/5 intermediate/40 minor; every 10°C span 10 intervals/9 interior; endpoint aligned.
 
 ### Graduated container
-- scale lines are parallel and anchored consistently to one side/reference edge;
-- liquid/meniscus reading point aligns to the target scale centerline;
-- container decoration cannot create a second apparent scale.
+Parallel/consistent anchored scale lines; read point exact; no competing scale.
 
 ### Protractor
-- radial graduations share exact center/origin geometry;
-- baseline 0° direction and active scale direction are explicit;
-- 0°/180° endpoints are exact for semicircle;
-- 0°/360° share one physical position for cyclic full-circle mode;
-- 0–180° @1° uses exactly 180 intervals / 181 positions;
-- `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70` when `MIN_TICK_CENTER_SPACING_MM=0.60` and the reading ring spans the semicircle;
-- a learner-read 1° protractor must use a deterministic vector instrument layer; unresolved `RENDER_PATH=AUTO` is forbidden in the final prompt;
-- use one clearly active reading direction. A mirrored competing inner scale is forbidden unless the lesson explicitly teaches dual-scale selection;
-- if 5° relations are used in item verification, 5° intermediate marks are required and occupy existing 1° positions.
+Perfect upper semicircle; 0° right/90° top/180° left; 180/181 @1°; 10° major/5° intermediate/1° minor; one active numeric scale by default; all ticks/rays radial from common center; width>=70 mm at 0.60 mm floor; no ellipse/skew/shear/non-uniform scale.
 
 ### Graph axis
-- tick marks intersect the axis at exact data positions;
-- uniform numeric interval => uniform geometric interval;
-- bar endpoints/heights align to the scale mapping;
-- grid lines, if present, correspond exactly to configured axis ticks and are visually subordinate to data marks.
+Exact uniform mapping; bar endpoints align to canonical data.
 
-## 14. Prompt serialization
+## 15. Prompt serialization
 
-The final prompt must include the resolved `SCALE_LINE_SPEC` once per canonical scale template and exact item states separately.
+The final prompt includes resolved `SCALE_LINE_SPEC` once per canonical template and exact item states separately. Vague phrases like `standard scale` are insufficient.
 
-Do not rely on vague phrases such as `draw clear scale marks`, `use normal ruler ticks`, `make a realistic thermometer`, `standard speedometer`, or `standard graph axis` without count, interval, direction, anchoring, hierarchy, endpoint semantics, and resolved print-spacing evidence.
+Dense radial instruments serialize computed print-spacing evidence and safe printed size. Radial/angular items serialize the common-center identity.
 
-For dense radial instruments, serialize the computed `PRINT_SPACING_ORACLE` result and minimum safe printed size. Do not serialize an empirically guessed size.
+`PROMPT_SCALE_LINE_SERIALIZATION_QA` blocks renderer invention of academic geometry.
 
-`PROMPT_SCALE_LINE_SERIALIZATION_QA` blocks release if the final prompt leaves scale-line geometry to renderer invention.
+## 16. Renderer review + W10 linkage
 
-## 15. Mandatory renderer review + independent metrology linkage
-
-For every learner-read instrument, scale-line rules must be consumed by both:
-
-- `INSTRUMENT_REVIEW_REVISE_PROTOCOL`; and
-- W10 `METROLOGY_AUDIT_STATE` from `METROLOGY_ASSURANCE_PROFILE.md`.
-
-The renderer must independently recount/rederive the visible scale against this profile and the owning domain state. W10 separately recomputes quantitative evidence before W09 release. If any count, spacing, anchoring, label, target-alignment or inactive-region mismatch is detected, repair/regenerate and re-run the entire instrument checklist before finalization.
+Every learner-read scale is checked by both renderer review protocol and W10 independent metrology. Renderer must recount/rederive visible scale, verify common-center/origin, label order, shape integrity, target alignment and gap integrity, then repair/regenerate and fully recheck any failure.
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-Renderer self-review and W10 prompt audit remain prevention layers and do not prove actual artifact correctness.
+Self-review and W10 prompt audit remain prevention, not pixel proof.
 
-## 16. Artifact phase
-
-Prompt QA cannot prove actual drawn scale lines.
+## 17. Artifact phase
 
 Before image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 
-For every rendered learner-read scale inspect, at minimum:
-
+For each artifact inspect at minimum:
 1. exact tick/position count;
 2. no missing/extra/merged tick;
 3. uniform spacing;
-4. major/minor hierarchy;
-5. common anchoring ring/baseline;
-6. scale direction;
-7. labels and clearance;
-8. pointer/level/endpoint alignment;
-9. inactive-region integrity;
-10. print/photocopy distinguishability;
-11. absence of decorative competing marks;
-12. computed print-spacing oracle remains satisfied at actual output size.
+4. hierarchy;
+5. anchoring;
+6. direction and label order;
+7. labels/clearance;
+8. common center/origin and radial collinearity;
+9. pointer/level/endpoint alignment;
+10. inactive-region integrity;
+11. shape/aspect-ratio integrity;
+12. decoration isolation;
+13. print readability and spacing.
 
 One incorrect instructional scale blocks classroom release.
 
-## 17. Mandatory QA family
+## 18. Mandatory QA family
 
 `PROMPT_SCALE_LINE_SPEC_QA`
 `PROMPT_SCALE_TICK_ANCHOR_QA`
@@ -348,13 +323,19 @@ One incorrect instructional scale blocks classroom release.
 `PROMPT_SCALE_DIRECTION_QA`
 `PROMPT_SCALE_LABEL_ALIGNMENT_QA` when labels apply
 `PROMPT_SCALE_LABEL_CLEARANCE_QA` when labels apply
+`PROMPT_SCALE_LABEL_ORDER_QA` when ordered labels apply
 `PROMPT_SCALE_TARGET_ALIGNMENT_QA`
 `PROMPT_SCALE_INACTIVE_REGION_QA` when applicable
 `PROMPT_SCALE_DECORATION_ISOLATION_QA`
 `PROMPT_SCALE_TEMPLATE_CONSISTENCY_QA`
 `PROMPT_SCALE_LINE_SERIALIZATION_QA`
+`PROMPT_INSTRUMENT_COMMON_CENTER_QA` when radial/angular
+`PROMPT_POINTER_ORIGIN_COINCIDENCE_QA` when pointer/ray exists
+`PROMPT_RADIAL_COLLINEARITY_QA` when radial/angular
+`PROMPT_INSTRUMENT_SHAPE_INTEGRITY_QA`
 `PROMPT_PROTRACTOR_ACTIVE_SCALE_QA` when applicable
 `PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
+`PROMPT_PROTRACTOR_SHAPE_INTEGRITY_QA` when applicable
 `PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
 `PROMPT_METROLOGY_INDEPENDENCE_QA`
 
