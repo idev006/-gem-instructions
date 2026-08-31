@@ -109,7 +109,7 @@ CHECKS = {
         "UAT-01", "UAT-03", "UAT-05", "UAT-06", "UAT-10", "821/821 PASS",
     ],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
-    "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES) == 360, len(CASES)"],
+    "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES)==360,len(CASES)"],
     "tools/runtime_uat_regression_suite.py": ["12/12 PASS", "profile-embedded-main"],
     "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["821/821 PASS", "runtime_uat_regression_suite.py"],
 }
