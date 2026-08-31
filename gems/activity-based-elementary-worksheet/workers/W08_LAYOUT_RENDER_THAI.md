@@ -41,6 +41,8 @@ Resolve AUTO to exactly one:
 
 Never emit unresolved alternatives.
 
+For a learner-read semicircular protractor at 1° resolution, the instrument geometry must be deterministic vector geometry. The final prompt must not contain unresolved `RENDER_PATH=AUTO`. If theme art is used, it remains a separate decorative layer and may not own the protractor ticks, labels, origin or rays.
+
 ## One-page feasibility
 
 Attempt safe one-page A4 before page 2 unless user requests another policy.
@@ -75,6 +77,8 @@ When `ONE_PAGE_LOCK=OFF`, preserve safe pagination wording; never compile a pref
 
 Do not mechanically force 2×5 when the smallest graduation becomes ambiguous. Reduce decoration or paginate before shrinking scale geometry below minimums.
 
+For 0–180° @1° protractors with `MIN_TICK_CENTER_SPACING_MM=0.60`, use the geometric oracle from the shared scale profile. `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`. A proposed 65 mm protractor is invalid because 1° tick spacing is approximately 0.567 mm. If 10 items plus answer space cannot fit at or above 70 mm under a user-explicit one-page lock, return `PROMPT_ONE_PAGE_FEASIBILITY_QA=FAIL`; never reduce tick count or physical spacing to satisfy the lock.
+
 ## Scale-line layout integrity
 
 All learner-read scales inherit `SCALE_LINE_INTEGRITY_PROFILE.md`.
@@ -85,6 +89,7 @@ W08 must preserve:
 - authoritative baseline/ring/arc;
 - exact interval/position count;
 - minimum tick-center separation;
+- computed `PRINT_SPACING_ORACLE` for dense scales;
 - major/minor hierarchy;
 - label alignment/clearance;
 - target alignment zone;
@@ -92,6 +97,8 @@ W08 must preserve:
 - canonical template consistency.
 
 Theme, borders, card dividers, shadows, texture or illustration may not introduce repeated strokes that could be read as graduations.
+
+For semicircular protractors, use one clearly active scale direction unless dual-scale interpretation is explicitly the lesson objective. A mirrored competing inner scale must not be introduced merely to imitate a commercial protractor. If per-item relations use 5° ticks, the canonical template must require 5° intermediate marks consistently.
 
 ## Mandatory renderer-side review/revise serialization
 
@@ -110,6 +117,8 @@ and include:
 The protocol must require deterministic recount, alignment checks, repair/regenerate on mismatch, and a complete recheck after repair.
 
 For ruler 1 cm @1 mm, explicitly require 10 intervals / 11 positions / 9 interior positions and prohibit counting the physical ruler edge as a graduation.
+
+For a 1° protractor, explicitly require 180 intervals / 181 positions, printed tick-spacing oracle ≥0.60 mm, width ≥70 mm under the default profile, one active reading direction, exact origin/baseline/ray alignment, and no unresolved AUTO render path.
 
 W08 must not claim that renderer self-review equals artifact QA.
 
@@ -156,10 +165,13 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_PRINT_QA`
 `PROMPT_THEME_INTERFERENCE_QA`
 `PROMPT_SCALE_PRINT_SEPARATION_QA` when learner-read scales apply
+`PROMPT_SCALE_PRINT_SPACING_ORACLE_QA` when dense learner-read scales apply
 `PROMPT_SCALE_LABEL_CLEARANCE_QA` when scale labels apply
 `PROMPT_NO_FIRST_PASS_INSTRUMENT_RELEASE_QA` when learner-read instruments apply
 `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA` when learner-read instruments apply
 `PROMPT_PROTRACTOR_READABILITY_QA` when applicable
+`PROMPT_PROTRACTOR_ACTIVE_SCALE_QA` when applicable
+`PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
 `PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
 Unresolved render path, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, missing review protocol, ambiguous labels or theme interference blocks release.
