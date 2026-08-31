@@ -4,7 +4,7 @@
 Package is derived from GitHub SSOT. Build is blocked unless static SSOT
 validation and every release suite passes:
 449 core + 360 skill + 12 runtime-UAT + 20 semantic-oracle + 30 system-wide
-+ 40 scale-line + 60 instrument-review/speedometer = 971 cases total.
++ 40 scale-line + 60 instrument-review/speedometer + 24 protractor-scale = 995 cases total.
 """
 from __future__ import annotations
 
@@ -112,6 +112,8 @@ def main() -> int:
     if scale_line.returncode != 0: return 1
     instrument_review = gate("instrument_review_speedometer_regression_suite.py", "60-case instrument review/speedometer regression")
     if instrument_review.returncode != 0: return 1
+    protractor_scale = gate("protractor_scale_safety_regression_suite.py", "24-case protractor scale safety regression")
+    if protractor_scale.returncode != 0: return 1
 
     if PACKAGE_DIR.exists(): shutil.rmtree(PACKAGE_DIR)
     if ZIP_PATH.exists(): ZIP_PATH.unlink()
@@ -123,7 +125,7 @@ def main() -> int:
     compact_note = (
         "COMPACT RUNTIME PROFILE\n"
         "The 9 Knowledge TXT files are generated bundles with all mandatory shared safety profiles embedded.\n"
-        "Built only after SSOT validation + 449 core + 360 skill + 12 runtime-UAT + 20 semantic-oracle + 30 system-wide + 40 scale-line + 60 instrument-review/speedometer = 971/971 PASS.\n\n"
+        "Built only after SSOT validation + 449 core + 360 skill + 12 runtime-UAT + 20 semantic-oracle + 30 system-wide + 40 scale-line + 60 instrument-review/speedometer + 24 protractor-scale = 995/995 PASS.\n\n"
     )
     main_instructions = (
         compact_note
@@ -153,6 +155,7 @@ def main() -> int:
     (guide_dir / "SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt").write_text(system_quality.stdout, encoding="utf-8")
     (guide_dir / "SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt").write_text(scale_line.stdout, encoding="utf-8")
     (guide_dir / "INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt").write_text(instrument_review.stdout, encoding="utf-8")
+    (guide_dir / "PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt").write_text(protractor_scale.stdout, encoding="utf-8")
     (guide_dir / "ACTUAL_RULER_EXTRA_TICK_REGRESSION.txt").write_text(read("qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md"), encoding="utf-8")
 
     manifest = []
@@ -170,9 +173,9 @@ def main() -> int:
         if bad is not None:
             raise RuntimeError(f"ZIP integrity failure: {bad}")
 
-    for result in (validation, core, skill, uat, semantic, system_quality, scale_line, instrument_review):
+    for result in (validation, core, skill, uat, semantic, system_quality, scale_line, instrument_review, protractor_scale):
         print(result.stdout.strip())
-    print("COMBINED DRY-RUN: 971/971 PASS")
+    print("COMBINED DRY-RUN: 995/995 PASS")
     print("PACKAGE BUILD: PASS")
     print("Knowledge files: 9")
     print(f"ZIP: {ZIP_PATH}")
