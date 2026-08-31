@@ -16,6 +16,19 @@ The Gem is an **Orchestrator**. It routes requests to Specialist Workers, valida
 
 It does not claim the final image has passed visual QA until the actual artifact is inspected.
 
+## Current release gate
+
+Baseline 2.6.x release builds are blocked unless all executable prompt-system suites pass:
+
+- core deterministic/policy dry-run: `449/449`
+- declared-skill matrix: `360/360`
+- runtime UAT regression: `12/12`
+- combined minimum gate: `821/821 PASS`
+
+CI must also pass SSOT validation, package build, ZIP integrity verification and artifact upload.
+
+A real UAT defect must be converted into a permanent regression case before the next release artifact is accepted.
+
 ## Nine Specialist Workers
 
 - `W01_ACADEMIC_CONTENT` — arithmetic, color-by-code, Thai literacy, generic content
@@ -40,11 +53,17 @@ Knowledge slot 10 is intentionally reserved for a narrow compatible hotfix.
 - `policies/PARAMETER_POLICY.md`
 - `domains/DOMAIN_REGISTRY.md`
 - `domains/MEASUREMENT_COVERAGE_P1_P6.md`
+- `domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md`
 - `workers/` — W01..W09 contracts
 - `qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md`
 - `qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md`
+- `qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md`
+- `qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md`
 - `qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md`
 - `qa/DOMAIN_RELEASE_MATRIX.md`
+- `tools/full_dry_run_suite.py`
+- `tools/full_skill_matrix_suite.py`
+- `tools/runtime_uat_regression_suite.py`
 - `examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
 - `USER_GUIDE.md`
 - `GEM_INSTALLATION_GUIDE.md`
@@ -86,6 +105,24 @@ Baseline 2.6.x supports, when grade/objective appropriate:
 See `domains/MEASUREMENT_COVERAGE_P1_P6.md`.
 
 Speed/rate is not silently inferred from distance.
+
+## Thai P3 analog-clock runtime profile
+
+For a Thai Grade 3 analog-clock request in AUTO mode, such as:
+
+`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
+
+canonical runtime behavior is:
+
+- `CLOCK_READING_MODE=DAY_NIGHT_PAIR`
+- one analog clock per question
+- exactly two blank response fields: `กลางวัน` and `กลางคืน`
+- strict half-hour intent means minute `30` only unless the teacher explicitly requests mixed whole-hour items
+- deterministic day/night mapping
+- exact numeric hand angles + relational wording + item-specific hard negative in renderer-only state
+- no target time/angles inside Student Blueprint
+- `ONE_PAGE_LOCK=OFF` unless the teacher explicitly requires exactly one page
+- canonical instructional topology must not be degraded merely to force page fit
 
 ## Exact core relations
 
