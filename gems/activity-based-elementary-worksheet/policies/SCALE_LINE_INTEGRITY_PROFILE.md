@@ -1,6 +1,6 @@
 # Scale-Line Integrity Profile — All Learner-Read Scales
 
-Version: 1.1.0
+Version: 1.2.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
 Primary auditor: `W07_INSTRUMENT_AUDITOR`
@@ -27,6 +27,8 @@ A scale line is academic data.
 
 Missing, extra, merged, floating, uneven, misaligned, reversed, occluded, or visually ambiguous graduations are critical academic defects when the learner must read them.
 
+A scale is not valid merely because its interval count is numerically correct. The final printed geometry must also preserve independently verifiable spacing, anchoring, hierarchy, direction, labels, and target alignment.
+
 ## 2. Mandatory scale-line specification
 
 Every learner-read scale must resolve a `SCALE_LINE_SPEC` before prompt release containing at least:
@@ -45,6 +47,7 @@ Every learner-read scale must resolve a `SCALE_LINE_SPEC` before prompt release 
 - `INACTIVE_REGION_RULE` when applicable
 - `MIN_PRINTED_INSTRUMENT_SIZE`
 - `MIN_TICK_CENTER_SPACING_MM`
+- `PRINT_SPACING_ORACLE` for dense learner-read scales
 
 If any required field is unresolved for a learner-read scale, `PROMPT_SCALE_LINE_SPEC_QA=FAIL`.
 
@@ -114,6 +117,7 @@ Default print-safe hierarchy unless a domain specifies stronger values:
 - major tick stroke width: at least 0.35 mm and not thinner than minor ticks;
 - major tick length: at least 1.5× minor tick length;
 - optional intermediate marks must have one consistent level between major and minor and must correspond to a real configured subdivision;
+- when per-item verification references an intermediate mark such as a 5° protractor mark, that intermediate hierarchy becomes REQUIRED for the canonical template rather than optional;
 - identical semantic levels use identical length/weight throughout one canonical template;
 - do not use decorative stroke variation as if it were an instructional hierarchy.
 
@@ -125,7 +129,7 @@ If the renderer cannot maintain this hierarchy at the planned size, increase the
 
 At final intended print size:
 
-- adjacent smallest instructional tick centers should be separated by at least 0.60 mm;
+- adjacent smallest instructional tick centers must satisfy the resolved minimum spacing oracle; default lower bound is at least 0.60 mm;
 - ticks must remain individually distinguishable after black-and-white photocopying;
 - two adjacent ticks must not merge into one dark block;
 - no tick may be so faint/thin that photocopy loss is likely;
@@ -133,6 +137,18 @@ At final intended print size:
 - dense scales must increase instrument size or paginate before compromising tick identity.
 
 `MIN_TICK_CENTER_SPACING_MM=0.60` is the default lower bound; a domain may require more, never less without explicit audited justification.
+
+For radial scales, do not estimate spacing from overall page width. Compute it at the authoritative reading/tick ring:
+
+`tick_center_spacing_mm = reading_radius_mm × radians(MINOR_INTERVAL_DEG)`
+
+For a 0–180° protractor at 1° resolution and the default 0.60 mm minimum:
+
+`MIN_READING_RADIUS_MM = 0.60 / radians(1) ≈ 34.38 mm`
+`MIN_READING_RING_DIAMETER_MM ≈ 68.76 mm`
+`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM = 70 mm`
+
+A 65 mm diameter protractor fails this spacing oracle because its 1° arc spacing is only about 0.567 mm. It must not pass `PROMPT_SCALE_PRINT_SEPARATION_QA`.
 
 `PROMPT_SCALE_PRINT_SEPARATION_QA` is mandatory.
 
@@ -256,7 +272,12 @@ Only the intended item state (pointer/hand/level/endpoints/data value) may chang
 - radial graduations share exact center/origin geometry;
 - baseline 0° direction and active scale direction are explicit;
 - 0°/180° endpoints are exact for semicircle;
-- 0°/360° share one physical position for cyclic full-circle mode.
+- 0°/360° share one physical position for cyclic full-circle mode;
+- 0–180° @1° uses exactly 180 intervals / 181 positions;
+- `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70` when `MIN_TICK_CENTER_SPACING_MM=0.60` and the reading ring spans the semicircle;
+- a learner-read 1° protractor must use a deterministic vector instrument layer; unresolved `RENDER_PATH=AUTO` is forbidden in the final prompt;
+- use one clearly active reading direction. A mirrored competing inner scale is forbidden unless the lesson explicitly teaches dual-scale selection;
+- if 5° relations are used in item verification, 5° intermediate marks are required and occupy existing 1° positions.
 
 ### Graph axis
 - tick marks intersect the axis at exact data positions;
@@ -268,7 +289,9 @@ Only the intended item state (pointer/hand/level/endpoints/data value) may chang
 
 The final prompt must include the resolved `SCALE_LINE_SPEC` once per canonical scale template and exact item states separately.
 
-Do not rely on vague phrases such as `draw clear scale marks`, `use normal ruler ticks`, `make a realistic thermometer`, `standard speedometer`, or `standard graph axis` without count, interval, direction, anchoring, hierarchy, and endpoint semantics.
+Do not rely on vague phrases such as `draw clear scale marks`, `use normal ruler ticks`, `make a realistic thermometer`, `standard speedometer`, or `standard graph axis` without count, interval, direction, anchoring, hierarchy, endpoint semantics, and resolved print-spacing evidence.
+
+For dense radial instruments, serialize the computed `PRINT_SPACING_ORACLE` result and minimum safe printed size. Do not serialize an empirically guessed size.
 
 `PROMPT_SCALE_LINE_SERIALIZATION_QA` blocks release if the final prompt leaves scale-line geometry to renderer invention.
 
@@ -302,7 +325,8 @@ For every rendered learner-read scale inspect, at minimum:
 8. pointer/level/endpoint alignment;
 9. inactive-region integrity;
 10. print/photocopy distinguishability;
-11. absence of decorative competing marks.
+11. absence of decorative competing marks;
+12. computed print-spacing oracle remains satisfied at actual output size.
 
 One incorrect instructional scale blocks classroom release.
 
@@ -312,6 +336,7 @@ One incorrect instructional scale blocks classroom release.
 `PROMPT_SCALE_TICK_ANCHOR_QA`
 `PROMPT_SCALE_MAJOR_MINOR_HIERARCHY_QA`
 `PROMPT_SCALE_PRINT_SEPARATION_QA`
+`PROMPT_SCALE_PRINT_SPACING_ORACLE_QA`
 `PROMPT_SCALE_UNIFORM_SPACING_QA`
 `PROMPT_SCALE_DIRECTION_QA`
 `PROMPT_SCALE_LABEL_ALIGNMENT_QA` when labels apply
@@ -321,5 +346,7 @@ One incorrect instructional scale blocks classroom release.
 `PROMPT_SCALE_DECORATION_ISOLATION_QA`
 `PROMPT_SCALE_TEMPLATE_CONSISTENCY_QA`
 `PROMPT_SCALE_LINE_SERIALIZATION_QA`
+`PROMPT_PROTRACTOR_ACTIVE_SCALE_QA` when applicable
+`PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
 
 Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
