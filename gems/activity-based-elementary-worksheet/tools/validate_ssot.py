@@ -60,7 +60,6 @@ CHECKS = {
     "GEM_INSTRUCTIONS_PRODUCTION.md": [
         "Orchestrator", "W02_TIME_CLOCK", "FINAL_IMAGE_GENERATION_PROMPT",
         "ARTIFACT_QA=NOT_YET_TESTED", "RENDER_ONLY_NOT_FOR_WORKSHEET",
-        "THAI_P3_CLOCK_RUNTIME_PROFILE", "AUTO → DAY_NIGHT_PAIR",
         "ONE_PAGE_LOCK=OFF",
     ],
     "policies/PARAMETER_POLICY.md": [
@@ -74,6 +73,12 @@ CHECKS = {
         "ANSWER_FIELDS_PER_QUESTION=2", "TARGET_MINUTE_SET={30}",
         "ONE_PAGE_LOCK=OFF", "minute_angle=180°",
         "do not reduce to only 5-minute ticks",
+    ],
+    "tools/build_install_package.py": [
+        "MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK",
+        "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
+        "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
+        "821/821 PASS",
     ],
     "workers/W02_TIME_CLOCK.md": [
         "Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}",
@@ -104,7 +109,7 @@ CHECKS = {
         "UAT-01", "UAT-03", "UAT-05", "UAT-06", "UAT-10", "821/821 PASS",
     ],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
-    "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES) == 360"],
+    "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES) == 360, len(CASES)"],
     "tools/runtime_uat_regression_suite.py": ["12/12 PASS", "profile-embedded-main"],
     "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["821/821 PASS", "runtime_uat_regression_suite.py"],
 }
@@ -178,6 +183,7 @@ def main() -> int:
     print("baseline: 2.6.x")
     print("workers: 9/9 unique, schema=1")
     print("Thai P3 clock runtime profile + UAT regression: present")
+    print("generated runtime profile embedding: present")
     print("core dry-run: 449-case executable present")
     print("declared-skill matrix: 360-case executable present")
     print("runtime UAT regression: 12-case executable present")
