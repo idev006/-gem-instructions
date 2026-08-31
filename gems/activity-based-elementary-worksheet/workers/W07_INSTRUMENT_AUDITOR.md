@@ -89,7 +89,7 @@ Audit exact origin, selected 0° baseline, target ray, active scale direction, n
 
 Every learner-read visual item requires an atomic renderer-only state:
 
-`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL/ENDPOINT + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
+`SEMANTIC TARGET + EXACT INDEX/ANGLE/LEVEL/ENDPOINT + RELATIONAL WORDING + ITEM-SPECIFIC HARD_NEGATIVE`
 
 Semantic-only instructions such as `show 10:30`, `show 70°`, `show 2.4 kg`, or `show 60 km/h` are insufficient.
 
@@ -120,6 +120,39 @@ A vague `looks correct` check is insufficient.
 
 Owning worker may define a stronger minimum. If layout pressure threatens graduation distinguishability, reduce decoration before instrument size. Never merge/omit ticks to fit one page.
 
+## Weight-dial inactive-gap audit — permanent actual-artifact rule
+
+For the canonical 0–5 kg dial, W07 must audit the active tick set and the inactive gap as two separate geometry regions.
+
+Expected active tick set:
+
+`active_tick_angle(i)=(240+6*i) mod 360, i=0..50`
+
+Expected gap state:
+
+`INACTIVE_GAP_START_ANGLE=180°`
+`INACTIVE_GAP_END_ANGLE=240°`
+`INACTIVE_GAP_SWEEP_DEG=60°`
+`INACTIVE_GAP_TICK_COUNT=0`
+`INACTIVE_GAP_RADIAL_MARK_COUNT=0`
+
+W07 must explicitly search the open inactive arc for **any radial scale-like segment**, not merely labeled value ticks. A short unlabeled stroke, decorative hatch, duplicate endpoint, or continuation of the active tick ring counts as a failure.
+
+The outer circular outline may cross the gap because it is tangential, not radial. It must not be misclassified as a graduation.
+
+For the canonical template also verify exact label angles:
+
+`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+
+A renderer-created alternative label rotation is a canonical-template failure unless the owning domain explicitly supplies a consistently transformed template.
+
+If an actual artifact has one or more radial marks in the inactive gap:
+
+`ARTIFACT_DIAL_INACTIVE_GAP_QA=FAIL`
+`ARTIFACT_SCALE_TOPOLOGY_QA=FAIL`
+`ARTIFACT_QA=FAIL`
+`CLASSROOM_RELEASE=BLOCKED`
+
 ## Prompt QA
 
 `PROMPT_INSTRUMENT_TEMPLATE_QA`
@@ -144,6 +177,9 @@ Owning worker may define a stronger minimum. If layout pressure threatens gradua
 `PROMPT_PROTRACTOR_TOPOLOGY_QA` when applicable
 `PROMPT_PROTRACTOR_BASELINE_QA` when applicable
 `PROMPT_PROTRACTOR_SCALE_DIRECTION_QA` when applicable
+`PROMPT_DIAL_GAP_GEOMETRY_SERIALIZATION_QA` when applicable
+`PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA` when applicable
+`PROMPT_DIAL_CANONICAL_LABEL_ANGLE_QA` when applicable
 
 Any applicable FAIL blocks prompt release.
 
@@ -156,5 +192,7 @@ Before actual image:
 If an artifact is supplied, inspect every instructional instrument individually for shape/orientation, range, interval/position count, spacing, anchoring, labels, pointer/hand/ray/level, target alignment, no missing/extra/merged marks, inactive-region integrity, and photocopy readability.
 
 For a ruler 1 cm @1 mm, independently verify 10 spaces, 11 endpoint-inclusive positions, 9 interior positions, and no border/decoration acting as an extra graduation.
+
+For an open-arc dial, inspect the inactive region independently and count radial marks there; the expected count is zero unless the owning domain explicitly defines otherwise.
 
 One wrong instructional instrument blocks classroom release.
