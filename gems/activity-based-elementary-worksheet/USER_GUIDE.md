@@ -1,145 +1,122 @@
 # คู่มือสำหรับครู — Activity-Based Elementary Worksheet Generator
 
-Version: 2.6.0-LTS
-Status: Teacher-facing guide for Orchestrator + Specialist Worker baseline
+Version: 2.6.3-LTS
+Status: Teacher-facing guide for Orchestrator + 10 Specialist Workers
 
 ## Gem นี้ทำอะไร
 
-Gem นี้มีหน้าที่หลักคือ **สร้าง Prompt สำหรับใบงาน** ที่ตรวจเนื้อหาและข้อกำหนดก่อนส่งต่อให้ AI สร้างภาพ ไม่ใช่รับประกันว่าภาพปลายทางถูกต้องโดยอัตโนมัติ
+Gem นี้สร้าง **Prompt สำหรับใบงาน** ที่ตรวจเนื้อหา เครื่องมือวัด layout และข้อกำหนดก่อนส่งต่อให้ระบบสร้างภาพ ไม่รับประกันว่าภาพปลายทางถูกต้องโดยอัตโนมัติจนกว่าจะตรวจ artifact จริง
 
-ครูบอกเพียงระดับชั้น เรื่อง/ทักษะ และจำนวนข้อเป็นหลัก เช่น:
+ตัวอย่างคำสั่ง:
 
 - `ป.3 อ่านนาฬิกาเข็ม 10 ข้อ`
 - `ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ`
-- `ป.4 คำนวณระยะทางไปกลับ 10 ข้อ`
-- `ป.4 อ่านมุมจากโพรแทรกเตอร์ 10 ข้อ`
-- `ป.5 แปลงหน่วยพื้นที่ 10 ข้อ`
 - `ป.3 อ่านตราชั่ง 0–5 กก. ขีดละ 0.1 กก. 10 ข้อ`
-- `ป.4 แปลงลิตรกับมิลลิลิตร 10 ข้อ`
-- `ป.6 แปลง cm³ dm³ และ m³ 10 ข้อ`
-
-Gem จะ normalize คำสั่ง, route ไปยัง Specialist Worker, ตรวจค่าภายใน, วาง layout และสร้าง `FINAL_IMAGE_GENERATION_PROMPT` ที่ copy ไปใช้ได้ทันที
+- `ป.4 อ่านหน้าปัดความเร็วรถ 0–120 km/h ขีดละ 10 km/h 10 ข้อ`
+- `ป.4 อ่านมุมจากโพรแทรกเตอร์ 0–180° ขีดละ 1° 10 ข้อ`
+- `ป.4 อ่านเทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C 10 ข้อ`
+- `ป.4 อ่านปริมาตรจากภาชนะตวง 0–1000 mL ขีดละ 50 mL 10 ข้อ`
+- `ป.4 อ่านกราฟแท่งที่แกนตั้งเพิ่มทีละ 5 จำนวน 10 ข้อ`
 
 ## สถาปัตยกรรม
 
-Main Instructions ทำหน้าที่เป็น **Orchestrator** ส่วน Knowledge 9 ไฟล์เป็น Specialist Workers:
+Main Instructions เป็น Orchestrator และมี Knowledge Worker 10 ไฟล์:
 
 1. W01 — คณิตศาสตร์ทั่วไป / color-by-code / ภาษาไทย
-2. W02 — เวลา หน่วยเวลา และนาฬิกา
+2. W02 — เวลาและนาฬิกา
 3. W03 — น้ำหนักและตราชั่ง
-4. W04 — ไม้บรรทัด ความยาว ระยะทาง มุม/โพรแทรกเตอร์ รอบรูป และพื้นที่
-5. W05 — อุณหภูมิ ความจุ เมนิสคัส และปริมาตร
+4. W04 — ไม้บรรทัด ความยาว ระยะทาง speedometer มุม/โพรแทรกเตอร์ รอบรูป พื้นที่
+5. W05 — อุณหภูมิ ความจุ เมนิสคัส ปริมาตร
 6. W06 — เงิน ปฏิทิน ตาราง/กราฟ
-7. W07 — ตรวจ geometry/topology ของมาตรวัด
+7. W07 — ตรวจ geometry/topology
 8. W08 — layout/render/ภาษาไทย/งานพิมพ์
 9. W09 — QA/release
+10. W10 — วิศวกร metrology ตรวจซ้ำอย่างอิสระ
 
-ช่อง Knowledge ที่ 10 เว้นไว้สำหรับ hotfix ขนาดเล็กในอนาคต เพื่อลดความจำเป็นในการติดตั้งทั้งชุดใหม่
+เมื่อเด็กต้องอ่านเครื่องมือวัด route คือ:
 
-## Measurement ที่รองรับอย่างเป็นทางการ
+`OWNING WORKER → W07 → W10 → W08 → W09`
 
-### เวลา
-- อ่านนาฬิกาเข็ม
-- ชั่วโมงเต็ม/ครึ่งชั่วโมง/ช่วง 15, 5, 1 นาทีตามระดับ
-- ชั่วโมง นาที วินาที และการแปลงหน่วยเวลาเมื่อเหมาะกับจุดประสงค์
-- กลางวัน/กลางคืน
-- เวลาเริ่มต้น + ระยะเวลา → เวลาสิ้นสุด
-- เวลาสิ้นสุด − ระยะเวลา → เวลาเริ่มต้น
-- เวลาเริ่ม/สิ้นสุด → ระยะเวลา
-- ตารางเวลาและการเปรียบเทียบเวลา
+## Five safety profiles
 
-Gem จะไม่ใส่เข็มวินาทีในนาฬิกาเพียงเพราะโจทย์มีการแปลงวินาที ถ้าไม่ได้สอนการอ่านเข็มวินาทีโดยตรง
+ระบบใช้ shared profiles 5 ชุด:
 
-### ความยาวและไม้บรรทัด
-- อ่านไม้บรรทัดจาก 0
-- อ่านจากจุดเริ่มที่ไม่ใช่ 0
-- mm / cm / m / km
-- บวก ลบ หาผลต่าง เปรียบเทียบ
-- แปลงหน่วย
+- System-Wide Quality
+- Scale-Line Integrity
+- Instrument Review–Revise
+- Metrology Assurance
+- Physical Page Feasibility
 
-### ระยะทาง
-- ระยะทางรวม
-- ไป-กลับ
-- หลายช่วง
-- เปรียบเทียบเส้นทาง
-- m/km conversion
+หลักสำคัญ:
 
-Gem จะไม่แอบเปลี่ยนโจทย์ระยะทางให้เป็นเรื่องความเร็ว ถ้าไม่ได้ขอ
+`ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER`
 
-### มุมและโพรแทรกเตอร์
-- อ่านมุมจากโพรแทรกเตอร์
-- acute/right/obtuse/straight classification
-- vertex ต้องอยู่ตรง origin
-- baseline ray ต้องตรง 0° ที่เลือก
-- dual scale ต้องระบุ inner/outer direction ให้ชัด
-- target ray ต้องตรง graduation ที่กำหนด
+`NO NUMERIC PACKING PROOF = NO PAGE-FEASIBILITY PASS`
 
-### รอบรูปและพื้นที่
-รองรับสูตรตามระดับ/จุดประสงค์ เช่น:
+## เครื่องมือวัด = เนื้อหาการเรียน
 
-- rectangle/square perimeter
-- rectangle/square area
-- triangle area
-- parallelogram area
-- trapezoid area
-- circle area/circumference เมื่อสั่ง
+### ไม้บรรทัด
+1 cm @1 mm ต้องมี 10 intervals /11 positions /9 interior positions และขอบไม้บรรทัดไม่ใช่ขีดเพิ่ม
 
-การแปลงหน่วยพื้นที่ต้องใช้ตัวคูณแบบยกกำลังสอง เช่น:
+### ตราชั่ง 0–5 kg
+Canonical classroom template:
 
-`1 m² = 10,000 cm²`
+- 0 อยู่ด้านบน
+- ค่าเพิ่มตามเข็มนาฬิกา
+- 0,1,2,3,4,5 อยู่ที่ 0°,60°,120°,180°,240°,300°
+- 50 intervals /51 positions
+- gap 60° ระหว่าง 5→0 ต้องไม่มีขีดหรือเส้น radial ที่ดูเหมือนสเกล
+- จุดหมุนเข็มต้องตรงศูนย์กลางหน้าปัดจริง
 
-โจทย์วงกลมต้องใช้ `PI_POLICY` เดียวกันทั้งใบงาน เช่น `3.14` หรือ `22/7`
+### Speedometer 0–120 km/h
+- 12 intervals /13 positions
+- active 240° / inactive 120°
+- `target_angle=(240+2*speed) mod 360`
+- 60 km/h ชี้ตรงขึ้นบนตาม coordinate convention ของ engine
+- จุดปักเข็ม = ศูนย์กลาง arc/ring และเข็มต้องเป็น radial line จริง
 
-### น้ำหนัก
-- อ่านตราชั่ง
-- kg / g / kg+g / kg+ขีด
-- บวก ลบ เปรียบเทียบ แปลงหน่วย
-- `1000 g = 1 kg`
-- บริบทไทยที่เกี่ยวข้อง: `1 ขีด = 100 g = 0.1 kg`
+### Thermometer 0–50°C @1°C
+- 50 intervals /51 positions
+- major: 0,10,20,30,40,50 =6
+- intermediate: 5,15,25,35,45 =5
+- ordinary minor =40
+- ทุกช่วง 10°C มี 10 intervals /9 interior positions
+- ปลายของเหลวต้องตรงขีดเป้าหมาย
 
-### อุณหภูมิ
-- อ่านเทอร์โมมิเตอร์
-- °C / °F เมื่อระบุ
-- เปรียบเทียบและการเปลี่ยนแปลงอุณหภูมิ
-- target ของแบบ discrete ต้องตรงขีดที่แทนค่าได้จริง
+### Protractor 0–180° @1°
+สำหรับใบงานอ่านมุมพื้นฐาน:
 
-### ปริมาตร/ความจุ
-- อ่านภาชนะตวง
-- mL / L
-- บวก ลบ เปรียบเทียบ แปลงหน่วย
-- meniscus เมื่อระบุ
-- ปริมาตรทรงสี่เหลี่ยมมุมฉาก
-- รูปทรงประกอบจากทรงสี่เหลี่ยมมุมฉากแบบง่ายเมื่อเหมาะกับระดับ
-- cm³ / dm³ / m³ conversion
+- ใช้ perfect upper semicircle
+- 180 intervals /181 positions
+- 0° ด้านขวา, 90° ด้านบน, 180° ด้านซ้าย
+- single active numeric scale เป็น default
+- 10° major /5° intermediate /1° minor
+- center ของ arc = midpoint ของ baseline = origin ของ ray
+- ทุก tick/ray เป็น radial จาก center เดียวกัน
+- ห้าม ellipse, skew, shear, perspective หรือ non-uniform stretch
+- width ขั้นต่ำ 70 mm ที่ spacing floor 0.60 mm
 
-ความสัมพันธ์สำคัญ:
+Dual-scale ใช้เฉพาะเมื่อ **จุดประสงค์การเรียนคือการเลือกอ่านสเกลคู่โดยตรง** เท่านั้น ไม่ใช่ default ของใบงานอ่านมุมพื้นฐาน
 
-`1000 cm³ = 1 dm³`
-`1000 dm³ = 1 m³`
-`1 m³ = 1,000,000 cm³`
+## Page layout
 
-เมื่อจุดประสงค์สอนความสัมพันธ์ capacity-volume โดยตรง:
+Default:
 
-`1 cm³ = 1 mL`
-`1 dm³ = 1 L`
-`1 m³ = 1000 L`
+`ONE_PAGE_PREFERRED=YES`
+`TARGET_PAGE_COUNT=1`
+`ONE_PAGE_LOCK=OFF`
 
-Gem จะไม่ฉีดความสัมพันธ์เหล่านี้เข้าโจทย์เด็กเล็กโดยอัตโนมัติ
+หนึ่งหน้าเป็นเพียง preference ไม่ใช่คำสั่งบังคับ ระบบต้องคำนวณพื้นที่จริงก่อน
 
-## Grade progression ป.1–ป.6
+Shape-aware rule:
 
-Gem มี `CURRICULUM_PROFILE=AUTO` ซึ่งใช้ progression แบบอนุรักษ์นิยมจาก `domains/MEASUREMENT_COVERAGE_P1_P6.md` ไม่ได้ถือว่าโรงเรียนทุกแห่งใช้ลำดับเดียวกัน
+- วงกลม diameter D ใช้พื้นที่ตัวเครื่อง D×D
+- protractor ครึ่งวงกลม width W มี body height W/2 ก่อนเพิ่ม label/answer space
+- thermometer ใช้ selected vertical scale length จริง
 
-โดยสรุป:
+ดังนั้น protractor กว้าง 70 mm มี semicircle body สูง 35 mm ไม่ใช่ 70 mm
 
-- ป.1: เปรียบเทียบ/อ่านหน่วยง่าย ไม่เน้น conversion ซับซ้อน
-- ป.2: อ่านมาตรวัดพื้นฐานและคำนวณหนึ่งขั้น
-- ป.3: cm/mm, kg/ขีด, mL/L, duration, ระยะทางพื้นฐาน และรอบรูปง่าย ๆ
-- ป.4: mixed units, nonzero ruler start, multi-segment distance, protractor, rectangle/square area/perimeter, seconds เมื่อสอน
-- ป.5: mixed/decimal units, triangle/parallelogram/trapezoid area, rectangular-prism volume, cm³/dm³ เมื่อเหมาะ
-- ป.6: multi-step measurement reasoning, polygon/circle measurement, composite rectangular-prism volume และ cm³/dm³/m³
-
-ครูสามารถกำหนดความยาก/หน่วย/ชนิดโจทย์เองได้เสมอ
+ถ้า layout ที่ต้องการไม่พอดีและ lock=OFF ให้ paginate ไม่ลดขีด ไม่ย่อจนอ่านไม่ได้ และไม่ตัดพื้นที่ตอบ
 
 ## Output มาตรฐาน
 
@@ -150,69 +127,37 @@ Gem มี `CURRICULUM_PROFILE=AUTO` ซึ่งใช้ progression แบบ
 5. `QA_REPORT`
 6. `FINAL_IMAGE_GENERATION_PROMPT`
 
-ส่วนที่ 6 คือผลลัพธ์หลัก
+ส่วนที่ 6 ต้อง copy-ready ด้วยตัวเอง
 
-## Student Blueprint กับข้อมูล renderer ต่างกัน
+## Student Blueprint กับ renderer metadata
 
-Student Blueprint ต้องมีเฉพาะสิ่งที่เด็กเห็นจริง จึงไม่ควรมี target time, target weight, target length/angle, tick index, ray angle หรือ liquid level
+Student Blueprint มีเฉพาะสิ่งที่เด็กเห็นจริง ห้ามมี target answer, tick index, ray angle, needle angle, liquid level หรือ W07/W10 audit data
 
-แต่ Final Prompt สามารถมีข้อมูลเหล่านี้เพื่อสั่ง AI วาดภาพให้ถูก โดยทำเครื่องหมาย:
+ข้อมูลจำเป็นสำหรับการวาดอยู่ใน renderer metadata และทำเครื่องหมาย:
 
 `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT`
 
-## เครื่องมือวัด = ข้อมูลทางการเรียน
+## Renderer review loop
 
-กฎกลางของ linear scale:
+ทุกเครื่องมือวัดต้องมี:
 
-`EXPECTED_INTERVAL_COUNT=(MAX-MIN)/MINOR_INTERVAL`
+`NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-`EXPECTED_TICK_POSITION_COUNT=EXPECTED_INTERVAL_COUNT+1`
+และ:
 
-ตัวอย่างสำคัญ:
+`GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-- ไม้บรรทัด 1 cm @1 mm = 10 intervals / 11 positions
-- โพรแทรกเตอร์ 0–180° @1° = 180 intervals / 181 positions
-- นาฬิกา 10:30 → เข็มนาที 180°, เข็มชั่วโมง 315°, กึ่งกลาง 10–11
-- ตราชั่ง 0–5 kg canonical → 300° active + 60° inactive gap
-- thermometer แบบ discrete → endpoint ต้องตรงขีดที่แทนค่าได้จริง
-
-## One-page-first
-
-Default:
-
-`ONE_PAGE_PREFERRED=YES`
-`TARGET_PAGE_COUNT=1`
-`ONE_PAGE_LOCK=OFF`
-
-Gem จะพยายามหนึ่งหน้าก่อน แต่ไม่ยอมแลกกับความถูกต้อง ขนาดมาตรวัด ความอ่านง่าย หรือพื้นที่เขียนตอบ
-
-ถ้าครูสั่ง `A4 หน้าเดียวเท่านั้น` แล้วทำอย่างปลอดภัยไม่ได้ Gem ต้องแจ้ง feasibility FAIL แทนการบีบจนผิด
+ต้องนับขีด ตรวจ center/origin, label order, target alignment, shape integrity และ gap จริง ไม่ใช่เพียง `looks correct`
 
 ## Prompt QA ไม่ใช่ Artifact QA
 
-เมื่อ Gem สร้าง prompt เสร็จ สามารถรายงาน `PROMPT_RELEASE=APPROVED` ได้หาก prompt ผ่าน
+แม้ prompt ผ่าน:
 
-แต่ก่อนตรวจภาพจริงต้องยังเป็น:
+`PROMPT_RELEASE=APPROVED`
+
+ก่อนตรวจภาพจริงยังต้องเป็น:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-ภาพปลายทาง โดยเฉพาะนาฬิกา ตราชั่ง ไม้บรรทัด โพรแทรกเตอร์ เทอร์โมมิเตอร์ และภาชนะตวง ต้องตรวจ visual artifact ก่อนใช้กับเด็ก
-
-## ตรวจสุขภาพ Gem
-
-หลังติดตั้งหรือสงสัยว่า Knowledge ขาด ให้พิมพ์:
-
-`ตรวจสุขภาพ Gem`
-
-Gem จะตรวจ baseline, W01–W09, schema, route, measurement capability family, visibility model, render-path rule และสถานะ hotfix โดยไม่ต้องสร้างใบงาน
-
-## Command Catalog
-
-ตัวอย่างคำสั่ง ป.1–ป.6 อยู่ใน:
-
-`examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md`
-
-## จำง่าย ๆ
-
-> Gem ต้องสร้าง Prompt ที่ **ถูกต้อง + worker ถูกตัว + หน่วยถูก + student-safe + geometry ชัด + copy-ready** และต้องไม่อ้างว่าภาพจริงผ่านก่อนเห็นภาพจริง
+ภาพจริงที่มีขีดผิด ตัวเลขเรียงผิด จุดปักเข็มเยื้อง หรือโปรแทรกเตอร์เบี้ยว ต้อง `ARTIFACT_QA=FAIL` และนำ defect กลับมาเป็น permanent regression
