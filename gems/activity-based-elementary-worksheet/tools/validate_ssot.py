@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Static SSOT validator for activity-based-elementary-worksheet 2.6.x.
 
-Structural/document-contract validation only. Full deterministic dry-run is
-performed separately by full_dry_run_suite.py. Neither claims artifact pixels pass.
+Structural/document-contract validation only. Executable prompt-system validation
+is performed by the 449-case core suite, 360-case declared-skill matrix and
+12-case runtime UAT regression suite. None of these claims artifact pixels pass.
 """
 from __future__ import annotations
 
@@ -34,13 +35,17 @@ REQUIRED_FILES = [
     "domains/DOMAIN_REGISTRY.md",
     "domains/MEASUREMENT_COVERAGE_P1_P6.md",
     "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md",
+    "domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
     "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md",
     "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
     "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md",
+    "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
     "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md",
     "qa/DOMAIN_RELEASE_MATRIX.md",
     "examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md",
     "tools/full_dry_run_suite.py",
+    "tools/full_skill_matrix_suite.py",
+    "tools/runtime_uat_regression_suite.py",
     "tools/build_install_package.py",
     *WORKERS.values(),
 ]
@@ -55,6 +60,8 @@ CHECKS = {
     "GEM_INSTRUCTIONS_PRODUCTION.md": [
         "Orchestrator", "W02_TIME_CLOCK", "FINAL_IMAGE_GENERATION_PROMPT",
         "ARTIFACT_QA=NOT_YET_TESTED", "RENDER_ONLY_NOT_FOR_WORKSHEET",
+        "THAI_P3_CLOCK_RUNTIME_PROFILE", "AUTO → DAY_NIGHT_PAIR",
+        "ONE_PAGE_LOCK=OFF",
     ],
     "policies/PARAMETER_POLICY.md": [
         "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR",
@@ -73,6 +80,11 @@ CHECKS = {
         "12:15 → กลางวัน 12:15 | กลางคืน 00:15",
         "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
     ],
+    "domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md": [
+        "THAI_P3_CLOCK_RUNTIME_PROFILE", "DAY_NIGHT_PAIR",
+        "TARGET_MINUTE_SET={30}", "ANSWER_FIELDS_PER_QUESTION=2",
+        "ONE_PAGE_LOCK=OFF", "EXACT NUMERIC ANGLES",
+    ],
     "workers/W04_LENGTH_DISTANCE.md": [
         "CYCLIC_FULL_CIRCLE", "360 equal intervals / 360 distinct positions",
         "no duplicated 0°/360° physical mark",
@@ -87,7 +99,14 @@ CHECKS = {
         "DN-13 — numeric angles mandatory", "DN-17 — page-lock provenance",
         "DN-19 — false-PASS prevention",
     ],
+    "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md": [
+        "UAT", "one clock", "two", "ONE_PAGE_LOCK=OFF",
+        "numeric angles", "canonical",
+    ],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
+    "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES) == 360"],
+    "tools/runtime_uat_regression_suite.py": ["12", "821"],
+    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["821/821 PASS", "runtime_uat_regression_suite.py"],
 }
 
 EXACT_RELATIONS = [
@@ -138,7 +157,6 @@ def main() -> int:
     for rel, relation in EXACT_RELATIONS:
         if relation not in read(rel): errors.append(f"{rel}: missing exact relation: {relation}")
 
-    # Explicit conflict guards discovered by full dry-run review.
     policy = read("policies/PARAMETER_POLICY.md")
     if "CLOCK_READING_MODE=SINGLE|DAY_NIGHT_PAIR" in policy and "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR" not in policy:
         errors.append("clock mode policy lacks AUTO resolution")
@@ -159,9 +177,11 @@ def main() -> int:
     print("SSOT VALIDATION: PASS")
     print("baseline: 2.6.x")
     print("workers: 9/9 unique, schema=1")
-    print("clock day/night + half-hour + page-lock hardening: present")
-    print("0–180 and deterministic 0–360 protractor contracts: present")
-    print("full dry-run executable: present")
+    print("Thai P3 clock runtime profile + UAT regression: present")
+    print("core dry-run: 449-case executable present")
+    print("declared-skill matrix: 360-case executable present")
+    print("runtime UAT regression: 12-case executable present")
+    print("combined minimum release gate: 821 cases")
     print("artifact QA: NOT_YET_TESTED")
     return 0
 
