@@ -286,7 +286,20 @@ If **any** applicable critical gate is FAIL or NOT_RUN:
 
 W09 must never emit `PROMPT_RELEASE=APPROVED` while the compiled prompt structurally violates a gate.
 
-Required global applicable gates include route, compatibility, ownership, academic data, Student Blueprint isolation, grade appropriateness, unit/formula gates, page provenance, render-path resolution, one-page feasibility, completeness, copy-ready, no placeholders, leak guards, canonical labels, plus all applicable scale-line and instrument review/revise gates.
+Required global applicable gates include:
+
+`KB_ROUTE_QA`
+`KB_COMPATIBILITY_QA`
+`WORKER_OWNERSHIP_QA`
+`RENDER_PATH_RESOLVED_QA`
+`PROMPT_COPY_READY_QA`
+`PROMPT_COMPLETENESS_QA`
+`NO_PLACEHOLDER_QA`
+`STUDENT_VISIBLE_ANSWER_LEAK_QA`
+`STUDENT_VISIBLE_TARGET_TEXT_LEAK_QA`
+`CANONICAL_LABEL_PRESERVATION_QA`
+
+plus all applicable academic, page-policy, scale-line and instrument review/revise gates.
 
 ## Phase semantics
 
