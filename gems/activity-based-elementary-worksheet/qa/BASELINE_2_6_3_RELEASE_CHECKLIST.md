@@ -187,12 +187,12 @@ All prior tests remain; counts only increase.
 10. actual weight-dial inactive-gap regression: 32
 11. physical page feasibility regression: 48
 12. actual instrument geometry regression: 64
-13. measurement reference artifact regression: 64
+13. measurement reference artifact regression: 66
 14. repository full-line audit: 81
 
 Combined mandatory gate:
 
-`1364/1364 PASS`
+`1366/1366 PASS`
 
 The repository full-line audit scans every UTF-8 text/code line in the Gem SSOT plus its GitHub workflow for encoding/control/merge-marker hazards and applies 81 semantic coherence assertions. It is additive to, not a replacement for, domain regression suites.
 
@@ -208,7 +208,7 @@ Must contain:
 - all five shared profiles embedded in main and worker bundles;
 - W10 metrology worker;
 - actual defect evidence;
-- reports for all 14 regression suites including 64-case measurement-reference regression and 81-case repository full-line audit;
+- reports for all 14 regression suites including 66-case measurement-reference regression and 81-case repository full-line audit;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
@@ -217,7 +217,7 @@ Use the exact GitHub Actions artifact only after all gates pass.
 
 ## Prompt / artifact boundary
 
-Passing `1364/1364 PASS` means:
+Passing `1366/1366 PASS` means:
 
 `PROMPT_RELEASE=APPROVED`
 
