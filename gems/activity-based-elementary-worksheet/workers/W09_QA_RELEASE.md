@@ -145,6 +145,19 @@ Strict half-hour intent requires minute=30 only unless explicit mixed whole-hour
 
 Each high-risk clock item requires semantic target + exact numeric angles + relational wording + item-specific hard negative.
 
+Applicable mandatory clock gates:
+
+`PROMPT_CLOCK_MODE_RESOLUTION_QA`
+`PROMPT_HALF_HOUR_INTENT_QA`
+`PROMPT_DAY_NIGHT_MAPPING_QA`
+`PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
+`PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
+`PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA`
+`PROMPT_PER_ITEM_RENDER_STATE_QA`
+`PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
+
+Any FAIL above forces `PROMPT_RELEASE=BLOCKED`.
+
 ## Speedometer hard gates
 
 Direct speedometer reading routes to `W04 + W07 + W08 + W09` and uses `SPEEDOMETER_READING_ENGINE.md`.
