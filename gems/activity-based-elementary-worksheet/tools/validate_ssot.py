@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static SSOT validator for activity-based-elementary-worksheet 2.6.3-LTS.
 
-Prompt/package coherence only. The additive release gate is 1075 cases.
+Prompt/package coherence only. The additive release gate is 1107 cases.
 Artifact pixels remain NOT_YET_TESTED until separately inspected.
 """
 from pathlib import Path
@@ -28,10 +28,10 @@ REQUIRED_FILES=[
 'domains/DOMAIN_REGISTRY.md','domains/MEASUREMENT_COVERAGE_P1_P6.md','domains/INSTRUMENT_READING_ENGINE.md',
 'domains/CLOCK_READING_ENGINE.md','domains/SCALE_READING_ENGINE.md','domains/LENGTH_READING_ENGINE.md','domains/SPEEDOMETER_READING_ENGINE.md',
 'domains/TEMPERATURE_READING_ENGINE.md','domains/CAPACITY_READING_ENGINE.md','domains/TABLE_GRAPH_READING_ENGINE.md',
-'qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/DOMAIN_RELEASE_MATRIX.md',
+'qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/DOMAIN_RELEASE_MATRIX.md',
 'tools/full_dry_run_suite.py','tools/full_skill_matrix_suite.py','tools/runtime_uat_regression_suite.py','tools/semantic_oracle_regression_suite.py',
 'tools/system_wide_quality_regression_suite.py','tools/scale_line_integrity_regression_suite.py','tools/instrument_review_speedometer_regression_suite.py',
-'tools/protractor_scale_safety_regression_suite.py','tools/metrology_full_audit_regression_suite.py','tools/build_install_package.py',*WORKERS.values()]
+'tools/protractor_scale_safety_regression_suite.py','tools/metrology_full_audit_regression_suite.py','tools/weight_dial_inactive_gap_regression_suite.py','tools/build_install_package.py',*WORKERS.values()]
 
 def read(rel): return (ROOT/rel).read_text(encoding='utf-8')
 def need(errors,rel,*tokens):
@@ -63,17 +63,20 @@ def main():
     need(errors,'policies/METROLOGY_ASSURANCE_PROFILE.md','ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER','PROMPT_METROLOGY_INDEPENDENCE_QA','tick_center_spacing_mm = reading_radius_mm × radians(minor_interval_deg)','ARTIFACT_QA=NOT_YET_TESTED')
     need(errors,'policies/SCALE_LINE_INTEGRITY_PROFILE.md','METROLOGY_ASSURANCE_PROFILE.md','W10_METROLOGY_ENGINEER','PROMPT_SCALE_PRINT_SPACING_ORACLE_QA')
     need(errors,'policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','W10_METROLOGY_ENGINEER','PROMPT_METROLOGY_AUDIT_REQUIRED_QA')
-    need(errors,'workers/W10_METROLOGY_ENGINEER.md','METROLOGY_AUDIT_STATE','recompute at least one independent quantitative oracle','Any proposed 65 mm diameter at 1° is rejected')
-    need(errors,'tools/build_install_package.py','activity-based-elementary-worksheet_Gem_v2.6.3_LTS_10WORKERS_TXT','W10_METROLOGY_ENGINEER.txt','METROLOGY_ASSURANCE_PROFILE.md','metrology_full_audit_regression_suite.py','1075/1075 PASS','Knowledge bundle count must equal 10')
+    need(errors,'domains/SCALE_READING_ENGINE.md','INACTIVE_GAP_RADIAL_MARK_COUNT=0','PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA','LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}')
+    need(errors,'workers/W10_METROLOGY_ENGINEER.md','METROLOGY_AUDIT_STATE','recompute at least one independent quantitative oracle','Any proposed 65 mm diameter at 1° is rejected','PROMPT_METROLOGY_DIAL_GAP_RADIAL_MARK_ZERO_QA')
+    need(errors,'tools/build_install_package.py','activity-based-elementary-worksheet_Gem_v2.6.3_LTS_10WORKERS_TXT','W10_METROLOGY_ENGINEER.txt','METROLOGY_ASSURANCE_PROFILE.md','metrology_full_audit_regression_suite.py','weight_dial_inactive_gap_regression_suite.py','1107/1107 PASS','Knowledge bundle count must equal 10')
     need(errors,'tools/metrology_full_audit_regression_suite.py','Expected case count: exactly 80','assert len(CASES)==80','all learner-read scale families + independent W10 metrology audit')
-    need(errors,'qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','W10_METROLOGY_ENGINEER','1075/1075 PASS','ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER')
+    need(errors,'tools/weight_dial_inactive_gap_regression_suite.py','Expected case count: exactly 32','assert len(CASES)==32','actual weight-dial inactive-gap + label-coordinate regression')
+    need(errors,'qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','W10_METROLOGY_ENGINEER','1107/1107 PASS','ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER','actual weight-dial inactive-gap regression: 32')
+    need(errors,'qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','P0_CRITICAL_ACADEMIC','INACTIVE_GAP_RADIAL_MARK_COUNT=0','CLASSROOM_RELEASE=BLOCKED')
 
     builder=read('tools/build_install_package.py')
     for profile in ['policies/SYSTEM_WIDE_QUALITY_PROFILE.md','policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md']:
         if profile not in builder: errors.append(f'builder missing mandatory shared profile: {profile}')
 
     workflow=(ROOT.parent.parent/'.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml').read_text(encoding='utf-8')
-    for token in ['Full metrology audit — 80 cases','metrology_full_audit_regression_suite.py','v2.6.3_LTS_10WORKERS_TXT']:
+    for token in ['Full metrology audit — 80 cases','metrology_full_audit_regression_suite.py','Actual weight-dial inactive-gap regression — 32 cases','weight_dial_inactive_gap_regression_suite.py','v2.6.3_LTS_10WORKERS_TXT']:
         if token not in workflow: errors.append(f'workflow missing {token}')
 
     if errors:
@@ -92,7 +95,8 @@ def main():
     print('instrument review/speedometer regression: 60-case executable present')
     print('protractor scale safety regression: 24-case executable present')
     print('metrology full audit regression: 80-case executable present')
-    print('combined minimum release gate: 1075 cases')
+    print('actual weight-dial inactive-gap regression: 32-case executable present')
+    print('combined minimum release gate: 1107 cases')
     print('artifact QA: NOT_YET_TESTED')
     return 0
 if __name__=='__main__': sys.exit(main())
