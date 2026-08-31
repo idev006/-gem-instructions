@@ -6,9 +6,9 @@ Installation profile: Orchestrator + 10 Specialist Workers
 
 ## 1. Main Instructions
 
-Use the complete generated `01_MAIN_INSTRUCTIONS/GEM_ORCHESTRATOR_INSTRUCTIONS.txt` from the CI installation ZIP in the Gem Instructions field.
+Use the complete generated `01_MAIN_INSTRUCTIONS/GEM_ORCHESTRATOR_INSTRUCTIONS.txt` from the successful CI installation ZIP in the Gem Instructions field.
 
-Do not replace it with a shortened formula dump. The generated Instructions include the Orchestrator and all mandatory shared safety profiles.
+Do not replace it with a shortened formula dump. Generated Instructions include the Orchestrator and all mandatory shared safety profiles.
 
 ## 2. Knowledge upload — exactly 10 base files
 
@@ -25,9 +25,9 @@ Upload every `.txt` from `02_UPLOAD_10_WORKER_KNOWLEDGE_TXT`:
 9. `W09_QA_RELEASE.txt`
 10. `W10_METROLOGY_ENGINEER.txt`
 
-W10 is a production worker, not a hotfix. It independently audits measuring instruments and scale feasibility.
+W10 is a production worker, not a hotfix. It independently audits measuring instruments, common centers/origins, scale feasibility and shape-aware page evidence.
 
-## 3. Mandatory safety architecture
+## 3. Five mandatory safety profiles
 
 All 10 worker bundles embed:
 
@@ -35,12 +35,13 @@ All 10 worker bundles embed:
 - `SCALE_LINE_INTEGRITY_PROFILE.md`
 - `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 - `METROLOGY_ASSURANCE_PROFILE.md`
+- `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
 Whenever a student reads an instrument:
 
 `OWNING WORKER → W07 → W10 → W08 → W09`
 
-W07 audits geometry. W10 independently recomputes metrology evidence. Missing either audit blocks prompt release.
+W07 audits geometry. W10 independently recomputes metrology/common-center/shape/page evidence. Missing either audit blocks prompt release.
 
 ## 4. Release artifact eligibility
 
@@ -56,7 +57,11 @@ Install only a ZIP whose exact GitHub Actions source commit passed:
 - instrument review/speedometer `60/60`
 - protractor scale safety `24/24`
 - full metrology audit `80/80`
-- combined `1075/1075 PASS`
+- actual weight-dial inactive-gap regression `32/32`
+- physical page feasibility regression `48/48`
+- actual instrument geometry regression `64/64`
+- repository full-line audit `81/81`
+- combined `1300/1300 PASS`
 - package build PASS
 - ZIP integrity PASS
 - artifact upload PASS
@@ -74,7 +79,7 @@ Expected:
 - release family 2.6.3-LTS / compatible baseline 2.6.x
 - W01..W10 present
 - worker schema version 1
-- four mandatory shared profiles present
+- five mandatory shared profiles present
 - `W10_METROLOGY_ENGINEER` active
 - `KB_COMPATIBILITY_QA=PASS`
 - `INSTALLATION_HEALTH=PASS`
@@ -84,68 +89,83 @@ Expected:
 ### Clock
 `ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นเวลาครึ่งชั่วโมง ไม่มีเฉลย`
 
-Expected learner-read route includes W02 + W07 + W10 + W08 + W09. Full minute face = 60 distinct positions. 10:30 = minute 180°, hour 315°.
+Expected: W02+W07+W10+W08+W09; 60 distinct minute positions; 10:30 = minute180°, hour315°; hands share one pivot.
 
 ### Ruler
 `ป.3 อ่านไม้บรรทัด เซนติเมตรและมิลลิเมตร 10 ข้อ ไม่มีเฉลย`
 
-Expected: each 1 cm @1 mm span = 10 intervals / 11 positions / 9 interior positions; physical edge is not a graduation.
-
-### Nonzero ruler start
-`ป.4 วัดความยาวจากไม้บรรทัดโดยวัตถุไม่ได้เริ่มที่ 0 จำนวน 10 ข้อ`
-
-Expected `length=end-start`.
+Expected each 1cm @1mm span =10 intervals/11 positions/9 interior; physical edge not graduation.
 
 ### Weight dial
 `ป.3 อ่านตราชั่ง 0–5 กก. ขีดย่อย 0.1 กก. 10 ข้อ ไม่มีเฉลย`
 
-Expected canonical 50 active intervals / 51 active positions and no value ticks in the inactive gap.
+Expected:
+- 0 at top, values increase clockwise;
+- labels `0@0°,1@60°,2@120°,3@180°,4@240°,5@300°`;
+- 50 intervals /51 active positions;
+- inactive gap `(300°,360°)` with zero radial scale-like marks;
+- needle pivot equals dial center.
 
 ### Protractor
 `ป.4 อ่านมุมจากโพรแทรกเตอร์ 0–180° ขีดละ 1° 10 ข้อ ไม่มีเฉลย`
 
 Expected:
-- 180 intervals / 181 positions;
-- exact origin/baseline/direction;
-- deterministic instrument geometry;
-- `tick_center_spacing_mm = reading_radius_mm × radians(1°)`;
-- at 0.60 mm spacing floor, production width >=70 mm;
-- 65 mm is rejected;
-- one clearly active reading scale unless dual-scale reading is explicitly taught.
+- perfect upper semicircle;
+- 180 intervals /181 positions;
+- single active numeric scale unless dual-scale is explicitly taught;
+- 0° right/90° top/180° left;
+- exact common center = baseline midpoint = ray origin;
+- all ticks/rays radial;
+- deterministic geometry;
+- width >=70mm at 0.60mm spacing floor;
+- no ellipse/skew/shear/non-uniform transform;
+- page packing uses 35mm semicircle body height at 70mm width plus actual label/answer reserves.
 
 ### Thermometer
 `ป.4 อ่านเทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C 10 ข้อ ไม่มีเฉลย`
 
-Expected 50 intervals / 51 positions; liquid endpoint exactly on target graduation.
+Expected 50 intervals/51 positions; 6 major +5 intermediate +40 ordinary minor; each 10°C span has 10 intervals/9 interior; liquid endpoint exactly on target.
 
 ### Speedometer
 `ป.4 อ่านหน้าปัดความเร็วรถ 0–120 km/h ขีดละ 10 km/h 10 ข้อ ไม่มีเฉลย`
 
-Expected 12 intervals / 13 positions, 240° active arc, 120° inactive gap and exact needle mapping.
+Expected 12 intervals/13 positions, 240° active, 120° inactive, exact mapping, pivot exactly at dial/reading-ring center, and radial needle.
 
 ### Graduated container
 `ป.4 อ่านปริมาตรจากภาชนะตวง 0–1000 mL ขีดละ 50 mL 10 ข้อ ไม่มีเฉลย`
 
-Expected 20 intervals / 21 positions and explicit level/meniscus convention.
+Expected 20 intervals/21 positions and explicit level/meniscus convention.
 
 ### Graph axis
 `ป.4 อ่านกราฟแท่งที่แกนตั้งเพิ่มทีละ 5 จำนวน 10 ข้อ`
 
-Expected equal numeric increments map to equal physical spacing and bar endpoints map exactly to canonical data.
+Expected equal numeric increments map to equal physical spacing and bar endpoints map to canonical data.
 
-## 7. Renderer review behavior
+## 7. Physical page behavior
 
-For every learner-read instrument, the final prompt must include:
+Default:
+
+`TARGET_PAGE_COUNT=1`
+`ONE_PAGE_PREFERRED=YES`
+`ONE_PAGE_LOCK=OFF`
+
+`NO NUMERIC PACKING PROOF = NO PAGE-FEASIBILITY PASS`
+
+Page calculations use shape-aware item bounding boxes. Circular diameter contributes width and height; a semicircular protractor of width W contributes body height W/2 before labels/answers. When unlocked, an infeasible candidate is paginated rather than degraded.
+
+## 8. Renderer review behavior
+
+For every learner-read instrument, final prompt includes:
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-and a review/revise loop:
+and:
 
 `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-A vague `looks correct` review is not sufficient.
+Review explicitly checks exact counts, labels/order, common center/origin, radial collinearity, shape integrity, target alignment and inactive regions. `Looks correct` is insufficient.
 
-## 8. Prompt vs artifact QA
+## 9. Prompt vs artifact QA
 
 Passing all prompt/package gates does not prove rendered pixels.
 
@@ -154,4 +174,4 @@ Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-One wrong learner-read scale in an actual worksheet means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
+One wrong learner-read scale, label order, pivot/origin, or distorted instrument means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
