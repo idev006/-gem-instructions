@@ -2,8 +2,9 @@
 """Static SSOT validator for activity-based-elementary-worksheet 2.6.x.
 
 Structural/document-contract validation only. Executable prompt-system validation
-is performed by the 449-case core suite, 360-case declared-skill matrix and
-12-case runtime UAT regression suite. None of these claims artifact pixels pass.
+is performed by the 449-case core suite, 360-case declared-skill matrix,
+12-case runtime UAT regression suite, and 20-case semantic-oracle suite.
+None of these claims artifact pixels pass.
 """
 from __future__ import annotations
 
@@ -46,6 +47,7 @@ REQUIRED_FILES = [
     "tools/full_dry_run_suite.py",
     "tools/full_skill_matrix_suite.py",
     "tools/runtime_uat_regression_suite.py",
+    "tools/semantic_oracle_regression_suite.py",
     "tools/build_install_package.py",
     *WORKERS.values(),
 ]
@@ -78,7 +80,8 @@ CHECKS = {
         "MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK",
         "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
         "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
-        "821/821 PASS",
+        "semantic_oracle_regression_suite.py",
+        "841/841 PASS",
     ],
     "workers/W02_TIME_CLOCK.md": [
         "Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}",
@@ -111,7 +114,8 @@ CHECKS = {
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
     "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES)==360,len(CASES)"],
     "tools/runtime_uat_regression_suite.py": ["12/12 PASS", "profile-embedded-main"],
-    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["821/821 PASS", "runtime_uat_regression_suite.py"],
+    "tools/semantic_oracle_regression_suite.py": ["Expected case count: exactly 20", "assert len(CASES) == 20"],
+    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["841/841 PASS", "semantic_oracle_regression_suite.py"],
 }
 
 EXACT_RELATIONS = [
@@ -187,7 +191,8 @@ def main() -> int:
     print("core dry-run: 449-case executable present")
     print("declared-skill matrix: 360-case executable present")
     print("runtime UAT regression: 12-case executable present")
-    print("combined minimum release gate: 821 cases")
+    print("semantic oracle regression: 20-case executable present")
+    print("combined minimum release gate: 841 cases")
     print("artifact QA: NOT_YET_TESTED")
     return 0
 
