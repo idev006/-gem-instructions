@@ -65,7 +65,7 @@ def main():
     need(errors,'policies/SCALE_LINE_INTEGRITY_PROFILE.md','METROLOGY_ASSURANCE_PROFILE.md','W10_METROLOGY_ENGINEER','PROMPT_SCALE_PRINT_SPACING_ORACLE_QA')
     need(errors,'policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','W10_METROLOGY_ENGINEER','PROMPT_METROLOGY_AUDIT_REQUIRED_QA')
     need(errors,'domains/SCALE_READING_ENGINE.md','INACTIVE_GAP_RADIAL_MARK_COUNT=0','PROMPT_DIAL_GAP_RADIAL_MARK_ZERO_QA','LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}')
-    need(errors,'workers/W08_LAYOUT_RENDER_THAI.md','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md','PHYSICAL_PAGE_STATE','Never emit `OUTPUT_MODE=DETERMINISTIC_VECTOR`','five rows of 70 mm protractors')
+    need(errors,'workers/W08_LAYOUT_RENDER_THAI.md','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md','PHYSICAL_PAGE_STATE','Never emit `OUTPUT_MODE=DETERMINISTIC_VECTOR`','70 mm','350 mm')
     need(errors,'workers/W10_METROLOGY_ENGINEER.md','METROLOGY_AUDIT_STATE','recompute at least one independent quantitative oracle','METROLOGY_MINIMUM_SIZE_MM','SELECTED_RENDER_SIZE_MM','five rows of 80 mm dials require at least 400 mm','PROMPT_PHYSICAL_PAGE_STATE_QA')
     need(errors,'tools/build_install_package.py','activity-based-elementary-worksheet_Gem_v2.6.3_LTS_10WORKERS_TXT','W10_METROLOGY_ENGINEER.txt','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md','physical_page_feasibility_regression_suite.py','1155/1155 PASS','Knowledge bundle count must equal 10')
     need(errors,'tools/metrology_full_audit_regression_suite.py','Expected case count: exactly 80','assert len(CASES)==80','all learner-read scale families + independent W10 metrology audit')
