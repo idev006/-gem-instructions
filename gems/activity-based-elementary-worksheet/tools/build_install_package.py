@@ -52,7 +52,7 @@ WORKER_BUNDLES: dict[str, list[str]] = {
         "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md", "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
         "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md", "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
         "qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md", "qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md",
-        "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md", "qa/DOMAIN_RELEASE_MATRIX.md",
+        "qa/BASELINE_2_6_2_RELEASE_CHECKLIST.md", "qa/DOMAIN_RELEASE_MATRIX.md",
     ],
 }
 
@@ -73,7 +73,6 @@ def run_gate(script: str) -> subprocess.CompletedProcess[str]:
 
 
 def bundle_text(worker_name: str, sources: list[str]) -> str:
-    # Every worker inherits all mandatory cross-worker safety profiles at runtime.
     effective_sources = [*SHARED_PROFILES, *sources]
     header = (
         f"ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {worker_name}\n"
