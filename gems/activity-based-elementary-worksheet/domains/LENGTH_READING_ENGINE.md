@@ -1,6 +1,6 @@
 # LENGTH_READING_ENGINE — Ruler / Length / Distance Rules
 
-Version: 1.3.0
+Version: 1.4.0
 Status: PRODUCTION_CANDIDATE
 Owning worker: `W04_LENGTH_DISTANCE`
 Requires `INSTRUMENT_READING_ENGINE.md` only when a learner reads a ruler/scale.
@@ -55,7 +55,7 @@ Geometry invariants:
 - uniform graduation spacing
 - zero graduation visually distinct from physical ruler edge
 - cm marks stronger/longer than mm marks
-- object start/end guides unambiguous
+- object start/end references are explicit and machine-checkable
 - no decoration that resembles graduations
 - repeated rulers share one template unless task explicitly changes scale
 
@@ -95,7 +95,49 @@ Both endpoints must be valid graduations in exact-reading mode.
 
 Do not confuse measurement start with the physical ruler edge.
 
-## 7. Length calculation
+## 7. Object endpoint projection/reference geometry — mandatory
+
+For elementary object-on-ruler worksheets, the learner must be able to see exactly which ruler graduations correspond to the two object endpoints.
+
+Canonical coordinate contract:
+
+`OBJECT_START_X == START_GRADUATION_X`
+`OBJECT_END_X == END_GRADUATION_X`
+
+When the object is drawn above the ruler and does not physically touch the reading line, use two thin dashed vertical projection guides:
+
+`START_PROJECTION_GUIDE_X = OBJECT_START_X = START_GRADUATION_X`
+`END_PROJECTION_GUIDE_X = OBJECT_END_X = END_GRADUATION_X`
+
+The projection guides:
+
+- run from the exact object endpoint down to the ruler reading/graduation zone;
+- remain perpendicular to the ruler baseline;
+- use a dashed/helper style visually distinct from ruler graduations;
+- must not obscure, replace, thicken, duplicate, or create a graduation;
+- are instructional reference geometry, not decoration.
+
+### ZERO_START_MODE
+
+If the task says or implies measurement starts at zero:
+
+`START_GRADUATION_VALUE=0`
+`OBJECT_START_X == ZERO_GRADUATION_X`
+`START_PROJECTION_GUIDE_X == ZERO_GRADUATION_X`
+
+The physical ruler border/edge is not a substitute for the zero graduation unless the owning template explicitly defines exact geometric coincidence between them. Default elementary templates keep the zero graduation visibly inside/distinct from the physical edge.
+
+### NONZERO_START_MODE
+
+If the task explicitly teaches a nonzero start:
+
+`START_GRADUATION_VALUE != 0` is permitted;
+`TARGET_LENGTH = END_VALUE - START_VALUE`;
+both projection guides remain required so the subtraction relation is visually unambiguous.
+
+A picture in which the object starts at the physical ruler edge while the zero graduation lies elsewhere is `CRITICAL_ACADEMIC` in ZERO_START_MODE.
+
+## 8. Length calculation
 
 Task types:
 
@@ -105,7 +147,7 @@ For subtraction in nonnegative elementary mode, generate values that produce a v
 
 Mixed-unit answer formats may be generated after exact base-unit computation, e.g. `2 m 35 cm`.
 
-## 8. Distance calculation
+## 9. Distance calculation
 
 Task types:
 
@@ -122,7 +164,7 @@ Rules:
 
 Map-style illustrations are contextual unless scale-map mathematics is explicitly requested; do not invent a map scale.
 
-## 9. Grade progression
+## 10. Grade progression
 
 Follow `MEASUREMENT_COVERAGE_P1_P6.md`.
 
@@ -135,28 +177,29 @@ Conservative defaults:
 - P5: mixed-unit/decimal conversion where appropriate, multi-step distance
 - P6: multi-step conversion + route reasoning
 
-## 10. Renderer-only ruler metadata
+## 11. Renderer-only ruler metadata
 
 For each ruler item compile internally:
 
-`START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT, EXPECTED_INTERVAL_COUNT, EXPECTED_TICK_POSITION_COUNT`
+`START_VALUE, END_VALUE, START_TICK_INDEX, END_TICK_INDEX, TARGET_LENGTH, UNIT, EXPECTED_INTERVAL_COUNT, EXPECTED_TICK_POSITION_COUNT, START_GRADUATION_X, END_GRADUATION_X, START_PROJECTION_GUIDE_X, END_PROJECTION_GUIDE_X`
 
 Put exact geometry only in teacher-visible renderer metadata marked `RENDER_ONLY_NOT_FOR_WORKSHEET`. Do not expose target values/indices in Student Blueprint.
 
-## 11. Canonical labels
+## 12. Canonical labels
 
 Ruler labels/graduations required by the configured scale are legitimate instructional data and must remain visible. Leak guards prohibit target-answer callouts, not canonical ruler labels.
 
-## 12. Layout/readability
+## 13. Layout/readability
 
 The smallest active graduation must remain distinguishable after print/photocopy.
 
 - reserve fixed-aspect instrument zone
 - preserve exact graduation count before decoration
+- reserve space for projection guides without cropping object endpoints
 - reduce decoration before ruler size
 - if one-page lock cannot preserve the scale, fail feasibility rather than merge/omit ticks
 
-## 13. QA
+## 14. QA
 
 Prompt-phase gates:
 
@@ -169,8 +212,11 @@ Prompt-phase gates:
 `PROMPT_RULER_ENDPOINT_QA`
 `PROMPT_RULER_TARGET_REPRESENTABILITY_QA`
 `PROMPT_RULER_LABEL_PRESERVATION_QA`
+`PROMPT_RULER_ENDPOINT_PROJECTION_GUIDE_QA`
+`PROMPT_RULER_ZERO_START_ALIGNMENT_QA`
+`PROMPT_RULER_NONZERO_START_RELATION_QA`
 `PROMPT_MEASUREMENT_GRADE_APPROPRIATENESS_QA`
 
 Artifact checks run only after render and inspect every ruler individually.
 
-Critical blockers include wrong conversion/arithmetic, wrong start reference, wrong interval/position count, missing/extra graduation, between-tick target in exact mode, or misleading distance relation.
+Critical blockers include wrong conversion/arithmetic, wrong start reference, object endpoint not aligned to its intended graduation, missing/misplaced projection guide, physical-edge substitution for zero, wrong interval/position count, missing/extra graduation, between-tick target in exact mode, or misleading distance relation.
