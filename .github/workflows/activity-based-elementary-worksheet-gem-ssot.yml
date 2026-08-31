@@ -56,6 +56,9 @@ jobs:
       - name: Actual weight-dial inactive-gap regression — 32 cases
         run: python gems/activity-based-elementary-worksheet/tools/weight_dial_inactive_gap_regression_suite.py
 
+      - name: Physical page feasibility regression — 48 cases
+        run: python gems/activity-based-elementary-worksheet/tools/physical_page_feasibility_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
