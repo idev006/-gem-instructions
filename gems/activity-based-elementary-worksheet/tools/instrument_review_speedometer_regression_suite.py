@@ -40,10 +40,10 @@ integration=[
 ('manifest-three-profiles','INSTRUMENT_REVIEW_REVISE_PROFILE.md' in manifest and 'SCALE_LINE_INTEGRITY_PROFILE.md' in manifest),
 ('instrument-engine-review','NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON' in instrument and 'speedometer' in instrument.lower()),
 ('builder-review-profile','INSTRUMENT_REVIEW_REVISE_PROFILE.md' in builder),
-('builder-new-suite','instrument_review_speedometer_regression_suite.py' in builder and '1075/1075 PASS' in builder),
-('validator-new-suite','instrument_review_speedometer_regression_suite.py' in validator and '1075' in validator),
+('builder-new-suite','instrument_review_speedometer_regression_suite.py' in builder and '1107/1107 PASS' in builder),
+('validator-new-suite','instrument_review_speedometer_regression_suite.py' in validator and '1107' in validator),
 ('workflow-new-suite','Instrument review + speedometer regression' in workflow and '60 cases' in workflow),
-('checklist-new-suite','1075/1075 PASS' in checklist and 'instrument review/speedometer' in checklist.lower()),
+('checklist-new-suite','1107/1107 PASS' in checklist and 'instrument review/speedometer' in checklist.lower()),
 ('core-review-protocol','INSTRUMENT_REVIEW_REVISE_PROFILE.md' in core and 'speedometer' in core.lower()),
 ('output-review-protocol','INSTRUMENT_REVIEW_REVISE_PROTOCOL' in out and 'NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON' in out),]
 for name,ok in integration: CASES.append((name,bool(ok),'integration'))
