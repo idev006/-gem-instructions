@@ -99,6 +99,19 @@ and:
 
 A vague `looks correct` review is insufficient.
 
+### Renderer review/revise release gates — mandatory
+
+For every learner-read instrument, all applicable review gates must be explicitly present and PASS:
+
+`PROMPT_NO_FIRST_PASS_INSTRUMENT_RELEASE_QA`
+`PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA`
+`PROMPT_INSTRUMENT_INDEPENDENT_RECOUNT_QA`
+`PROMPT_INSTRUMENT_REVISE_UNTIL_PASS_QA`
+`PROMPT_INSTRUMENT_REVIEW_EVIDENCE_QA`
+`PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA`
+
+The serialized protocol must require deterministic recount/rederivation, geometry/alignment checks, repair or regeneration on any mismatch, and a complete recheck after repair. Missing, contradictory, FAIL, or NOT_RUN review evidence forces `PROMPT_RELEASE=BLOCKED`.
+
 ## Independent W10 hard gate
 
 Every canonical learner-read template requires independent `METROLOGY_AUDIT_STATE` evidence including, as applicable:
