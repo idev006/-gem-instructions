@@ -26,6 +26,9 @@ jobs:
       - name: Validate Gem SSOT
         run: python gems/activity-based-elementary-worksheet/tools/validate_ssot.py
 
+      - name: Full dry-run suite — 449 cases
+        run: python gems/activity-based-elementary-worksheet/tools/full_dry_run_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
