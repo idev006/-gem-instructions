@@ -8,6 +8,8 @@ Compatible worker baseline: 2.6.x / schema 1
 
 2.6.3-LTS promotes independent metrology engineering into the base architecture. The objective is educational safety: every learner-read measuring instrument must be quantitatively correct before prompt release, and actual rendered pixels still require artifact inspection before classroom release.
 
+The 2026-08-31 actual weight-dial inactive-gap defect is now permanent negative evidence. A continuous-looking 360° tick ring on the canonical 0–5 kg dial is release-blocking even when the active interval count elsewhere is numerically correct.
+
 ## Required base workers
 
 Exactly 10:
@@ -77,7 +79,14 @@ Clock:
 
 Weight dial:
 - 0–5 kg @0.1 kg → 50 active intervals / 51 positions;
-- canonical active sweep 300°, inactive gap 60°.
+- canonical active sweep 300°, inactive gap 60°;
+- canonical start/end: 240° → 180° through the 300° active sweep;
+- inactive open arc: 180° → 240°;
+- `INACTIVE_GAP_TICK_COUNT=0`;
+- `INACTIVE_GAP_RADIAL_MARK_COUNT=0`;
+- active ticks only from `active_tick_angle(i)=(240+6*i) mod 360, i=0..50`;
+- canonical label angles: `{0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`;
+- one radial scale-like mark inside the inactive gap is `P0_CRITICAL_ACADEMIC`.
 
 Ruler:
 - 1 cm @1 mm → 10 intervals / 11 positions / 9 interior positions;
@@ -143,6 +152,9 @@ Applicable metrology gates include:
 `PROMPT_METROLOGY_RENDER_PATH_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
+`PROMPT_METROLOGY_DIAL_ACTIVE_TICK_SET_QA`
+`PROMPT_METROLOGY_DIAL_GAP_RADIAL_MARK_ZERO_QA`
+`PROMPT_METROLOGY_DIAL_LABEL_ANGLE_QA`
 
 Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
 
@@ -159,12 +171,13 @@ All prior tests remain. Counts may only increase.
 7. instrument review/speedometer: 60
 8. protractor scale safety: 24
 9. full metrology audit: 80
+10. actual weight-dial inactive-gap regression: 32
 
 Combined:
 
-`1075/1075 PASS`
+`1107/1107 PASS`
 
-The new suite is `tools/metrology_full_audit_regression_suite.py` and audits all learner-read scale families plus W10/package integration.
+The additive suites include `tools/metrology_full_audit_regression_suite.py` and `tools/weight_dial_inactive_gap_regression_suite.py`. The latter protects the actual user-supplied 2026-08-31 defect and must never be removed or weakened to a generic visual check.
 
 ## Package audit
 
@@ -178,7 +191,9 @@ Must contain:
 - all four mandatory shared profiles embedded in main and worker bundles;
 - W10 metrology worker;
 - full metrology audit report;
+- actual weight-dial inactive-gap regression evidence/report;
 - all previous regression reports;
+- classroom artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
 
@@ -186,7 +201,7 @@ Build only from GitHub SSOT after all gates pass. Use the exact CI artifact; do 
 
 ## Prompt/artifact boundary
 
-Passing `1075/1075` establishes prompt-system/package coherence only.
+Passing `1107/1107` establishes prompt-system/package coherence only.
 
 Before actual rendered image inspection:
 
