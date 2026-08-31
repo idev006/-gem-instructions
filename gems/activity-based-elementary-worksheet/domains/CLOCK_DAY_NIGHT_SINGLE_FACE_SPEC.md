@@ -1,15 +1,21 @@
 # Clock Day/Night Single-Face Specification
 
-Version: 1.0.0
+Version: 1.1.0
 Compatible Gem baseline: 2.6.x
 Owner: `W02_TIME_CLOCK`
 Visual auditor: `W07_INSTRUMENT_AUDITOR`
 
 ## Purpose
 
-Define the canonical worksheet behavior when one analog clock image is used to ask for both daytime and nighttime interpretations.
+Define canonical behavior when one analog clock image is used to ask for both daytime and nighttime interpretations.
 
-## Canonical normalized mode
+## Mode resolution
+
+`CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR`
+
+For Thai Grade 3 analog-clock reading, AUTO resolves to `DAY_NIGHT_PAIR` unless the teacher explicitly requests one answer only.
+
+Canonical paired mode:
 
 `CLOCK_READING_MODE=DAY_NIGHT_PAIR`
 `ONE_CLOCK_TWO_ANSWERS=YES`
@@ -20,32 +26,51 @@ Define the canonical worksheet behavior when one analog clock image is used to a
 
 ## Student-visible composition
 
-Each question must contain exactly:
+Each question contains exactly:
 
 1. one analog clock face;
-2. one blank daytime answer field;
-3. one blank nighttime answer field.
+2. one blank daytime field;
+3. one blank nighttime field.
 
 Default answer line:
 
 `กลางวัน ........ น. | กลางคืน ........ น.`
 
-The same clock image is used for both answers. A separate day clock and night clock are prohibited unless the teacher explicitly requests two clocks.
+A separate day clock and night clock are prohibited unless explicitly requested.
 
-## Academic mapping
+## Deterministic Thai academic mapping
 
-The two interpretations of one analog face preserve the same minute component and differ by 12 hours modulo 24.
+The two interpretations preserve the same minute and differ by 12 hours modulo 24, but the **labels are not arbitrary**.
+
+For face `h12:m`:
+
+- `h12=1..5`: `กลางวัน=h12+12`, `กลางคืน=h12`
+- `h12=6..11`: `กลางวัน=h12`, `กลางคืน=h12+12`
+- `h12=12`: `กลางวัน=12`, `กลางคืน=00`
 
 Examples:
 
-- 1:30 ↔ 13:30
-- 7:00 ↔ 19:00
-- 10:30 ↔ 22:30
-- 12:15 ↔ 00:15
+- face 01:30 → กลางวัน 13:30 | กลางคืน 01:30
+- face 05:30 → กลางวัน 17:30 | กลางคืน 05:30
+- face 06:30 → กลางวัน 06:30 | กลางคืน 18:30
+- face 07:00 → กลางวัน 07:00 | กลางคืน 19:00
+- face 10:30 → กลางวัน 10:30 | กลางคืน 22:30
+- face 12:15 → กลางวัน 12:15 | กลางคืน 00:15
 
-Never render `24:xx` as a student answer; use `00:xx`.
+Never render `24:xx`; use `00:xx`.
 
-If seconds are active, the second component is preserved too.
+If seconds are active, preserve the second component too.
+
+## Half-hour semantics
+
+`MINUTE_GRANULARITY=30` alone is not equivalent to “half-hour only”. It permits `:00` and `:30`.
+
+When teacher intent is `เน้นเวลาครึ่งชั่วโมง`, `เฉพาะครึ่งชั่วโมง`, `half-hour only`, or equivalent, normalize:
+
+`TARGET_MINUTE_MODE=EXACT_MINUTE_SET`
+`TARGET_MINUTE_SET={30}`
+
+All generated targets must therefore use minute `30` unless the teacher explicitly asks for a mixed set.
 
 ## Clock geometry
 
@@ -56,25 +81,30 @@ For `h:m`:
 `minute_angle=6*m`
 `hour_angle=30*(h mod 12)+0.5*m`
 
-Both daytime and nighttime answers refer to exactly this same geometry.
+Both day and night answers refer to this exact same geometry.
 
-No second copy of the clock is required.
+Every renderer item state must include:
+
+`SEMANTIC TARGET + EXACT NUMERIC ANGLES + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
+
+For 10:30 specifically:
+- minute angle 180° / exactly at 6
+- hour angle 315° / exactly halfway 10–11
+- hard negative: hour hand must not point directly at 10
 
 ## Visibility contract
 
-Internal/teacher-visible state may contain:
+Student Blueprint contains only neutral clock item semantics plus the two blank labeled fields. It must not contain:
 
-- canonical 12-hour semantic target;
-- both verified 24-hour interpretations;
-- hand angles;
-- relational wording;
-- hard negatives.
+- target face time
+- daytime/nighttime answer values
+- hand angles
+- `RENDER_ONLY_NOT_FOR_WORKSHEET` item blocks
+- renderer relation strings
 
-Mark renderer geometry:
+Internal/teacher-visible state may contain canonical target, verified interpretations and geometry. Mark renderer metadata:
 
 `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
-
-Student Blueprint must contain only one neutral clock item plus two blank labeled fields. It must not reveal either target interpretation.
 
 ## Renderer hard negatives
 
@@ -82,32 +112,35 @@ Student Blueprint must contain only one neutral clock item plus two blank labele
 - DO NOT create different hand positions for daytime and nighttime.
 - DO NOT print target times near the clock.
 - DO NOT fill either response blank.
-- DO NOT remove required face numerals 1–12 merely to avoid answer leakage.
+- DO NOT remove required face numerals 1–12.
 - DO NOT add AM/PM labels unless explicitly requested.
+- DO NOT omit numeric renderer angles from high-risk per-item metadata.
 
-## Layout guidance
+## Page policy
 
-For 10 questions on A4 portrait, W08 should attempt an efficient one-page layout such as 2 columns × 5 rows only if the clock remains large enough to read and both answer fields remain writable.
+The paired mode does not imply `ONE_PAGE_LOCK=ON`.
 
-Reduce decorative art before reducing instructional clock size.
+Default remains:
+
+`TARGET_PAGE_COUNT=1`
+`ONE_PAGE_PREFERRED=YES`
+`ONE_PAGE_LOCK=OFF`
+
+Only an explicit user request such as `1 หน้าเท่านั้น` or `A4 หน้าเดียว` may turn the lock ON.
 
 ## QA
 
-`PROMPT_DAY_NIGHT_SINGLE_FACE_QA=PASS` requires:
+`PROMPT_DAY_NIGHT_SINGLE_FACE_QA=PASS` requires one clock, two blank fields, same hand state, deterministic Thai label mapping, identical minute/second components, no target leakage and canonical face labels.
 
-- exactly one clock per question;
-- exactly two blank answer fields per question;
-- same hand state for both interpretations;
-- verified 12-hour separation;
-- identical minute/second components;
-- no target answer leakage;
-- canonical face labels preserved.
+`PROMPT_HALF_HOUR_INTENT_QA=PASS` requires exact minute 30 for every item when strict half-hour intent is active.
 
-`PROMPT_DAY_NIGHT_TWO_BLANKS_QA=PASS` requires both labeled blanks to be present.
+`PROMPT_PER_ITEM_RENDER_STATE_QA=PASS` requires numeric angles + relational wording + item-specific hard negative for every clock item.
 
-`PROMPT_DAY_NIGHT_SAME_HAND_STATE_QA=PASS` requires one renderer hand state per question, not separate day/night states.
+`PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA=PASS` requires zero target/renderer metadata in Student Blueprint.
 
-Artifact QA remains separate. Before the downstream image is inspected:
+Any failure above blocks `PROMPT_RELEASE`.
+
+Before downstream image inspection:
 
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`.
