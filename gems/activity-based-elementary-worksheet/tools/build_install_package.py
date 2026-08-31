@@ -23,7 +23,10 @@ ZIP_PATH = DIST_ROOT / f"{PACKAGE_NAME}.zip"
 
 WORKER_BUNDLES: dict[str, list[str]] = {
     "W01_ACADEMIC_CONTENT.txt": ["workers/W01_ACADEMIC_CONTENT.md"],
-    "W02_TIME_CLOCK.txt": ["workers/W02_TIME_CLOCK.md", "domains/TIME_ENGINE.md", "domains/CLOCK_READING_ENGINE.md", "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md"],
+    "W02_TIME_CLOCK.txt": [
+        "workers/W02_TIME_CLOCK.md", "domains/TIME_ENGINE.md", "domains/CLOCK_READING_ENGINE.md",
+        "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md", "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
+    ],
     "W03_WEIGHT_SCALE.txt": ["workers/W03_WEIGHT_SCALE.md", "domains/SCALE_READING_ENGINE.md"],
     "W04_LENGTH_DISTANCE.txt": ["workers/W04_LENGTH_DISTANCE.md", "domains/LENGTH_READING_ENGINE.md"],
     "W05_TEMPERATURE_CAPACITY_VOLUME.txt": ["workers/W05_TEMPERATURE_CAPACITY_VOLUME.md", "domains/TEMPERATURE_READING_ENGINE.md", "domains/CAPACITY_READING_ENGINE.md"],
@@ -32,7 +35,8 @@ WORKER_BUNDLES: dict[str, list[str]] = {
     "W08_LAYOUT_RENDER_THAI.txt": ["workers/W08_LAYOUT_RENDER_THAI.md"],
     "W09_QA_RELEASE.txt": [
         "workers/W09_QA_RELEASE.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md",
-        "policies/PARAMETER_POLICY.md", "domains/DOMAIN_REGISTRY.md", "domains/MEASUREMENT_COVERAGE_P1_P6.md",
+        "policies/PARAMETER_POLICY.md", "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
+        "domains/DOMAIN_REGISTRY.md", "domains/MEASUREMENT_COVERAGE_P1_P6.md",
         "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md", "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
         "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md", "qa/ACTUAL_RENDER_FAILURE_REGRESSION_V2_3_1.md",
         "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md", "qa/DOMAIN_RELEASE_MATRIX.md",
@@ -94,7 +98,13 @@ def main() -> int:
         "COMPACT RUNTIME PROFILE\nThe 9 Knowledge TXT files are generated bundles. Supporting SSOT is embedded into the relevant worker bundle.\n"
         "This package was built only after SSOT validation + 449/449 core dry-run + 360/360 declared-skill matrix = 809/809 PASS.\n\n"
     )
-    (instructions_dir / "GEM_ORCHESTRATOR_INSTRUCTIONS.txt").write_text(compact_note + read("GEM_INSTRUCTIONS_PRODUCTION.md"), encoding="utf-8")
+    main_instructions = (
+        compact_note
+        + read("GEM_INSTRUCTIONS_PRODUCTION.md")
+        + "\n\n===== MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK =====\n\n"
+        + read("policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md")
+    )
+    (instructions_dir / "GEM_ORCHESTRATOR_INSTRUCTIONS.txt").write_text(main_instructions, encoding="utf-8")
     for out_name, sources in WORKER_BUNDLES.items():
         (knowledge_dir / out_name).write_text(bundle_text(out_name, sources), encoding="utf-8")
     if len(list(knowledge_dir.glob("*.txt"))) != 9: raise RuntimeError("Knowledge bundle count must equal 9")
