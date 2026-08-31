@@ -130,11 +130,11 @@ release_checks=[
 ('builder-line81','repository_full_line_audit_suite.py' in builder),
 ('validator-geometry64','instrument_geometry_artifact_regression_suite.py' in validator and 'measurement_reference_artifact_regression_suite.py' in validator),
 ('validator-line81','repository_full_line_audit_suite.py' in validator),
-('workflow-geometry64','Actual instrument geometry regression — 64 cases' in workflow_text and 'Measurement reference artifact regression — 64 cases' in workflow_text),
+('workflow-geometry64','Actual instrument geometry regression — 64 cases' in workflow_text and 'Measurement reference artifact regression — 66 cases' in workflow_text),
 ('workflow-line81','Repository full-line audit — 81 semantic cases' in workflow_text),
-('checklist-geometry64','actual instrument geometry regression: 64' in checklist.lower() and 'measurement reference artifact regression: 64' in checklist.lower()),
+('checklist-geometry64','actual instrument geometry regression: 64' in checklist.lower() and 'measurement reference artifact regression: 66' in checklist.lower()),
 ('checklist-line81','repository full-line audit: 81' in checklist.lower()),
-('release-total-1364',all('1364/1364 PASS' in x for x in [builder,checklist,install,readme])),
+('release-total-1366',all('1366/1366 PASS' in x for x in [builder,checklist,install,readme])),
 ('five-profile-packaging','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in builder and 'Mandatory shared profiles: 5' in builder),
 ]
 for n,o in release_checks:add(n,o)
