@@ -20,6 +20,7 @@ Normalized spec, Student Blueprint, owning-worker minimum geometry sizes, `SCALE
 - final worksheet visual hierarchy
 - serialization of mandatory renderer-side instrument review/revise protocol
 - numeric physical page packing proof before any one-page/grid approval
+- shape-aware item bounding boxes
 - pagination fallback when `ONE_PAGE_LOCK=OFF`
 - strict separation of `OUTPUT_MODE` from `RENDER_PATH`
 
@@ -79,26 +80,53 @@ When `ONE_PAGE_LOCK=OFF`, preserve safe pagination wording; never compile a pref
 
 A hard-coded layout such as `2 columns × 5 rows` is allowed in the final prompt only after numeric packing proof passes for that exact plan.
 
-## Layout families
+## Shape-aware layout families
 
 - numeric/text dense: deterministic table/grid
 - ruler/clock/weight-dial/thermometer/capacity/speedometer: repeated card/grid with locked instrument zone
-- protractor: larger geometry cards with enough diameter for required degree ticks, labels and rays
+- protractor: shape-aware semicircle card; body height is radius, not width
 - perimeter/area: figure zone + dimension-label clearance + answer zone
 - length/distance/time word problems: rows/tables preserving reading flow
 - color-by-code: region/mosaic plan with readable expressions and separate legend
 - graphs/tables: reserve exact data area before decoration
 - volume: clear 3D diagram/dimension-label zone without decorative occlusion
 
-Do not mechanically force 2×5 when the smallest graduation becomes ambiguous. Reduce decoration or paginate before shrinking scale geometry below minimums.
+Do not mechanically force or reject 2×5. Use numeric shape-aware proof.
 
-For 0–180° @1° protractors with `MIN_TICK_CENTER_SPACING_MM=0.60`, use the geometric oracle from the shared scale profile. `PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`. A proposed 65 mm protractor is invalid because 1° tick spacing is approximately 0.567 mm. Five vertical rows of 70 mm instruments already require at least 350 mm before header, margins or answer zones, so an A4 portrait 2×5 plan cannot PASS; with `ONE_PAGE_LOCK=OFF`, paginate.
+### Semicircular protractor layout
 
-For a thermometer with a 60 mm vertical 0→50 scale, five rows consume at least 300 mm before header, margins or answer zones. A one-page five-row plan cannot PASS. If 60 mm is only a selected render size rather than a domain/metrology minimum, W08 may choose another size only if W10 confirms it remains at or above the true audited minimum; otherwise paginate.
+For 0–180° @1°:
 
-For graduated-container cards, include the complete item-box height and answer zone. Five 50 mm item boxes consume 250 mm before row gaps/header/margins, so no PASS is allowed without explicit numeric proof.
+`PRODUCTION_MIN_PROTRACTOR_WIDTH_MM=70`
 
-For graph worksheets, axis height alone does not prove fit. Include graph title, axis/category labels, questions and answer lines in the physical content stack.
+At width 70 mm:
+
+`PROTRACTOR_RADIUS_MM=35`
+`PROTRACTOR_BODY_HEIGHT_MM=35`
+
+Do **not** use 70 mm as the vertical body height. Add separate numeric reserves for label/baseline clearance, question number, response zone and internal spacing to obtain the item height.
+
+A 2-column layout is preferred because two 70 mm-wide protractors plus a reasonable column gap can fit within A4 portrait usable width when margins are budgeted. A `2×5` plan may PASS only if the complete vertical stack also passes numeric proof; if it fails and `ONE_PAGE_LOCK=OFF`, paginate.
+
+For protractor geometry, W08 must preserve:
+
+- perfect upper semicircle / no skew or non-uniform transform;
+- one active numeric scale unless dual-scale reading is explicitly taught;
+- exact common origin/baseline center/ray origin;
+- exact 180/181 topology;
+- 10° major / 5° intermediate / 1° minor hierarchy.
+
+### Thermometer layout
+
+For a 0–50°C @1°C thermometer, the spacing-derived scale-length minimum is 30 mm at a 0.60 mm floor. A selected 60 mm scale has exactly 1.20 mm spacing but five 60 mm vertical scales consume 300 mm before other content. W08 may select a smaller size only if it remains above all W10/metrology/readability minima; otherwise paginate.
+
+### Graduated-container layout
+
+Include the complete item-box height and answer zone. Five 50 mm item boxes consume 250 mm before row gaps/header/margins, so no PASS is allowed without explicit numeric proof.
+
+### Graph layout
+
+Axis height alone does not prove fit. Include graph title, axis/category labels, questions and answer lines in the physical content stack.
 
 ## Scale-line layout integrity
 
@@ -106,20 +134,19 @@ All learner-read scales inherit `SCALE_LINE_INTEGRITY_PROFILE.md`.
 
 W08 must preserve:
 
-- exact `SCALE_LINE_SPEC` fields from the owning worker/W07;
+- exact `SCALE_LINE_SPEC` fields from owning worker/W07;
 - authoritative baseline/ring/arc;
 - exact interval/position count;
 - minimum tick-center separation;
 - computed `PRINT_SPACING_ORACLE` for dense scales;
-- major/minor hierarchy;
-- label alignment/clearance;
+- major/intermediate/minor hierarchy;
+- label alignment/clearance/order;
 - target alignment zone;
+- common center/origin where radial/angular;
 - inactive-region integrity;
 - canonical template consistency.
 
 Theme, borders, card dividers, shadows, texture or illustration may not introduce repeated strokes that could be read as graduations.
-
-For semicircular protractors, use one clearly active scale direction unless dual-scale interpretation is explicitly the lesson objective. A mirrored competing inner scale must not be introduced merely to imitate a commercial protractor. If per-item relations use 5° ticks, the canonical template must require 5° intermediate marks consistently.
 
 ## Mandatory renderer-side review/revise serialization
 
@@ -135,13 +162,15 @@ and include:
 
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-The protocol must require deterministic recount, alignment checks, repair/regenerate on mismatch, and a complete recheck after repair.
+The protocol must require deterministic recount, common-center/alignment checks, repair/regenerate on mismatch, and a complete recheck after repair.
 
 For ruler 1 cm @1 mm, explicitly require 10 intervals / 11 positions / 9 interior positions and prohibit counting the physical ruler edge as a graduation.
 
-For a 1° protractor, explicitly require 180 intervals / 181 positions, printed tick-spacing oracle ≥0.60 mm, width ≥70 mm under the default profile, one active reading direction, exact origin/baseline/ray alignment, and no unresolved AUTO render path.
+For a 1° protractor, explicitly require 180 intervals / 181 positions, printed tick-spacing oracle ≥0.60 mm, width ≥70 mm, one active scale direction, perfect semicircle, exact common origin/baseline/ray alignment, radial ticks and no unresolved AUTO render path.
 
-For a 0–50°C thermometer whose scale is exactly 60 mm long, serialize spacing as exactly `1.20 mm`, therefore `>=1.20 mm` and `>0.60 mm`; never claim `>1.20 mm`.
+For a 0–50°C thermometer, require 50/51 plus the exact 6-major/5-intermediate/40-minor hierarchy. If the selected scale is exactly 60 mm, serialize spacing as exactly `1.20 mm`, therefore `>=1.20 mm` and `>0.60 mm`; never claim `>1.20 mm`.
+
+For speedometers/weight dials, explicitly serialize that the pointer pivot equals the reading-ring center.
 
 W08 must not claim that renderer self-review equals artifact QA.
 
@@ -185,6 +214,7 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_PHYSICAL_WIDTH_FEASIBILITY_QA`
 `PROMPT_PHYSICAL_HEIGHT_FEASIBILITY_QA`
 `PROMPT_ITEM_BOUNDING_BOX_QA`
+`PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA`
 `PROMPT_ANSWER_ZONE_PRESERVATION_QA`
 `PROMPT_PAGINATION_FALLBACK_QA`
 `PROMPT_PAGE_POLICY_SERIALIZATION_QA`
@@ -200,11 +230,14 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_SCALE_PRINT_SEPARATION_QA` when learner-read scales apply
 `PROMPT_SCALE_PRINT_SPACING_ORACLE_QA` when dense learner-read scales apply
 `PROMPT_SCALE_LABEL_CLEARANCE_QA` when scale labels apply
+`PROMPT_INSTRUMENT_COMMON_CENTER_QA` when radial/angular
 `PROMPT_NO_FIRST_PASS_INSTRUMENT_RELEASE_QA` when learner-read instruments apply
 `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA` when learner-read instruments apply
 `PROMPT_PROTRACTOR_READABILITY_QA` when applicable
 `PROMPT_PROTRACTOR_ACTIVE_SCALE_QA` when applicable
+`PROMPT_PROTRACTOR_COMMON_CENTER_QA` when applicable
+`PROMPT_PROTRACTOR_SHAPE_INTEGRITY_QA` when applicable
 `PROMPT_PROTRACTOR_RENDER_PATH_QA` when applicable
 `PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
-Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, missing review protocol, ambiguous labels or theme interference blocks release.
+Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised scale geometry, off-center origin, distorted protractor, missing review protocol, ambiguous labels or theme interference blocks release.
