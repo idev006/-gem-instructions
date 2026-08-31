@@ -14,11 +14,13 @@ Owning-domain verified state, `SCALE_LINE_SPEC`, W07 audit state, resolved or ca
 - interval/position recount independent of owning worker;
 - physical print-spacing oracle;
 - zero/reference/origin/baseline correctness audit;
+- common-center/common-origin coincidence audit for radial/angular instruments;
 - scale-direction and monotonicity audit;
 - major/intermediate/minor hierarchy audit without extra positions;
 - pointer/hand/ray/liquid/meniscus/bar endpoint alignment audit;
+- radial pointer/ray collinearity audit;
 - inactive-region audit;
-- label-to-tick association audit;
+- label-to-tick association and label-order audit;
 - repeated-template consistency audit;
 - metrology minimum-size derivation;
 - independent numeric physical-page feasibility evidence supplied to W08/W09;
@@ -36,7 +38,7 @@ Academic target values, domain formulas, question wording, theme, final page des
 
 Children learn measurement concepts directly from the visible instrument.
 
-`METROLOGY_CORRECTNESS > VISUAL STYLE > DENSITY > ONE_PAGE_FIT`
+`METROLOGY_CORRECTNESS > VISUAL_STYLE > DENSITY > ONE_PAGE_FIT`
 
 A visually attractive but quantitatively incorrect scale is a critical academic defect.
 
@@ -54,12 +56,30 @@ W10 must recompute at least one independent quantitative oracle; repeating the o
 Examples:
 - ruler 1 cm @1 mm → 10 intervals / 11 positions / 9 interior positions;
 - clock minute ring → 60 intervals / 60 distinct positions / 6°;
-- weight dial 0–5 kg @0.1 → 50/51 active topology;
-- speedometer 0–120 @10 → 12/13 active topology;
-- protractor 0–180 @1° → 180/181 plus printed arc-spacing oracle;
-- thermometer → endpoint-inclusive linear count and exact target index;
+- weight dial 0–5 kg @0.1 → 50/51 active topology + canonical label-order oracle;
+- speedometer 0–120 @10 → 12/13 active topology + common-center oracle;
+- protractor 0–180 @1° → 180/181 + radial spacing + perfect-semicycle/common-origin oracle;
+- thermometer → endpoint-inclusive count + hierarchy recount + exact target index;
 - container → exact count + configured meniscus/read convention;
 - graph axis → numeric interval mapped to uniform physical spacing.
+
+## Common-center / common-origin metrology
+
+For radial dials/clocks/speedometers:
+
+`PIVOT_CENTER == READING_RING_CENTER == TICK_RADIAL_CENTER`
+
+For protractors:
+
+`ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER`
+
+The equality is geometric, not visual approximation. W10 requires zero displacement in the canonical state.
+
+Required evidence:
+
+`COMMON_CENTER_CHECK`
+`POINTER_ORIGIN_COINCIDENCE_CHECK` when pointer/ray exists
+`RADIAL_COLLINEARITY_CHECK` when radial/angular
 
 ## Scale-placement safety
 
@@ -74,7 +94,7 @@ For 0–180° protractor @1°:
 - minimum reading-ring diameter ≈ 68.76 mm;
 - production minimum width = 70 mm.
 
-Any proposed 65 mm diameter at 1° is rejected.
+Any proposed 65 mm width at 1° is rejected.
 
 For linear scales:
 
@@ -94,7 +114,10 @@ Required fields:
 
 `METROLOGY_MINIMUM_SIZE_MM` is the smallest size satisfying the spacing oracle or a stronger legitimate domain/user minimum. `SELECTED_RENDER_SIZE_MM` may be larger, but the larger value must not be reported as the metrology minimum merely because it was convenient for layout.
 
-For the canonical 0–5 kg weight dial, the owning domain currently has a stronger practical minimum diameter of 30 mm; a generated 80 mm dial may be a selected size but is not automatically a metrology minimum.
+Examples:
+- canonical 0–5 kg weight dial has a stronger practical domain minimum diameter of 30 mm;
+- canonical 0–50°C @1°C thermometer has a spacing-derived scale-length minimum of 30 mm at the 0.60 mm floor;
+- 0–180° @1° protractor has a genuine minimum production width of 70 mm at the 0.60 mm arc-spacing floor.
 
 ## Render-path audit
 
@@ -102,7 +125,7 @@ When learner-read geometry requires exact graduations, final `RENDER_PATH=AUTO` 
 
 `IMAGE_ONLY` is rejected when nondeterminism can alter scale geometry.
 
-`OUTPUT_MODE` is audited separately from `RENDER_PATH`; W10 must not accept a render-path value placed in the output-mode field as coherent evidence.
+`OUTPUT_MODE` is audited separately from `RENDER_PATH`; a render-path value placed in the output-mode field is invalid evidence.
 
 ## Physical page feasibility audit
 
@@ -122,13 +145,20 @@ A page-feasibility PASS requires numeric evidence for:
 
 If any required dimension is missing, page feasibility is `NOT_RUN`, not PASS.
 
-Immediate impossibility oracles:
-- five rows of 80 mm dials require at least 400 mm vertically before other content → cannot fit A4 portrait;
-- five rows of 70 mm protractors require at least 350 mm → cannot fit A4 portrait;
-- five rows of 60 mm thermometer scales require at least 300 mm before answer/header/margins → cannot fit A4 portrait;
-- five 50 mm container item boxes consume 250 mm before gaps/header/margins → requires full numeric proof and must not be assumed PASS.
+Important shape semantics:
 
-If `ONE_PAGE_LOCK=OFF` and the candidate one-page plan fails, W10 returns page-feasibility FAIL for that candidate and requires W08 to paginate/recompute. This is not a prompt-release blocker once a new feasible paginated plan is supplied and re-audited.
+- circular dial body diameter contributes the same minimum width and height;
+- vertical thermometer scale length contributes directly to item height;
+- **semicircular protractor width does not equal body height**: for width `W=2R`, semicircle body height is `R=W/2`; label/answer/clearance reserves are added separately by W08;
+- therefore a 70 mm protractor is not automatically a 70 mm-high item.
+
+Immediate lower-bound examples:
+- five rows of 80 mm circular dials require at least 400 mm vertically before other content → cannot fit A4 portrait;
+- five rows of 60 mm thermometer scales require at least 300 mm before answer/header/margins → cannot fit A4 portrait;
+- five 50 mm container item boxes consume 250 mm before gaps/header/margins → requires full numeric proof and must not be assumed PASS;
+- five 70 mm-wide protractors **must not** be rejected using `5×70` as a height oracle; use body height 35 mm plus actual per-item reserves.
+
+If `ONE_PAGE_LOCK=OFF` and a candidate one-page plan fails, W10 returns page-feasibility FAIL for that candidate and requires W08 to recompute or paginate. This is not a prompt-release blocker once a new feasible plan is supplied and re-audited.
 
 If `ONE_PAGE_LOCK=ON` and the candidate plan fails, W10 returns FAIL and W09 blocks release.
 
@@ -147,42 +177,82 @@ Mandatory W10 audit applies to:
 - graph axis;
 - any future learner-read graduated instrument.
 
-## Weight-dial inactive-gap independent oracle
+## Weight-dial independent oracle
 
-For the canonical 0–5 kg / 0.1 kg dial, W10 must derive the active/gap geometry independently from range and sweep before reading W07's verdict.
+For canonical 0–5 kg / 0.1 kg:
 
-Independent derivation:
-
+- angle convention: 0° top, clockwise positive;
 - active intervals = `(5-0)/0.1 = 50`;
-- active positions = `50+1 = 51`;
-- active sweep = `50 × 6° = 300°`;
-- inactive sweep = `360° - 300° = 60°`;
-- with canonical start 240°, active endpoint = `(240° + 300°) mod 360° = 180°`;
-- therefore open inactive arc is from 180° to 240°;
-- expected radial scale-like marks strictly inside that arc = **0**.
+- active positions = 51;
+- active sweep = `50×6° = 300°`;
+- active start = 0°;
+- active end = 300°;
+- inactive sweep = 60°;
+- inactive open arc = `(300°,360°)`;
+- expected radial scale-like marks strictly inside that arc = 0.
 
 Canonical active tick set:
 
-`A={ (240+6*i) mod 360 | i∈[0,50] }`
-
-W10 must verify that every intended graduation belongs to `A` and that no intended or decorative radial mark belongs to the open gap `(180°,240°)`.
-
-The outer circle is not a radial graduation and is allowed to continue through the gap.
+`A={ (6*i) mod 360 | i∈[0,50] }`
 
 Canonical label-angle oracle:
 
-`LABEL_ANGLES={0:240°,1:300°,2:0°,3:60°,4:120°,5:180°}`
+`LABEL_ANGLES={0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`
 
-If a rendered/template state places the labels at a different rotation while retaining the canonical target-angle mapping, W10 returns FAIL because the displayed values and pointer geometry no longer share one coordinate system.
+Canonical order:
 
-Required W10 evidence fields for this family:
+`CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`
+
+W10 independently verifies active set, zero-gap radial marks, label-to-tick association, clockwise order, and:
+
+`NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`.
+
+Required evidence:
 
 `ACTIVE_TICK_SET_CHECK`
 `INACTIVE_GAP_ANGLE_CHECK`
 `INACTIVE_GAP_RADIAL_MARK_COUNT`
 `CANONICAL_LABEL_ANGLE_CHECK`
+`MAJOR_LABEL_ORDER_CHECK`
+`COMMON_CENTER_CHECK`
 
-`INACTIVE_GAP_RADIAL_MARK_COUNT` must equal `0`.
+## Speedometer independent oracle
+
+Canonical 0–120 @10:
+
+- 12 intervals / 13 active positions;
+- `target_angle=(240+2*target_kmh) mod 360`;
+- 60 km/h → 0° → straight up under the family convention;
+- 120° inactive gap;
+- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`;
+- needle must be radial from center to target tick.
+
+## Thermometer independent oracle
+
+Canonical 0–50°C @1°C:
+
+- 50 intervals / 51 positions;
+- major positions = 6 at multiples of 10;
+- intermediate positions = 5 at 5,15,25,35,45;
+- ordinary minor positions = 40;
+- every 10°C major span = 10 intervals / 9 interior positions;
+- target liquid endpoint = target tick centerline;
+- 60 mm selected scale length → exactly 1.20 mm spacing.
+
+## Protractor independent oracle
+
+Canonical 0–180° @1°:
+
+- perfect upper semicircle from one center C and radius R;
+- 0° right, 90° top, 180° left;
+- 180 intervals / 181 positions;
+- all ticks radial from C;
+- one active numeric scale by default;
+- 10° major, 5° intermediate, 1° minor reuse the 181 positions;
+- `ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER`;
+- no ellipse, shear, perspective or non-uniform stretch;
+- width >=70 mm at default 0.60 mm spacing floor;
+- semicircle body height = width/2 before label/answer reserves.
 
 ## Required audit-state schema
 
@@ -194,12 +264,17 @@ Required W10 evidence fields for this family:
 `SELECTED_RENDER_SIZE_MM`
 `SIZE_ORACLE_SOURCE`
 `REFERENCE_ORIGIN_CHECK`
+`COMMON_CENTER_CHECK` when radial/angular
+`POINTER_ORIGIN_COINCIDENCE_CHECK` when pointer/ray exists
+`RADIAL_COLLINEARITY_CHECK` when radial/angular
 `DIRECTION_MONOTONICITY_CHECK`
 `HIERARCHY_CHECK`
 `LABEL_ASSOCIATION_CHECK`
+`LABEL_ORDER_CHECK` when ordered numeric scale labels apply
 `TARGET_ALIGNMENT_CHECK`
 `INACTIVE_REGION_CHECK` when applicable
 `TEMPLATE_CONSISTENCY_CHECK`
+`SHAPE_INTEGRITY_CHECK` when applicable
 `PHYSICAL_PAGE_STATE`
 `PRINT_FEASIBILITY_CHECK`
 `INDEPENDENT_VERDICT=PASS|FAIL`
@@ -213,12 +288,16 @@ Required W10 evidence fields for this family:
 `PROMPT_METROLOGY_INTERVAL_COUNT_QA`
 `PROMPT_METROLOGY_POSITION_COUNT_QA`
 `PROMPT_METROLOGY_REFERENCE_QA`
+`PROMPT_METROLOGY_COMMON_CENTER_QA` when radial/angular
+`PROMPT_METROLOGY_RADIAL_COLLINEARITY_QA` when radial/angular
 `PROMPT_METROLOGY_SPACING_ORACLE_QA`
 `PROMPT_METROLOGY_HIERARCHY_QA`
 `PROMPT_METROLOGY_LABEL_ASSOCIATION_QA`
+`PROMPT_METROLOGY_LABEL_ORDER_QA` when applicable
 `PROMPT_METROLOGY_TARGET_ALIGNMENT_QA`
 `PROMPT_METROLOGY_INACTIVE_REGION_QA` when applicable
 `PROMPT_METROLOGY_TEMPLATE_CONSISTENCY_QA`
+`PROMPT_METROLOGY_SHAPE_INTEGRITY_QA` when applicable
 `PROMPT_METROLOGY_RENDER_PATH_QA`
 `PROMPT_METROLOGY_PAGE_FEASIBILITY_QA`
 `PROMPT_METROLOGY_PRINT_FEASIBILITY_QA`
@@ -238,7 +317,7 @@ W10 prompt audit does not prove pixels.
 Before actual image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 
-If a rendered instrument is supplied, independently inspect visible tick count, spacing, anchoring, labels, reference, target alignment and print readability. For open-arc dials, count radial marks in the inactive region independently; any count above zero is a critical topology defect.
+If a rendered instrument is supplied, independently inspect visible tick count, spacing, anchoring, labels/order, common center/origin, target alignment, shape integrity and print readability. For open-arc dials, count radial marks in the inactive region independently; any count above zero is a critical topology defect.
 
 One wrong instructional scale means:
 
