@@ -2,8 +2,8 @@
 """Build the compact 9-Knowledge-file Gemini Gem installation package.
 
 Package is derived from GitHub SSOT. Build is blocked unless static SSOT
-validation, the 449-case core dry-run, and the 360-case declared-skill matrix
-all pass (809 deterministic/policy cases total).
+validation, the 449-case core dry-run, the 360-case declared-skill matrix,
+and the 12-case runtime-UAT regression all pass (821 cases total).
 """
 from __future__ import annotations
 
@@ -87,6 +87,11 @@ def main() -> int:
         print(skill.stdout); print(skill.stderr, file=sys.stderr)
         print("BUILD BLOCKED: 360-case declared-skill matrix failed", file=sys.stderr); return 1
 
+    uat = run_gate("runtime_uat_regression_suite.py")
+    if uat.returncode != 0:
+        print(uat.stdout); print(uat.stderr, file=sys.stderr)
+        print("BUILD BLOCKED: 12-case runtime UAT regression failed", file=sys.stderr); return 1
+
     if PACKAGE_DIR.exists(): shutil.rmtree(PACKAGE_DIR)
     if ZIP_PATH.exists(): ZIP_PATH.unlink()
     instructions_dir = PACKAGE_DIR / "01_MAIN_INSTRUCTIONS"
@@ -96,7 +101,7 @@ def main() -> int:
 
     compact_note = (
         "COMPACT RUNTIME PROFILE\nThe 9 Knowledge TXT files are generated bundles. Supporting SSOT is embedded into the relevant worker bundle.\n"
-        "This package was built only after SSOT validation + 449/449 core dry-run + 360/360 declared-skill matrix = 809/809 PASS.\n\n"
+        "This package was built only after SSOT validation + 449 core + 360 declared-skill + 12 runtime-UAT = 821/821 PASS.\n\n"
     )
     main_instructions = (
         compact_note
@@ -117,6 +122,7 @@ def main() -> int:
     (guide_dir / "SSOT_VALIDATION_REPORT.txt").write_text(validation.stdout, encoding="utf-8")
     (guide_dir / "FULL_DRY_RUN_449_REPORT.txt").write_text(core.stdout, encoding="utf-8")
     (guide_dir / "FULL_SKILL_MATRIX_360_REPORT.txt").write_text(skill.stdout, encoding="utf-8")
+    (guide_dir / "RUNTIME_UAT_REGRESSION_12_REPORT.txt").write_text(uat.stdout, encoding="utf-8")
 
     manifest = []
     for path in sorted(PACKAGE_DIR.rglob("*")):
@@ -130,8 +136,8 @@ def main() -> int:
         bad = z.testzip()
         if bad is not None: raise RuntimeError(f"ZIP integrity failure: {bad}")
 
-    print(validation.stdout.strip()); print(core.stdout.strip()); print(skill.stdout.strip())
-    print("COMBINED DRY-RUN: 809/809 PASS")
+    print(validation.stdout.strip()); print(core.stdout.strip()); print(skill.stdout.strip()); print(uat.stdout.strip())
+    print("COMBINED DRY-RUN: 821/821 PASS")
     print("PACKAGE BUILD: PASS"); print("Knowledge files: 9")
     print(f"ZIP: {ZIP_PATH}"); print(f"ZIP SHA256: {sha256(ZIP_PATH)}")
     return 0
