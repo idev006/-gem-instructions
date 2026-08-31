@@ -1,6 +1,6 @@
 # Domain Release Matrix
 
-Version: 1.5.0
+Version: 1.6.0
 Compatible Gem baseline: 2.6.x
 Status: Release-evidence SSOT
 
@@ -10,16 +10,17 @@ Status: Release-evidence SSOT
 | TIME | YES / mature | N/A | YES | threshold not yet documented under 2.6.x | PRODUCTION_CANDIDATE |
 | TIME_CLOCK | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_WEIGHT | YES | YES | YES | 10 deterministic-overlay worksheets; 100/100 dials pass; full hybrid/generative evidence incomplete | PRODUCTION_CANDIDATE |
-| MEASUREMENT_LENGTH | YES | YES | YES | LIMITED; 2.6 nonzero-start/conversion expansion not yet fully audited | PRODUCTION_CANDIDATE |
+| MEASUREMENT_LENGTH | YES | YES | YES | LIMITED; actual 2026-08-31 extra-tick ruler defect recorded and converted to regression | PRODUCTION_CANDIDATE |
 | MEASUREMENT_DISTANCE | YES | contextual geometry optional | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
+| MEASUREMENT_SPEEDOMETER | YES for direct dial reading | YES, open-arc scale + needle | YES | no systematic actual-render audit yet | PRODUCTION_CANDIDATE |
 | MEASUREMENT_ANGLE | YES | YES for protractor | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
 | MEASUREMENT_PERIMETER_AREA | YES for supported figure grammar | diagram/data rules | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
-| MEASUREMENT_TEMPERATURE | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
+| MEASUREMENT_TEMPERATURE | YES | YES | YES | LIMITED; renderer review/revise hardening added in 2.6.2 | PRODUCTION_CANDIDATE |
 | MEASUREMENT_CAPACITY | YES | YES | YES | LIMITED | PRODUCTION_CANDIDATE |
 | MEASUREMENT_VOLUME | YES for rectangular-prism/simple composite grammar | diagram/data rules | YES | no systematic 2.6 artifact audit yet | PRODUCTION_CANDIDATE |
 | MONEY | YES | data association rules | YES | LIMITED | PRODUCTION_CANDIDATE |
 | CALENDAR | YES | calendar grid rules | YES | LIMITED | PRODUCTION_CANDIDATE |
-| DATA_READING | YES | graph/table mapping rules | YES | LIMITED | PRODUCTION_CANDIDATE |
+| DATA_READING | YES | graph/table mapping rules | YES | LIMITED; scale-line integrity applies to learner-read axes | PRODUCTION_CANDIDATE |
 | WORD_PROBLEM_GENERIC | partial by selected skill | varies | core only | not systematic | SUPPORTED_GENERIC |
 
 ## Promotion rule
@@ -35,13 +36,11 @@ To promote a candidate domain to `PRODUCTION_HARDENED`:
 7. failure/repair examples are documented;
 8. one-page policy and render-path behavior are covered by regression.
 
-For instrument-reading domains, every instructional instrument in the 10 render audits must be inspected individually; one wrong instrument makes that worksheet a failed render case.
+For instrument-reading domains, every instructional instrument in the 10 render audits must be inspected individually. One wrong instrument makes that worksheet a failed render case.
 
-For text-heavy/calculation domains, artifact audit checks page count, Thai/numeral fidelity, exact values/givens, answer leakage, writable response space, cropping and print usability.
+Renderer-side self-review/revise is required as a prevention layer for learner-read instruments but does not count as actual-render evidence.
 
 ## Academic maturity vs overall maturity
-
-A domain may have deterministic mature academic rules while overall status remains `PRODUCTION_CANDIDATE` because artifact evidence is incomplete.
 
 Do not conflate:
 
@@ -50,6 +49,8 @@ with
 `OVERALL DOMAIN MATURITY`
 with
 `ARTIFACT RELEASE STATUS`.
+
+A domain can have deterministic rules while remaining `PRODUCTION_CANDIDATE` because artifact evidence is incomplete.
 
 ## Render-path evidence
 
@@ -64,7 +65,7 @@ A strong path does not harden untested paths automatically.
 
 ## Demotion rule
 
-A hardened domain is demoted if a new systemic defect can produce academically wrong/unusable output without being caught by current QA, or if the claimed maturity cannot be supported by documented evidence.
+A hardened domain is demoted if a new systemic defect can produce academically wrong/unusable output without being caught by current QA, or if claimed maturity cannot be supported by documented evidence.
 
 ## Existing weight evidence
 
@@ -80,33 +81,60 @@ KAN-V2-01 (2026-08-30):
 
 See `qa/KAN_V2_01_SCALE_RENDER_AUDIT_2026-08-30.md`.
 
+## 2.6.2 instrument-safety evidence
+
+### Ruler actual-render regression
+
+A user-supplied 2026-08-31 artifact showed too many graduation lines in a 1 cm span at 1 mm resolution. The defect is classified `CRITICAL_ACADEMIC` and documented in:
+
+`qa/ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md`
+
+Canonical oracle:
+
+- 10 intervals per cm;
+- 11 endpoint-inclusive positions;
+- 9 interior positions;
+- physical ruler edge is not a graduation.
+
+This actual defect does not harden the domain; it provides negative evidence and a permanent regression requirement.
+
+### Speedometer
+
+`SPEEDOMETER_READING_ENGINE.md` adds deterministic direct speedometer reading in 2.6.2. Prompt/regression evidence exists, but no production-hardening claim is allowed until ≥10 actual rendered worksheets for the claimed render path pass instrument-by-instrument inspection.
+
+### Thermometer
+
+2.6.2 strengthens exact graduation topology, representability, endpoint alignment and mandatory renderer review/revise. Artifact maturity remains LIMITED until the promotion threshold is met.
+
 ## Baseline 2.6 expansion evidence note
 
-The following 2.6 capabilities have deterministic prompt rules/regressions but **must not be promoted solely from documentation changes**:
+The following capabilities have deterministic prompt rules/regressions but must not be promoted solely from documentation changes:
 
-- hours/minutes/seconds conversion and second-precision time tasks
+- seconds/time conversion tasks
 - mixed-unit length conversion/arithmetic
-- nonzero ruler starts
+- nonzero ruler starts and 1 mm subdivision integrity
 - multi-segment/round-trip/route-comparison distance
+- direct speedometer reading
 - angle/protractor reading
 - perimeter/area/circle measurement and squared-unit conversion
 - weight arithmetic/conversion
-- capacity arithmetic/conversion
-- rectangular-prism/simple composite rectangular-prism volume
-- cm³/dm³/m³ conversion and capacity-volume relations
+- thermometer reading
+- capacity arithmetic/conversion/meniscus
+- rectangular-prism/simple composite volume
+- cubic-unit conversion/capacity-volume relations
+- learner-read graph axes
 
-They remain `PRODUCTION_CANDIDATE` until the promotion evidence above is recorded.
+They remain `PRODUCTION_CANDIDATE` until promotion evidence is recorded.
 
 ## Current priority backlog
 
-1. TIME: audit ≥10 actual DOCUMENT_FIRST/HYBRID worksheets including second-unit tasks.
-2. CLOCK: actual-render audit including half-hour, 5-minute and DAY_NIGHT_PAIR cases.
-3. SCALE: full hybrid generative-context + deterministic-dial audit.
-4. LENGTH: ruler 1 mm spacing, zero/nonzero starts and mixed-unit outputs.
-5. DISTANCE: 10 text/document worksheets including asymmetric round trips and route comparison.
-6. ANGLE: 10 protractor worksheets covering left/right zero baselines and inner/outer scale ambiguity.
-7. PERIMETER/AREA: 10 worksheets covering formula/diagram fidelity, squared units and circle π policy.
-8. TEMPERATURE/CAPACITY: actual graduation/level/meniscus audits.
-9. VOLUME: diagrams, dimension-label fidelity, cubic-unit conversion and composite decomposition.
-10. DATA_READING: deterministic graph/table overlay audits.
-11. reusable deterministic reference templates for learner-read instruments.
+1. LENGTH: audit ≥10 actual ruler worksheets, including 1 mm subdivisions and explicit recount of 10 intervals /11 positions /9 interior positions.
+2. SPEEDOMETER: audit ≥10 actual open-arc speedometer worksheets, including major/minor ticks, inactive gap and needle alignment.
+3. TEMPERATURE: audit ≥10 actual thermometer worksheets across canonical profiles and endpoint positions.
+4. CLOCK: actual-render audit including half-hour, 5-minute and DAY_NIGHT_PAIR cases.
+5. SCALE: full hybrid generative-context + deterministic-dial audit.
+6. ANGLE: 10 protractor worksheets covering baseline/direction/dual-scale ambiguity.
+7. CAPACITY: actual graduation/level/meniscus audits.
+8. DATA_READING: deterministic graph-axis/table overlay audits.
+9. TIME/DISTANCE/PERIMETER/AREA/VOLUME: complete path-specific artifact evidence thresholds.
+10. reusable deterministic reference templates for every learner-read instrument.
