@@ -1,21 +1,23 @@
 # Scale-Line Integrity Profile — All Learner-Read Scales
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
 Primary auditor: `W07_INSTRUMENT_AUDITOR`
+Companion prevention profile: `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 
 Applies whenever a learner reads graduations, ticks, marks, grid/axis intervals, or a pointer/level against a scale, including:
 
 - analog clock minute/hour marks
 - weight/dial scales
 - rulers and linear measuring scales
+- **vehicle speedometers / open-arc speed dials**
 - thermometers
 - graduated capacity containers
 - semicircular/full-circle protractors
 - learner-read graph axes
 
-This profile complements domain formulas. Owning domain workers define values/topology; this profile protects the physical/visual integrity of the scale lines used to represent them.
+This profile complements domain formulas. Owning domain workers define values/topology; this profile protects the physical/visual integrity of the scale lines used to represent them. The companion review-revise profile requires the downstream renderer to recount and repair learner-read instruments before finalization.
 
 ## 1. Core rule
 
@@ -54,8 +56,16 @@ The smallest instructional graduation defines the count.
 
 `EXPECTED_INTERVAL_COUNT=(MAX-MIN)/MINOR_INTERVAL`
 `EXPECTED_POSITION_COUNT=EXPECTED_INTERVAL_COUNT+1`
+`EXPECTED_INTERIOR_POSITION_COUNT=max(EXPECTED_POSITION_COUNT-2,0)`
 
 Both endpoints are physical scale positions.
+
+Canonical ruler 1 cm @1 mm:
+
+- 10 intervals
+- 11 endpoint-inclusive positions
+- 9 interior positions
+- physical ruler edge is not an extra graduation
 
 ### CYCLIC_FULL_CIRCLE
 
@@ -68,6 +78,8 @@ Analog clock full minute face: exactly 60 intervals / 60 positions.
 The active arc is endpoint-inclusive; the inactive/non-scale region contains no value ticks unless the owning domain explicitly defines otherwise.
 
 Canonical 0–5 kg teaching dial: 50 active intervals / 51 active positions plus a 60° inactive gap.
+
+Canonical 0–120 km/h speedometer with 10 km/h minor interval: 12 active intervals / 13 active positions plus a 120° inactive gap.
 
 ### PROTRACTOR_HALF_CIRCLE
 
@@ -194,17 +206,7 @@ Inside or immediately adjacent to an instructional instrument:
 
 Repeated instruments sharing the same configured scale must use one canonical `SCALE_LINE_SPEC`.
 
-Across those items, do not change:
-
-- count
-- spacing
-- major/minor hierarchy
-- label positions
-- active range
-- direction
-- reference ring/baseline
-- stroke hierarchy
-- inactive-region geometry
+Across those items, do not change count, spacing, hierarchy, label positions, active range, direction, reference ring/baseline, stroke hierarchy or inactive-region geometry.
 
 Only the intended item state (pointer/hand/level/endpoints/data value) may change.
 
@@ -218,7 +220,7 @@ Only the intended item state (pointer/hand/level/endpoints/data value) may chang
 - major hour marks stronger than minute marks but do not add positions;
 - all radial ticks share one ring and consistent orientation.
 
-### Dial scale
+### Weight dial
 - honor owning-domain active sweep and inactive gap;
 - all active ticks lie on the same arc/ring;
 - endpoint ticks are present exactly once;
@@ -227,12 +229,23 @@ Only the intended item state (pointer/hand/level/endpoints/data value) may chang
 ### Ruler
 - every graduation begins on the authoritative ruler baseline/edge;
 - cm marks stronger/longer than mm marks;
-- physical ruler edge must not substitute for the zero graduation.
+- physical ruler edge must not substitute for or add to the zero graduation;
+- at 1 mm resolution every 1 cm span has exactly 10 intervals / 11 positions / 9 interior positions;
+- a 5 mm hierarchy mark occupies an existing position and never adds a new one.
+
+### Speedometer
+- topology is the owning-domain open arc, not an invented full circle;
+- all active ticks share one reading ring;
+- canonical 0–120 km/h profile has 12 intervals / 13 positions and a 120° inactive gap;
+- one instructional needle only;
+- needle endpoint intersects the exact target tick on the reading ring;
+- no value ticks in the inactive gap.
 
 ### Thermometer
 - graduations are perpendicular to one straight scale axis;
 - labels align to configured major ticks;
-- liquid endpoint aligns to the target graduation centerline.
+- liquid endpoint aligns to the target graduation centerline;
+- discrete targets do not sit between ticks.
 
 ### Graduated container
 - scale lines are parallel and anchored consistently to one side/reference edge;
@@ -255,18 +268,21 @@ Only the intended item state (pointer/hand/level/endpoints/data value) may chang
 
 The final prompt must include the resolved `SCALE_LINE_SPEC` once per canonical scale template and exact item states separately.
 
-Do not rely on vague phrases such as:
-
-- `draw clear scale marks`
-- `use normal ruler ticks`
-- `make a realistic thermometer`
-- `standard graph axis`
-
-without count, interval, direction, anchoring, hierarchy, and endpoint semantics.
+Do not rely on vague phrases such as `draw clear scale marks`, `use normal ruler ticks`, `make a realistic thermometer`, `standard speedometer`, or `standard graph axis` without count, interval, direction, anchoring, hierarchy, and endpoint semantics.
 
 `PROMPT_SCALE_LINE_SERIALIZATION_QA` blocks release if the final prompt leaves scale-line geometry to renderer invention.
 
-## 15. Artifact phase
+## 15. Mandatory renderer review linkage
+
+For every learner-read instrument, scale-line rules must be consumed by the mandatory `INSTRUMENT_REVIEW_REVISE_PROTOCOL`.
+
+The renderer must independently recount/rederive the visible scale against this profile and the owning domain state. If any count, spacing, anchoring, label, target-alignment or inactive-region mismatch is detected, repair/regenerate and re-run the entire instrument checklist before finalization.
+
+`NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
+
+Renderer self-review remains a prevention layer and does not prove actual artifact correctness.
+
+## 16. Artifact phase
 
 Prompt QA cannot prove actual drawn scale lines.
 
@@ -290,7 +306,7 @@ For every rendered learner-read scale inspect, at minimum:
 
 One incorrect instructional scale blocks classroom release.
 
-## 16. Mandatory QA family
+## 17. Mandatory QA family
 
 `PROMPT_SCALE_LINE_SPEC_QA`
 `PROMPT_SCALE_TICK_ANCHOR_QA`
