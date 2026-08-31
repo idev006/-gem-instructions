@@ -47,6 +47,9 @@ jobs:
       - name: Instrument review + speedometer regression — 60 cases
         run: python gems/activity-based-elementary-worksheet/tools/instrument_review_speedometer_regression_suite.py
 
+      - name: Protractor scale safety regression — 24 cases
+        run: python gems/activity-based-elementary-worksheet/tools/protractor_scale_safety_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
