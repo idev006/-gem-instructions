@@ -32,10 +32,10 @@ REQUIRED_FILES = [
     "KB_ROUTER.md",
     "KB_MANIFEST.md",
     "policies/PARAMETER_POLICY.md",
+    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
     "domains/DOMAIN_REGISTRY.md",
     "domains/MEASUREMENT_COVERAGE_P1_P6.md",
     "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md",
-    "domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
     "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md",
     "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
     "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md",
@@ -69,6 +69,12 @@ CHECKS = {
         "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
         "PROTRACTOR_RANGE=0_180|0_360", "DM3", "PI_POLICY",
     ],
+    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md": [
+        "CLOCK_READING_MODE=DAY_NIGHT_PAIR", "ONE_CLOCK_TWO_ANSWERS=YES",
+        "ANSWER_FIELDS_PER_QUESTION=2", "TARGET_MINUTE_SET={30}",
+        "ONE_PAGE_LOCK=OFF", "minute_angle=180°",
+        "do not reduce to only 5-minute ticks",
+    ],
     "workers/W02_TIME_CLOCK.md": [
         "Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}",
         "กลางวัน = h12+12", "กลางคืน = h12+12",
@@ -79,11 +85,6 @@ CHECKS = {
         "06:30 → กลางวัน 06:30 | กลางคืน 18:30",
         "12:15 → กลางวัน 12:15 | กลางคืน 00:15",
         "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
-    ],
-    "domains/THAI_P3_CLOCK_RUNTIME_PROFILE.md": [
-        "THAI_P3_CLOCK_RUNTIME_PROFILE", "DAY_NIGHT_PAIR",
-        "TARGET_MINUTE_SET={30}", "ANSWER_FIELDS_PER_QUESTION=2",
-        "ONE_PAGE_LOCK=OFF", "EXACT NUMERIC ANGLES",
     ],
     "workers/W04_LENGTH_DISTANCE.md": [
         "CYCLIC_FULL_CIRCLE", "360 equal intervals / 360 distinct positions",
@@ -100,12 +101,11 @@ CHECKS = {
         "DN-19 — false-PASS prevention",
     ],
     "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md": [
-        "UAT", "one clock", "two", "ONE_PAGE_LOCK=OFF",
-        "numeric angles", "canonical",
+        "UAT-01", "UAT-03", "UAT-05", "UAT-06", "UAT-10", "821/821 PASS",
     ],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
     "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES) == 360"],
-    "tools/runtime_uat_regression_suite.py": ["12", "821"],
+    "tools/runtime_uat_regression_suite.py": ["12/12 PASS", "profile-embedded-main"],
     "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["821/821 PASS", "runtime_uat_regression_suite.py"],
 }
 
@@ -166,7 +166,7 @@ def main() -> int:
         errors.append("0_360 protractor exposed without deterministic full-circle topology")
 
     stale = re.compile(r"(?:baseline|Version:|Compatible Gem baseline:)[^\n]*(?:2\.3\.|2\.4\.|2\.5\.)", re.I)
-    for rel in ["GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md", "domains/DOMAIN_REGISTRY.md", *WORKERS.values()]:
+    for rel in ["GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md", "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md", "domains/DOMAIN_REGISTRY.md", *WORKERS.values()]:
         if stale.search(read(rel)): errors.append(f"{rel}: stale runtime baseline reference")
 
     if errors:
