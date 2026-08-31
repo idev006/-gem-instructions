@@ -3,8 +3,8 @@
 
 Structural/document-contract validation only. Executable prompt-system validation
 is performed by the 449-case core suite, 360-case declared-skill matrix,
-12-case runtime UAT regression suite, and 20-case semantic-oracle suite.
-None of these claims artifact pixels pass.
+12-case runtime UAT regression, 20-case semantic-oracle regression and
+30-case system-wide quality regression. None of these claims artifact pixels pass.
 """
 from __future__ import annotations
 
@@ -27,28 +27,18 @@ WORKERS = {
 }
 
 REQUIRED_FILES = [
-    "GEM_INSTRUCTIONS_PRODUCTION.md",
-    "OUTPUT_CONTRACT.md",
-    "ARCHITECTURE.md",
-    "KB_ROUTER.md",
-    "KB_MANIFEST.md",
-    "policies/PARAMETER_POLICY.md",
-    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
-    "domains/DOMAIN_REGISTRY.md",
-    "domains/MEASUREMENT_COVERAGE_P1_P6.md",
+    "GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md",
+    "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md",
+    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md",
+    "domains/DOMAIN_REGISTRY.md", "domains/MEASUREMENT_COVERAGE_P1_P6.md",
     "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md",
-    "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md",
-    "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
-    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md",
-    "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
-    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md",
-    "qa/DOMAIN_RELEASE_MATRIX.md",
+    "qa/PROMPT_GENERATOR_ACCEPTANCE_TESTS.md", "qa/MEASUREMENT_EXPANSION_REGRESSION_V2_6_0.md",
+    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md", "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
+    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md", "qa/DOMAIN_RELEASE_MATRIX.md",
     "examples/MEASUREMENT_COMMAND_CATALOG_P1_P6.md",
-    "tools/full_dry_run_suite.py",
-    "tools/full_skill_matrix_suite.py",
-    "tools/runtime_uat_regression_suite.py",
-    "tools/semantic_oracle_regression_suite.py",
-    "tools/build_install_package.py",
+    "tools/full_dry_run_suite.py", "tools/full_skill_matrix_suite.py",
+    "tools/runtime_uat_regression_suite.py", "tools/semantic_oracle_regression_suite.py",
+    "tools/system_wide_quality_regression_suite.py", "tools/build_install_package.py",
     *WORKERS.values(),
 ]
 
@@ -59,63 +49,23 @@ EXPECTED_DOMAINS = {
 }
 
 CHECKS = {
-    "GEM_INSTRUCTIONS_PRODUCTION.md": [
-        "Orchestrator", "W02_TIME_CLOCK", "FINAL_IMAGE_GENERATION_PROMPT",
-        "ARTIFACT_QA=NOT_YET_TESTED", "RENDER_ONLY_NOT_FOR_WORKSHEET",
-        "ONE_PAGE_LOCK=OFF",
-    ],
-    "policies/PARAMETER_POLICY.md": [
-        "CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR",
-        "TARGET_MINUTE_MODE=ANY_VALID|MULTIPLE_OF_GRANULARITY|EXACT_MINUTE_SET",
-        "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
-        "PROTRACTOR_RANGE=0_180|0_360", "DM3", "PI_POLICY",
-    ],
-    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md": [
-        "CLOCK_READING_MODE=DAY_NIGHT_PAIR", "ONE_CLOCK_TWO_ANSWERS=YES",
-        "ANSWER_FIELDS_PER_QUESTION=2", "TARGET_MINUTE_SET={30}",
-        "ONE_PAGE_LOCK=OFF", "minute_angle=180°",
-        "do not reduce to only 5-minute ticks",
-    ],
-    "tools/build_install_package.py": [
-        "MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK",
-        "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md",
-        "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md",
-        "semantic_oracle_regression_suite.py",
-        "841/841 PASS",
-    ],
-    "workers/W02_TIME_CLOCK.md": [
-        "Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}",
-        "กลางวัน = h12+12", "กลางคืน = h12+12",
-        "PROMPT_PER_ITEM_RENDER_STATE_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA",
-    ],
-    "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md": [
-        "01:30 → กลางวัน 13:30 | กลางคืน 01:30",
-        "06:30 → กลางวัน 06:30 | กลางคืน 18:30",
-        "12:15 → กลางวัน 12:15 | กลางคืน 00:15",
-        "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF",
-    ],
-    "workers/W04_LENGTH_DISTANCE.md": [
-        "CYCLIC_FULL_CIRCLE", "360 equal intervals / 360 distinct positions",
-        "no duplicated 0°/360° physical mark",
-    ],
-    "workers/W09_QA_RELEASE.md": [
-        "Critical QA is conjunctive", "PROMPT_RELEASE=BLOCKED",
-        "PROMPT_PAGE_LOCK_PROVENANCE_QA", "PROMPT_HALF_HOUR_INTENT_QA",
-        "PROMPT_DAY_NIGHT_MAPPING_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA",
-    ],
-    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md": [
-        "DN-01 — Thai P3 AUTO mode", "DN-10 — strict half-hour intent",
-        "DN-13 — numeric angles mandatory", "DN-17 — page-lock provenance",
-        "DN-19 — false-PASS prevention",
-    ],
-    "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md": [
-        "UAT-01", "UAT-03", "UAT-05", "UAT-06", "UAT-10", "821/821 PASS",
-    ],
+    "GEM_INSTRUCTIONS_PRODUCTION.md": ["Orchestrator", "W02_TIME_CLOCK", "FINAL_IMAGE_GENERATION_PROMPT", "ARTIFACT_QA=NOT_YET_TESTED", "RENDER_ONLY_NOT_FOR_WORKSHEET", "ONE_PAGE_LOCK=OFF"],
+    "policies/PARAMETER_POLICY.md": ["CLOCK_READING_MODE=AUTO|SINGLE|DAY_NIGHT_PAIR", "TARGET_MINUTE_MODE=ANY_VALID|MULTIPLE_OF_GRANULARITY|EXACT_MINUTE_SET", "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF", "PROTRACTOR_RANGE=0_180|0_360", "DM3", "PI_POLICY"],
+    "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md": ["CLOCK_READING_MODE=DAY_NIGHT_PAIR", "ONE_CLOCK_TWO_ANSWERS=YES", "ANSWER_FIELDS_PER_QUESTION=2", "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF", "minute_angle=180°", "do not reduce to only 5-minute ticks"],
+    "policies/SYSTEM_WIDE_QUALITY_PROFILE.md": ["SYSTEM_INDEPENDENT_ORACLE_QA", "SYSTEM_DIFFICULTY_FIDELITY_QA", "PROMPT_RENDER_STATE_SERIALIZATION_QA", "PROMPT_PAGE_POLICY_WORDING_QA", "PROMPT_QA_EVIDENCE_CONSISTENCY_QA", "SYSTEM_PHASE_BOUNDARY_QA"],
+    "tools/build_install_package.py": ["MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK", "MANDATORY SYSTEM-WIDE QUALITY PROFILE", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md", "system_wide_quality_regression_suite.py", "871/871 PASS"],
+    "workers/W02_TIME_CLOCK.md": ["Thai Grade 3 analog-clock reading", "TARGET_MINUTE_SET={30}", "กลางวัน = h12+12", "กลางคืน = h12+12", "PROMPT_PER_ITEM_RENDER_STATE_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA"],
+    "domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md": ["01:30 → กลางวัน 13:30 | กลางคืน 01:30", "06:30 → กลางวัน 06:30 | กลางคืน 18:30", "12:15 → กลางวัน 12:15 | กลางคืน 00:15", "TARGET_MINUTE_SET={30}", "ONE_PAGE_LOCK=OFF"],
+    "workers/W04_LENGTH_DISTANCE.md": ["CYCLIC_FULL_CIRCLE", "360 equal intervals / 360 distinct positions", "no duplicated 0°/360° physical mark"],
+    "workers/W09_QA_RELEASE.md": ["Critical QA is conjunctive", "PROMPT_RELEASE=BLOCKED", "PROMPT_PAGE_LOCK_PROVENANCE_QA", "PROMPT_HALF_HOUR_INTENT_QA", "PROMPT_DAY_NIGHT_MAPPING_QA", "PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA"],
+    "qa/CLOCK_DAY_NIGHT_SINGLE_FACE_REGRESSION_V2_6_X.md": ["DN-01 — Thai P3 AUTO mode", "DN-10 — strict half-hour intent", "DN-13 — numeric angles mandatory", "DN-17 — page-lock provenance", "DN-19 — false-PASS prevention"],
+    "qa/RUNTIME_UAT_CLOCK_REGRESSION_V2_6_X.md": ["UAT-01", "UAT-03", "UAT-05", "UAT-06", "UAT-10", "821/821 PASS"],
     "tools/full_dry_run_suite.py": ["expected 449", "assert len(CASES) == 449"],
     "tools/full_skill_matrix_suite.py": ["Expected case count: exactly 360", "assert len(CASES)==360,len(CASES)"],
     "tools/runtime_uat_regression_suite.py": ["12/12 PASS", "profile-embedded-main"],
     "tools/semantic_oracle_regression_suite.py": ["Expected case count: exactly 20", "assert len(CASES) == 20"],
-    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["841/841 PASS", "semantic_oracle_regression_suite.py"],
+    "tools/system_wide_quality_regression_suite.py": ["Expected case count: exactly 30", "assert len(CASES) == 30"],
+    "qa/BASELINE_2_6_0_RELEASE_CHECKLIST.md": ["871/871 PASS", "system_wide_quality_regression_suite.py"],
 }
 
 EXACT_RELATIONS = [
@@ -128,16 +78,13 @@ EXACT_RELATIONS = [
     ("domains/MEASUREMENT_COVERAGE_P1_P6.md", "1 m³ = 1,000,000 cm³"),
 ]
 
-
 def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
-
 
 def main() -> int:
     errors: list[str] = []
     for rel in REQUIRED_FILES:
-        if not (ROOT / rel).is_file():
-            errors.append(f"missing required file: {rel}")
+        if not (ROOT / rel).is_file(): errors.append(f"missing required file: {rel}")
     if errors:
         for e in errors: print("FAIL", e)
         return 1
@@ -175,7 +122,7 @@ def main() -> int:
         errors.append("0_360 protractor exposed without deterministic full-circle topology")
 
     stale = re.compile(r"(?:baseline|Version:|Compatible Gem baseline:)[^\n]*(?:2\.3\.|2\.4\.|2\.5\.)", re.I)
-    for rel in ["GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md", "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md", "domains/DOMAIN_REGISTRY.md", *WORKERS.values()]:
+    for rel in ["GEM_INSTRUCTIONS_PRODUCTION.md", "OUTPUT_CONTRACT.md", "ARCHITECTURE.md", "KB_ROUTER.md", "KB_MANIFEST.md", "policies/PARAMETER_POLICY.md", "policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md", "policies/SYSTEM_WIDE_QUALITY_PROFILE.md", "domains/DOMAIN_REGISTRY.md", *WORKERS.values()]:
         if stale.search(read(rel)): errors.append(f"{rel}: stale runtime baseline reference")
 
     if errors:
@@ -187,15 +134,16 @@ def main() -> int:
     print("baseline: 2.6.x")
     print("workers: 9/9 unique, schema=1")
     print("Thai P3 clock runtime profile + UAT regression: present")
+    print("system-wide quality runtime profile: present")
     print("generated runtime profile embedding: present")
     print("core dry-run: 449-case executable present")
     print("declared-skill matrix: 360-case executable present")
     print("runtime UAT regression: 12-case executable present")
     print("semantic oracle regression: 20-case executable present")
-    print("combined minimum release gate: 841 cases")
+    print("system-wide quality regression: 30-case executable present")
+    print("combined minimum release gate: 871 cases")
     print("artifact QA: NOT_YET_TESTED")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
