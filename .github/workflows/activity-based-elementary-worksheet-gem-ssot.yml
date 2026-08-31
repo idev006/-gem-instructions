@@ -53,6 +53,9 @@ jobs:
       - name: Full metrology audit — 80 cases
         run: python gems/activity-based-elementary-worksheet/tools/metrology_full_audit_regression_suite.py
 
+      - name: Actual weight-dial inactive-gap regression — 32 cases
+        run: python gems/activity-based-elementary-worksheet/tools/weight_dial_inactive_gap_regression_suite.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
