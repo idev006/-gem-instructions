@@ -26,10 +26,10 @@ add('inactive-gap',360-300==60)
 # 13-26 SSOT policy/worker integration
 policy=read('policies/WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.md')
 w03=read('workers/W03_WEIGHT_SCALE.md')
-w07=read('workers/W07_INSTRUMENT_AUDITOR.md')
 w08=read('workers/W08_LAYOUT_RENDER_THAI.md')
 w09=read('workers/W09_QA_RELEASE.md')
 w10=read('workers/W10_METROLOGY_ENGINEER.md')
+builder=read('tools/build_install_package.py')
 checks=[
 ('policy-intervals','INTERVALS_PER_KG=10' in policy),
 ('policy-positions','POSITIONS_PER_KG_ENDPOINT_INCLUSIVE=11' in policy),
@@ -38,8 +38,8 @@ checks=[
 ('policy-visible-angle-offsets','VISIBLE_TICK_ANGLE_OFFSETS_PER_KG' in policy and '54°' in policy),
 ('policy-half-index','HALF_KG_INTERMEDIATE_INDEX=5' in policy),
 ('policy-hard-negative','DO NOT simplify, omit, merge, or sparsify' in policy),
-('w03-local-count','INTERVALS_PER_KG=10' in w03 and 'INTERIOR_POSITIONS_PER_KG_SPAN=9' in w03),
-('w07-local-recount','LOCAL_SPAN_RECOUNT_CHECK' in w07 and 'INTERVALS_PER_KG=10' in w07),
+('w03-explicit-visible-set','VISIBLE_TICK_OFFSETS_PER_KG' in w03 and 'VISIBLE_TICK_ANGLE_OFFSETS_PER_KG' in w03),
+('w07-runtime-policy-bundle',"'W07_INSTRUMENT_AUDITOR.txt':['workers/W07_INSTRUMENT_AUDITOR.md','domains/INSTRUMENT_READING_ENGINE.md',WEIGHT_VISIBLE_PROFILE]" in builder),
 ('w08-local-serialization','INTERVALS_PER_KG=10' in w08 and 'HALF_KG_INTERMEDIATE_OFFSET=0.5' in w08),
 ('w09-release-gate','PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA' in w09 and 'PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA' in w09),
 ('w10-independent-recount','INTERVALS_PER_KG=10' in w10 and 'LOCAL_SPAN_RECOUNT_CHECK' in w10),
@@ -49,7 +49,6 @@ checks=[
 for n,o in checks:add(n,o)
 
 # 27-32 release/package integration
-builder=read('tools/build_install_package.py')
 workflow=(REPO/'.github/workflows/activity-based-elementary-worksheet-gem-ssot.yml').read_text(encoding='utf-8')
 for n,o in [
 ('builder-policy','WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.md' in builder),
@@ -57,7 +56,7 @@ for n,o in [
 ('builder-effective-total','1430/1430 PASS' in builder),
 ('workflow-suite','Weight dial visible subdivision regression — 32 cases' in workflow),
 ('builder-defect-doc','ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md' in builder),
-('policy-bundled-team',all(worker in builder for worker in ['W03_WEIGHT_SCALE.txt','W07_INSTRUMENT_AUDITOR.txt','W08_LAYOUT_RENDER_THAI.txt','W09_QA_RELEASE.txt','W10_METROLOGY_ENGINEER.txt'])),
+('policy-bundled-team',all(token in builder for token in ["'W03_WEIGHT_SCALE.txt'","'W07_INSTRUMENT_AUDITOR.txt'","'W08_LAYOUT_RENDER_THAI.txt'","'W09_QA_RELEASE.txt'","'W10_METROLOGY_ENGINEER.txt'",'WEIGHT_VISIBLE_PROFILE'])),
 ]:add(n,o)
 
 assert len(CASES)==32,len(CASES)
@@ -70,5 +69,5 @@ print('WEIGHT DIAL VISIBLE SUBDIVISION REGRESSION: PASS')
 print('cases: 32')
 print('pass: 32')
 print('fail: 0')
-print('per-kg visible tick-set + midpoint hierarchy + package integration: 32/32 PASS')
+print('per-kg visible tick-set + midpoint hierarchy + runtime integration: 32/32 PASS')
 print('artifact QA: supplied defective artifact remains FAIL; future renders NOT_YET_TESTED')
