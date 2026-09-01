@@ -63,6 +63,33 @@ Every complete 1 kg span must serialize and verify:
 
 Within each 1 kg span, the whole-kilogram endpoints are major ticks; the existing +0.5 kg position is an intermediate tick; all other interior 0.1 kg positions are ordinary minor ticks. The +0.5 kg intermediate tick must be visually longer/more prominent than ordinary minor ticks but shorter/weaker than a whole-kilogram major tick. It never creates an extra graduation.
 
+### Visible tick-set serialization — MANDATORY
+
+The renderer must receive the physical graduation set explicitly; numeric interval counts alone are not sufficient.
+
+For every integer kilogram span `k → k+1`, `k=0..4`:
+
+`VISIBLE_TICK_OFFSETS_PER_KG={0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0}`
+`VISIBLE_TICK_ANGLE_OFFSETS_PER_KG={0°,6°,12°,18°,24°,30°,36°,42°,48°,54°,60°}`
+`HALF_KG_INTERMEDIATE_INDEX=5`
+`LOCAL_SPAN_VISIBLE_TICK_RECOUNT_REQUIRED=YES`
+
+Therefore the 0→1 kg span is exactly:
+
+`0.0@0°, 0.1@6°, 0.2@12°, 0.3@18°, 0.4@24°, 0.5@30°, 0.6@36°, 0.7@42°, 0.8@48°, 0.9@54°, 1.0@60°`.
+
+Every one of those 11 endpoint-inclusive positions must be physically drawn. The renderer must not simplify the scale to fewer visible graduations for aesthetics, spacing, theme, or page density.
+
+For each span, W03 must provide or require a visible recount:
+- 10 spaces between adjacent whole-kilogram labels;
+- 9 interior graduation marks;
+- the fifth interval (+0.5 kg) is the single intermediate hierarchy mark;
+- 8 other interior marks are ordinary 0.1 kg minor ticks.
+
+Hard negative:
+
+`DO NOT simplify, omit, merge, or sparsify 0.1 kg graduations between whole-kilogram labels.`
+
 Hard negatives:
 
 - **DO NOT** reverse the label sequence;
@@ -71,7 +98,8 @@ Hard negatives:
 - **DO NOT** continue ticks through the 5→0 gap;
 - **DO NOT** move the needle pivot away from the center used to construct the reading ring;
 - **DO NOT** render all ten 0.1 kg subdivisions with identical hierarchy when the canonical teaching profile requires the +0.5 kg intermediate tick;
-- **DO NOT** add an extra tick at +0.5 kg.
+- **DO NOT** add an extra tick at +0.5 kg;
+- **DO NOT** reduce the number of visible 0.1 kg graduations between integer labels.
 
 Target mapping for canonical 0.1 kg profile:
 
@@ -163,5 +191,9 @@ The needle is a radial segment beginning at `DIAL_CENTER` and directed at `targe
 `PROMPT_DIAL_GAP_DECORATION_ISOLATION_QA`
 `PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA`
 `PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA`
+`PROMPT_WEIGHT_VISIBLE_TICK_SET_SERIALIZATION_QA`
+`PROMPT_WEIGHT_PER_KG_VISIBLE_INTERVAL_COUNT_QA`
+`PROMPT_WEIGHT_PER_KG_VISIBLE_POSITION_COUNT_QA`
+`PROMPT_WEIGHT_VISIBLE_TICK_RECOUNT_PROTOCOL_QA`
 
-Wrong conversion/arithmetic, reversed/scrambled major-label order, wrong per-kilogram subdivision or missing/extra half-kilogram hierarchy mark, full-circle substitution, any radial scale-like mark in the inactive gap, off-center pivot, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
+Wrong conversion/arithmetic, reversed/scrambled major-label order, wrong per-kilogram subdivision or missing/extra half-kilogram hierarchy mark, missing/sparsified 0.1 kg visible graduations, full-circle substitution, any radial scale-like mark in the inactive gap, off-center pivot, wrong target mapping, wrong canonical label angle, or label/target leak blocks release.
