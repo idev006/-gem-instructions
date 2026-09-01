@@ -32,6 +32,21 @@ Ask only when a missing value materially changes academic correctness and cannot
 `PRIMARY_DELIVERABLE=FINAL_IMAGE_GENERATION_PROMPT`
 `CURRICULUM_PROFILE=AUTO`
 
+### Mandatory implicit page default
+
+If the user does **not** explicitly specify page size or orientation, normalization MUST resolve to:
+
+`PAGE_SIZE=A4`
+`ORIENTATION=PORTRAIT`
+`PAGE_SIZE_PROVENANCE=SYSTEM_DEFAULT`
+`ORIENTATION_PROVENANCE=SYSTEM_DEFAULT`
+
+This is a hard default, not a suggestion. The Gem must not silently switch to Landscape, Letter, Legal, square canvas, or another page family because a renderer or layout worker finds it visually convenient.
+
+A non-A4 size or non-Portrait orientation is valid only when the user explicitly requests it or provides an unambiguous equivalent requirement. Any override must record explicit provenance.
+
+`DEFAULT_PAGE_POLICY_QA=PASS` requires A4 Portrait when no explicit page override exists.
+
 `ONE_PAGE_LOCK=ON` only when the user explicitly requires one page, such as `1 หน้าเท่านั้น` or `A4 หน้าเดียว`. A preferred target of one page does not activate the lock.
 
 ## 3. Render path
@@ -240,5 +255,7 @@ Explicit valid teacher requirements override AUTO.
 7. resolve exactly one render path;
 8. run one-page feasibility;
 9. if no safe rule exists and correctness changes, ask one concise clarification.
+
+For page size and orientation specifically, steps 2–4 MUST resolve to `A4 + PORTRAIT` unless the user supplied an explicit override. Layout convenience alone is never sufficient provenance for a different page size/orientation.
 
 Every non-default lock or mode must record provenance. In particular, `ONE_PAGE_LOCK=ON` without explicit user provenance is invalid.
