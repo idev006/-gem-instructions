@@ -127,11 +127,80 @@ Canonical quarter-hour relations for any starting hour `h`:
 - exactly halfway 10–11
 - hard negative: never directly on 10
 
-Every nonzero-minute item includes **all four** renderer-state components:
+## Deterministic vector endpoint state — MANDATORY
 
-`SEMANTIC TARGET + EXACT NUMERIC ANGLES + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
+Actual artifact evidence showed that correct formulas and relational wording alone are insufficient: a renderer can still draw an hour hand on an approximate or snapped ray. W02 therefore owns a numeric vector endpoint state for every hand.
 
-Missing numeric hand angles for a high-risk clock item blocks prompt release.
+Angle convention: 0° at 12 o'clock, positive clockwise.
+
+For angle `θ`:
+
+`UNIT_DIRECTION_X = sin(radians(θ))`
+`UNIT_DIRECTION_Y = -cos(radians(θ))`
+
+Use normalized center `C=(0,0)` and normalized radius `R=1` in renderer metadata:
+
+`MINUTE_HAND_LENGTH_RATIO=0.78`
+`HOUR_HAND_LENGTH_RATIO=0.55`
+
+`MINUTE_ENDPOINT_NORMALIZED=(0.78*sin(radians(minute_angle)), -0.78*cos(radians(minute_angle)))`
+
+`HOUR_ENDPOINT_NORMALIZED=(0.55*sin(radians(hour_angle)), -0.55*cos(radians(hour_angle)))`
+
+The downstream renderer may uniformly scale/translate the complete clock but MUST NOT independently move, rotate, snap, or aesthetically adjust either endpoint.
+
+Every hand is the exact straight segment:
+
+`HAND_SEGMENT = CLOCK_CENTER → COMPUTED_ENDPOINT`
+
+### Anti-snap invariant
+For every `m != 0`:
+
+`HOUR_DISPLACEMENT_FROM_START_HOUR_DEG = 0.5*m`
+
+The renderer is forbidden to reduce this displacement. For example:
+- 3:30 → hour angle 105°, not 90°;
+- 9:30 → hour angle 285°, not 270°;
+- 11:45 → hour angle 352.5°, not 330°;
+- 2:45 → hour angle 82.5°, not 60°.
+
+### Mandatory atomic renderer-only state
+Every analog clock item MUST return all of these fields:
+
+`SEMANTIC_TARGET`
+`CLOCK_CENTER_NORMALIZED=(0,0)`
+`CLOCK_RADIUS_NORMALIZED=1`
+`MINUTE_HAND_ANGLE_DEG`
+`HOUR_HAND_ANGLE_DEG`
+`MINUTE_HAND_LENGTH_RATIO=0.78`
+`HOUR_HAND_LENGTH_RATIO=0.55`
+`MINUTE_ENDPOINT_NORMALIZED`
+`HOUR_ENDPOINT_NORMALIZED`
+`RELATIONAL_VERIFICATION`
+`ITEM_SPECIFIC_HARD_NEGATIVE`
+
+If any endpoint field is missing, `PROMPT_CLOCK_VECTOR_ENDPOINT_QA=FAIL`.
+
+### Required examples
+3:30:
+- minute angle 180°
+- hour angle 105°
+- minute endpoint ≈ `(0.000000,0.780000)`
+- hour endpoint ≈ `(0.531259,0.142350)`
+- relation: exactly halfway between 3 and 4
+- hard negative: do not draw the short hand directly at 3 or 4
+
+2:45:
+- minute angle 270°
+- hour angle 82.5°
+- relation: exactly 75% from 2 toward 3
+- hard negative: do not draw the short hand directly at 2 or 3
+
+Every nonzero-minute item includes **all five** geometry/verification components:
+
+`SEMANTIC TARGET + EXACT NUMERIC ANGLES + EXACT NORMALIZED ENDPOINTS + RELATIONAL WORDING + ITEM-SPECIFIC HARD NEGATIVE`
+
+Missing numeric hand angles or endpoint vectors for a high-risk clock item blocks prompt release.
 
 ## Deterministic Thai day/night mapping
 
@@ -164,10 +233,11 @@ Default student-visible response line:
 - semantic target times
 - paired day/night answer values
 - hand angles
+- hand endpoint coordinates
 - target tick/index values
 - renderer relation strings
 
-Clock target time/angles belong only to INTERNAL state and teacher-visible renderer metadata in the Final Prompt, marked `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
+Clock target time/angles/endpoints belong only to INTERNAL state and teacher-visible renderer metadata in the Final Prompt, marked `RENDER_ONLY_NOT_FOR_WORKSHEET — USE TO DRAW; DO NOT PRINT AS TEXT.`
 
 Clock numerals 1–12 remain visible when configured.
 
@@ -193,6 +263,9 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_NONZERO_MINUTE_DISPLACEMENT_QA`
 `PROMPT_HALF_HOUR_MIDPOINT_QA`
 `PROMPT_CLOCK_QUARTER_HOUR_INTERPOLATION_QA`
+`PROMPT_CLOCK_VECTOR_ENDPOINT_QA`
+`PROMPT_CLOCK_RADIAL_COLLINEARITY_QA`
+`PROMPT_CLOCK_ANTI_SNAP_QA`
 `PROMPT_DAY_NIGHT_MAPPING_QA`
 `PROMPT_DAY_NIGHT_SINGLE_FACE_QA`
 `PROMPT_DAY_NIGHT_TWO_BLANKS_QA`
@@ -200,4 +273,4 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_STUDENT_BLUEPRINT_ISOLATION_QA`
 `PROMPT_CLOCK_LABEL_PRESERVATION_QA`
 
-Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles, pinned nonzero-minute hour hand, wrong quarter/half-hour interpolation, Student Blueprint target leak, or filled answer blocks release.
+Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles/endpoints, pinned nonzero-minute hour hand, wrong quarter/half-hour interpolation, Student Blueprint target leak, or filled answer blocks release.
