@@ -1,6 +1,6 @@
 # Instrument Review–Revise Profile — Mandatory Renderer Self-Check
 
-Version: 1.2.0
+Version: 1.3.0
 Status: Mandatory cross-domain runtime profile
 Compatible Gem baseline: 2.6.x
 Applies to: every learner-read instrument/scale and every final image-generation prompt
@@ -127,11 +127,25 @@ For 0–50°C @1°C:
 - no value/pseudo-ticks in inactive gap;
 - no full-circle substitution.
 
-### Clock
+### Clock — deterministic vector geometry
 - 60 distinct minute positions when required;
 - no duplicate wrap tick;
-- both hands share exact pivot;
-- hand angles and continuous hour-hand placement match semantic time.
+- both hands share exact pivot `C`;
+- `minute_angle=6*m`;
+- `hour_angle=30*(h mod 12)+0.5*m`;
+- normalized direction for angle `θ` is `(sin θ, -cos θ)` under 0°=12, clockwise-positive convention;
+- minute endpoint uses length ratio `0.78R`;
+- hour endpoint uses length ratio `0.55R`;
+- each hand is the exact straight segment from `C` to its computed endpoint;
+- endpoint vector is radial/collinear with the formula-derived angle;
+- renderer must not snap, approximate, independently rotate, or aesthetically reposition the endpoint;
+- for nonzero minutes, hour displacement from the whole-hour ray is exactly `0.5*m` degrees;
+- :15 = 7.5° displacement, :30 =15°, :45 =22.5°;
+- 3:30 must be 105° for the hour hand, never 90°;
+- 9:30 must be 285°, never 270°;
+- exact angles + normalized endpoints + relational wording + item-specific hard negative are all required in renderer-only state.
+
+Any clock whose nonzero-minute hour hand visually lands on the starting whole-hour ray is `CRITICAL_ACADEMIC` even if the semantic target text is correct.
 
 ### Weight dial
 Canonical 0–5 kg @0.1:
@@ -179,6 +193,7 @@ When learner-read instruments exist, final prompt must include a compact `INSTRU
 - no blind first-pass release;
 - deterministic recount/recheck;
 - common-center/origin check where applicable;
+- exact endpoint/radial-vector rederivation for clock hands;
 - shape-integrity check;
 - repair/regenerate on mismatch;
 - finalization only after all instruments pass;
@@ -193,6 +208,8 @@ Gate: `PROMPT_INSTRUMENT_REVIEW_PROTOCOL_SERIALIZATION_QA`.
 - W08 ensures layout/render decisions preserve both audits and serializes review protocol.
 - W09 verifies W07/W10 evidence is present and consistent; any contradiction blocks prompt release.
 
+For analog clocks specifically, W07/W10 must independently verify endpoint vector collinearity and anti-snap displacement; W08 must preserve endpoint metadata in the final prompt; W09 must block missing endpoint evidence through the generic per-item/review/metrology gates.
+
 Mandatory learner-read route includes `W07 + W10 + W08 + W09` in addition to owning worker.
 
 ## 12. Artifact boundary
@@ -204,7 +221,7 @@ Even when renderer self-review and W10 audit are mandatory:
 
 until actual worksheet is inspected.
 
-If artifact contains incorrect scale/pivot/label order/distorted instrument:
+If artifact contains incorrect scale/pivot/label order/distorted instrument or a clock hand endpoint inconsistent with the target time:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
@@ -226,5 +243,8 @@ and defect becomes permanent regression.
 `PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA` when applicable
 `PROMPT_METROLOGY_AUDIT_REQUIRED_QA`
 `PROMPT_METROLOGY_INDEPENDENCE_QA`
+`PROMPT_CLOCK_VECTOR_ENDPOINT_QA` when analog clock
+`PROMPT_CLOCK_RADIAL_COLLINEARITY_QA` when analog clock
+`PROMPT_CLOCK_ANTI_SNAP_QA` when analog clock
 
 Any applicable FAIL or NOT_RUN forces `PROMPT_RELEASE=BLOCKED`.
