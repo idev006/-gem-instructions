@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """System-wide cross-worker quality regression for baseline 2.6.x.
 
-Protects architecture-level guarantees. W10-specific quantitative coverage is
-additive in metrology/full-line suites. Expected case count: exactly 30.
+Protects architecture-level guarantees. W10-specific quantitative coverage and
+primary-school pedagogy coverage are additive in dedicated suites.
+Expected case count: exactly 30.
 """
 from pathlib import Path
 import sys
@@ -21,13 +22,13 @@ compact=builder.replace(' ','')
 checks=[
 ('builder-shared-profile-path','policies/SYSTEM_WIDE_QUALITY_PROFILE.md' in builder),
 ('builder-shared-profile-main','MANDATORY SYSTEM-WIDE QUALITY PROFILE' in builder),
-('builder-shared-profile-workers','SHARED_PROFILES' in builder and ('effective=[*SHARED_PROFILES,*sources]' in compact or 'effective_sources=[*SHARED_PROFILES,*sources]' in compact)),
+('builder-shared-profile-workers','SHARED_PROFILES' in builder and 'effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,*sources]' in compact),
 ('builder-system-gate','system_wide_quality_regression_suite.py' in builder),
-('builder-current-total','1366/1366 PASS' in builder),
+('builder-current-total','1494/1494 PASS' in builder),
 ('workflow-system-gate','System-wide quality regression' in workflow),
 ('workflow-30-cases','30 cases' in workflow),
 ('profile-atomic-block','Atomic renderer-state serialization' in profile),
-('profile-no-hard-page-drift','ONE_PAGE_LOCK=OFF' in profile and 'Hard one-page wording is forbidden' in profile),]
+('profile-no-hard-page-drift','ONE_PAGE_LOCK=OFF' in profile and 'Hard one-page wording is forbidden' in profile and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in profile),]
 for n,o in checks:add(n,o)
 assert len(CASES)==30,len(CASES)
 failed=[c for c in CASES if not c[1]]
