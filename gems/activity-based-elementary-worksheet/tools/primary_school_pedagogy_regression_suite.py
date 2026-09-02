@@ -58,7 +58,7 @@ for name,ok in [
 ('p4p6-write-6mm','P4–P6: 6 mm' in profile),
 ('one-primary-action','one primary cognitive action' in profile),
 ('no-color-only','do not encode essential meaning by color alone' in profile),
-('paginate-before-degrade','paginate' in profile and 'Never degrade instructional geometry' not in profile),
+('paginate-before-degrade','paginate' in profile and 'Never degrade instructional geometry' in profile),
 ('answer-format-gate','PROMPT_LEARNER_ANSWER_FORMAT_QA' in profile),
 ]: add(name,ok)
 
