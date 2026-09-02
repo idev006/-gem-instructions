@@ -9,7 +9,7 @@ Status: Canonical production installation inventory
 
 Gemini Knowledge file limit is treated as 10 files. Baseline 2.6.3-LTS uses **10 base Knowledge workers**. W10 is the independent measurement/metrology engineer, not a hotfix override.
 
-The main Gem Instructions field uses `GEM_INSTRUCTIONS_PRODUCTION.md` and is not counted as one of the ten Knowledge workers.
+The main Gem Instructions field uses generated Orchestrator Instructions and is not counted as one of the ten Knowledge workers.
 
 ## 2. Required workers
 
@@ -27,13 +27,12 @@ The main Gem Instructions field uses `GEM_INSTRUCTIONS_PRODUCTION.md` and is not
 | W10_METROLOGY_ENGINEER | `workers/W10_METROLOGY_ENGINEER.md` | independent metrology, common-center/shape/print/page audit |
 
 Every base worker declares:
-
 `BASELINE_COMPATIBILITY=2.6.x`
 `WORKER_SCHEMA_VERSION=1`
 
-## 3. Five mandatory shared runtime profiles
+## 3. Mandatory runtime profiles
 
-Every W01–W10 Knowledge bundle embeds before worker/domain-specific SSOT:
+Every W01–W10 Knowledge bundle embeds five technical safety profiles:
 
 1. `policies/SYSTEM_WIDE_QUALITY_PROFILE.md`
 2. `policies/SCALE_LINE_INTEGRITY_PROFILE.md`
@@ -41,7 +40,13 @@ Every W01–W10 Knowledge bundle embeds before worker/domain-specific SSOT:
 4. `policies/METROLOGY_ASSURANCE_PROFILE.md`
 5. `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
-Missing any mandatory shared profile from a built worker bundle is `KB_COMPATIBILITY_QA=FAIL`.
+Every bundle also embeds the mandatory learner-facing profile:
+
+6. `policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
+
+The architecture continues to refer to the first five as the **five mandatory technical shared profiles**. The pedagogy profile is a separate mandatory cross-cutting learner contract, not a sixth base worker.
+
+Missing any required runtime profile from a built worker bundle is `KB_COMPATIBILITY_QA=FAIL`.
 
 ## 4. Independent instrument-safety chain
 
@@ -52,48 +57,58 @@ Whenever a student reads a visual scale:
 W10 independently recomputes quantitative evidence and may not echo W07 PASS.
 
 Mandatory learner-read state includes:
-
 `SCALE_LINE_SPEC`
 `INSTRUMENT_REVIEW_REVISE_PROTOCOL`
 `METROLOGY_AUDIT_STATE`
 `PHYSICAL_PAGE_STATE`
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
 
-For radial/angular instruments it also includes authoritative common-center/origin evidence.
+Academic geometry additionally requires:
+`ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED`
+`GENERATIVE_ART_MAY_NOT_REDRAW_ACADEMIC_GEOMETRY=YES`
+`CANONICAL_COORDINATE_SYSTEM_REQUIRED=YES`
+`POST_LAYOUT_GEOMETRY_TRANSFORM=UNIFORM_SCALE_AND_TRANSLATE_ONLY`
 
-## 5. Repository support files
+## 5. Primary-school learner-safety contract
+
+Every production route is subject to `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md` whether or not it contains an instrument.
+
+It checks grade appropriateness, instruction clarity, ambiguity, typography, response writing space, visual load, decoration isolation, item progression, answer-format alignment, print contrast and child-view artifact simulation.
+
+Default page format when the user gives no override is A4 Portrait. Pagination may use multiple A4 Portrait pages when unlocked.
+
+## 6. Repository support files
 
 Installable bundles include/derive from:
-
 - `GEM_INSTRUCTIONS_PRODUCTION.md`
 - `OUTPUT_CONTRACT.md`
 - `ARCHITECTURE.md`
 - `KB_ROUTER.md`
 - `KB_MANIFEST.md`
-- all five mandatory shared profiles
+- all five technical shared profiles
+- `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
 - deterministic domain engines
 - actual artifact regression evidence
-- full metrology, instrument geometry, physical-page and repository full-line regression tools.
+- clean-room pedagogy root-cause audit
+- full metrology, geometry, physical-page, pedagogy and repository full-line regression tools.
 
-## 6. Compatibility rule
+## 7. Compatibility rule
 
 `KB_COMPATIBILITY_QA=PASS` requires:
-
 1. W01..W10 all exist and are unique;
 2. each declares baseline2.6.x and schema1;
 3. W08/W09 available for every production request;
 4. W07+W10 both available whenever learner-read geometry is selected;
-5. all five mandatory shared profiles embedded in every generated worker bundle;
+5. all five technical profiles and the pedagogy profile embedded in every generated worker bundle;
 6. route/ownership matches `KB_ROUTER.md` and registry;
 7. speedometer engine embedded with W04;
 8. thermometer/capacity engines embedded with W05;
 9. W10 includes metrology and instrument context;
 10. all critical QA/regression files are coherent.
 
-## 7. Measurement capability requirements
+## 8. Measurement capability requirements
 
 Baseline2.6.x supports, grade/objective permitting:
-
 - analog clock reading;
 - weight/dial reading;
 - ruler/nonzero-start reading;
@@ -106,36 +121,37 @@ Baseline2.6.x supports, grade/objective permitting:
 
 Direct speedometer reading does not automatically enable speed-rate calculation.
 
-## 8. Known hardening requirements
+## 9. Known hardening requirements
 
-- clock: 60 minute positions and shared hand pivot;
-- weight dial: top-zero clockwise labels `{0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`, 50/51 active, gap `(300°,360°)`, pivot=center;
-- ruler 1cm @1mm: 10 intervals/11 positions/9 interior; edge not tick;
-- speedometer 0–120 @10: 12/13, 240° active,120° gap, pivot=center, radial needle;
-- protractor 0–180 @1°: perfect upper semicircle, 180/181, single active scale default, common center/origin, radial ticks, width70mm at0.60mm floor, shape-aware body height=W/2;
-- thermometer 0–50 @1: 50/51, 6 major/5 intermediate/40 minor, 10 intervals per10°C, endpoint aligned;
-- graduated container: exact read convention/no competing scale;
-- graph axis: equal-value interval→equal physical interval;
+- clock: 60 minute positions, shared pivot, continuous hour hand and deterministic vector endpoint;
+- weight dial: top-zero clockwise,50/51, exactly10 intervals/9 interior marks per kg, +0.5kg intermediate hierarchy, inactive gap clean, pivot=center;
+- ruler: 10/11/9 per cm, edge not tick, endpoint projections;
+- speedometer:12/13,240° active/120° gap,pivot=center,radial pointer;
+- protractor: perfect upper semicircle,180/181,single active scale default,common origin,radial ticks,width>=70mm,shape-aware height;
+- thermometer:50/51,6 major/5 intermediate/40 minor,local-span count,endpoint aligned;
+- graduated container: global and local span counts exact;
+- graph: canonical data mapped to exact 2D axis geometry;
 - renderer target/audit data stays out of Student Blueprint;
 - final render path resolves to one value;
-- no blind first-pass release;
+- academic geometry uses locked vector primitives;
 - numeric shape-aware page proof before page-fit PASS;
+- learner typography/writability/visual-load gates before prompt release;
 - renderer self-review and W10 prompt audit never masquerade as artifact QA.
 
-## 9. Update policy
+## 10. Update policy
 
-Architecture/routing/visibility/shared-profile/domain-geometry/critical measurement changes require base SSOT update + permanent regression + full CI + reinstall.
+Architecture/routing/visibility/shared-profile/pedagogy/domain-geometry/critical measurement changes require base SSOT update + permanent regression + full CI + reinstall.
 
-## 10. Installation artifact
+## 11. Installation artifact
 
 Distributed ZIP must contain:
-
 - one main Instructions `.txt`;
 - exactly ten worker `.txt` Knowledge files;
-- all five mandatory profiles embedded in main and every worker bundle;
+- all five technical profiles plus mandatory pedagogy profile embedded in main/worker bundles;
 - install/health-check guide;
 - static SSOT validation report;
-- all regression reports including actual instrument geometry and repository full-line audit;
+- all current regression reports including primary-school pedagogy and repository full-line audit;
+- clean-room pedagogy audit;
 - checksum manifest;
 - ZIP integrity PASS.
 
