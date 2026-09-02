@@ -1,14 +1,16 @@
 # Baseline 2.6.3-LTS Release Checklist
 
-Status: Critical educational-instrument safety release checklist
+Status: Critical educational-instrument + primary learner-safety release checklist
 Release family: 2.6.3-LTS
 Compatible worker baseline: 2.6.x / schema 1
 
-## Release principle
+## Release principles
 
 `ONE WRONG INSTRUCTIONAL SCALE = RELEASE BLOCKER`
 
 `NO NUMERIC PACKING PROOF = NO PAGE-FEASIBILITY PASS`
+
+`PHYSICAL_FIT != PRIMARY_LEARNER_USABILITY`
 
 Passing this checklist qualifies the **prompt/package system**. It never proves downstream pixels. Actual worksheets still require Artifact QA before classroom release.
 
@@ -27,149 +29,95 @@ Exactly 10 base workers:
 `W09_QA_RELEASE`
 `W10_METROLOGY_ENGINEER`
 
-Five mandatory shared runtime profiles:
-
+Five mandatory technical shared runtime profiles:
 1. `SYSTEM_WIDE_QUALITY_PROFILE.md`
 2. `SCALE_LINE_INTEGRITY_PROFILE.md`
 3. `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 4. `METROLOGY_ASSURANCE_PROFILE.md`
 5. `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
-Mandatory learner-read chain:
+Mandatory cross-cutting learner profile:
+`PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
 
+Mandatory learner-read chain:
 `OWNING DOMAIN → W07 GEOMETRY AUDIT → W10 INDEPENDENT METROLOGY AUDIT → W08 LAYOUT/RENDER → W09 RELEASE`
 
 `NO WORKER MAY SELF-CERTIFY ITS OWN HIGH-RISK OUTPUT.`
 
+## Primary-school learner safety
+
+Unless a valid explicit teacher requirement safely overrides them:
+- implicit page default = A4 Portrait;
+- P1–P3 body text target >=14 pt;
+- P4–P6 body text target >=12 pt;
+- primary title target >=18 pt;
+- learner-read numerals target >=12 pt;
+- handwritten response clear height P1–P3 >=8 mm; P4–P6 >=6 mm;
+- concise grade-appropriate directions;
+- one unambiguous response zone per item;
+- no essential meaning encoded by color alone;
+- no decoration competing with text/academic geometry;
+- no unrelated complexity added merely to increase difficulty;
+- physical page fit does not override readability/writability.
+
+Academic geometry uses:
+`ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED`
+`GENERATIVE_ART_MAY_NOT_REDRAW_ACADEMIC_GEOMETRY=YES`
+`CANONICAL_COORDINATE_SYSTEM_REQUIRED=YES`
+`POST_LAYOUT_GEOMETRY_TRANSFORM=UNIFORM_SCALE_AND_TRANSLATE_ONLY`
+
 ## Correct canonical instrument oracles
 
 ### Analog clock
-
-For `h:m`:
-
 `minute_angle=6*m`
 `hour_angle=30*(h mod 12)+0.5*m`
-
-Nonzero minutes require continuous hour-hand displacement. Quarter-hour checkpoints: :15=25%, :30=50%, :45=75% of the way to the next hour. For 14:45/2:45 the hour hand is 82.5° clockwise from 12 and must not remain on numeral 2.
+Nonzero minutes require continuous displacement. :15=25%, :30=50%, :45=75%. Renderer-only state includes exact angle plus deterministic vector endpoint. 3:30 hour hand=105°, never 90°; 9:30=285°, never270°.
 
 ### Weight dial 0–5 kg @0.1 kg
-
-- angle convention: `0° = top`, clockwise positive;
-- 50 active intervals / 51 endpoint-inclusive active positions;
-- 300° active sweep from 0° to 300°;
-- inactive open gap `(300°,360°)`;
-- `INACTIVE_GAP_TICK_COUNT=0`;
-- `INACTIVE_GAP_RADIAL_MARK_COUNT=0`;
-- `LABEL_ANGLES={0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`;
-- `CLOCKWISE_MAJOR_LABEL_SEQUENCE=[0,1,2,3,4,5]`;
-- `active_tick_angle(i)=(6*i) mod 360`;
-- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`;
-- `INTERVALS_PER_KG=10`;
-- `INTERIOR_POSITIONS_PER_KG_SPAN=9`;
-- existing +0.5 kg position is an intermediate tick longer than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks; it never adds a graduation.
-
-The superseded rotated label map is forbidden in current authoritative SSOT.
+- 0°=top, clockwise positive;
+- labels `{0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`;
+- 50 intervals /51 active positions;
+- each 1 kg span = exactly 10 intervals /11 endpoint-inclusive positions /9 interior marks;
+- +0.5 kg is existing index5 intermediate tick, longer than ordinary minor and shorter/weaker than whole-kg major;
+- inactive gap `(300°,360°)` with zero radial scale-like marks;
+- needle pivot=dial/reading-ring center;
+- visible tick set must be serialized explicitly; `10 divisions` prose alone is insufficient.
 
 ### Speedometer 0–120 km/h @10
-
-- 12 intervals / 13 positions;
-- 240° active /120° inactive gap;
-- `target_angle=(240+2*target_kmh) mod 360`;
-- 60 km/h →0°→straight up under this family convention;
-- `NEEDLE_PIVOT == DIAL_CENTER == READING_RING_CENTER`;
-- pointer ray is collinear center→target tick.
+12 intervals/13 positions; 240° active/120° inactive; `target_angle=(240+2*target_kmh) mod 360`; pivot=center; pointer radial.
 
 ### Ruler 1 cm @1 mm
-
-- 10 intervals /11 endpoint-inclusive positions /9 interior positions;
-- physical ruler edge is not an additional graduation;
-- 5 mm hierarchy mark reuses an existing position;
-- object-on-ruler tasks require exact endpoint-to-graduation identity plus start/end dashed projection guides;
-- ZERO_START_MODE requires `OBJECT_START_X == ZERO_GRADUATION_X`;
-- NONZERO_START_MODE requires `TARGET_LENGTH=END_VALUE-START_VALUE` with both projections preserved.
+10 intervals/11 positions/9 interior; physical edge not graduation; 5 mm hierarchy reuses position. Object-on-ruler tasks require start/end dashed projections. ZERO_START aligns object start with zero graduation; NONZERO uses END-START.
 
 ### Thermometer 0–50°C @1°C
-
-- 50 intervals /51 positions;
-- 6 major positions: 0,10,20,30,40,50;
-- 5 intermediate positions: 5,15,25,35,45;
-- 40 ordinary minor positions;
-- each complete 10°C span =10 intervals /9 interior positions;
-- liquid endpoint equals target graduation centerline;
-- a selected 60 mm scale has exactly 1.20 mm tick-center spacing.
+50/51; major=6, intermediate=5, ordinary minor=40; each10°C span=10 intervals/9 interior; liquid endpoint on target centerline.
 
 ### Graduated container 0–1000 mL @50 mL
-
-- global topology =20 intervals /21 positions;
-- major interval=100 mL;
-- every adjacent 100 mL span = exactly 2 intervals /3 endpoint-inclusive positions;
-- exactly one interior position at +50 mL;
-- no extra minor/pseudo-tick may exist inside a 100 mL span;
-- the +50 mL tick is shorter/weaker than the major ticks and normally unlabeled.
+20/21 globally; each100mL span=2 intervals/3 positions with exactly one +50mL interior tick; no extra local pseudo-ticks.
 
 ### Protractor 0–180° @1°
+Perfect upper semicircle;180/181; one active scale default;0° right/90° top/180° left; 10° major/5° intermediate/1° minor; common center=baseline midpoint=ray origin; all ticks/rays radial; no distortion; width>=70mm at0.60mm floor; body height=width/2 before label/answer reserves.
 
-- perfect upper semicircle;
-- 180 intervals /181 positions;
-- one active numeric scale by default unless dual-scale reading is explicitly taught;
-- 0° right /90° top /180° left;
-- 10° major /5° intermediate /1° minor, all reusing the 181 positions;
-- `ARC_CENTER == BASELINE_MIDPOINT == RAY_ORIGIN == TICK_RADIAL_CENTER`;
-- ticks and target ray radial from the common center;
-- no ellipse, shear, perspective, skew, or non-uniform stretch;
-- radial print-spacing oracle at 1° and 0.60 mm floor gives minimum reading-ring diameter≈68.76 mm and production width 70 mm; 65 mm fails;
-- **shape-aware page rule:** width 70 mm means semicircle geometric body height 35 mm before labels/answer/clearance reserves. Do not infer item height as 70 mm merely from width.
+## Page feasibility
 
-## Physical page feasibility
+Implicit default: A4 Portrait, 210×297mm before margins. `ONE_PAGE_PREFERRED != ONE_PAGE_LOCKED`.
 
-For A4 portrait: 210×297 mm before margins.
-
-A PASS requires numeric `PHYSICAL_PAGE_STATE` covering margins, header/title/directions, rows/columns, complete shape-aware item bounding boxes, answer zones, row/column gaps, usable dimensions and required dimensions.
-
-`ONE_PAGE_PREFERRED != ONE_PAGE_LOCKED`.
-
-When `ONE_PAGE_LOCK=OFF`, an infeasible preferred plan is recomputed or paginated. No worker may delete/merge/compress scale marks to force one page.
-
-Examples:
-- five 80 mm circular dials require at least 400 mm body height → impossible on A4 portrait;
-- five 60 mm vertical thermometer scales require at least 300 mm before other content → impossible;
-- five 50 mm container boxes consume 250 mm before header/gaps → full proof required;
-- protractor uses **shape-aware** semicircle height `W/2` plus explicit reserves, never `height=W` by assumption;
-- graph axis height alone never proves full worksheet fit.
-
-## Required prompt/artifact invariants
-
-- `OUTPUT_MODE=PROMPT_PACKAGE` is distinct from `RENDER_PATH`;
-- exact learner-read geometry uses deterministic geometry;
-- all radial/angular instruments require common-center/common-origin evidence;
-- every declared local subdivision grammar requires an independent local-span recount;
-- ruler object measurement requires endpoint/reference projection evidence;
-- all scale labels require label-to-tick association and monotonic order where applicable;
-- renderer prevention loop:
-  `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`;
-- `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`;
-- renderer self-review is prevention, never artifact proof.
+A PASS requires numeric `PHYSICAL_PAGE_STATE` including margins, header/title/directions, complete shape-aware item boxes, response zones and gaps. When lock=OFF, paginate rather than deleting/merging graduations, shrinking required text below learner defaults, or reducing response space.
 
 ## Permanent actual defects retained
 
 - ruler extra graduation;
-- ruler object starting from physical border instead of zero graduation / missing endpoint projections;
+- ruler physical-edge start / missing endpoint projections;
 - weight-dial inactive-gap radial marks;
-- weight-dial label-order/coordinate drift;
-- weight-dial missing 0.5 kg intermediate hierarchy;
+- weight-dial label order / coordinate drift;
+- weight-dial missing/sparsified 0.1kg graduations and missing midpoint hierarchy;
 - speedometer off-center pivot;
-- clock hour hand pinned to the starting numeral at nonzero minute, including 14:45;
-- thermometer incorrect subdivision/hierarchy;
-- graduated container extra subdivisions between adjacent 100 mL labels;
+- clock hour hand snap for nonzero minutes;
+- thermometer wrong subdivisions/hierarchy;
+- graduated-container extra local subdivisions;
 - distorted/misregistered protractor;
-- physical page feasibility contradictions.
-
-See:
-- `ACTUAL_RULER_EXTRA_TICK_REGRESSION_2026_08_31.md`
-- `ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md`
-- `ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md`
-- `ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md`
-- `CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md`
+- physical-page feasibility contradictions;
+- learner-facing ambiguity/readability risks discovered in clean-room pedagogy audit.
 
 ## Executable release gate
 
@@ -188,47 +136,45 @@ All prior tests remain; counts only increase.
 11. physical page feasibility regression: 48
 12. actual instrument geometry regression: 64
 13. measurement reference artifact regression: 66
-14. repository full-line audit: 81
+14. clock hand endpoint regression: 32
+15. weight dial visible subdivision regression: 32
+16. primary-school pedagogy regression: 64
+17. repository full-line audit: 81
 
-Combined mandatory gate:
+Combined mandatory effective gate:
 
-`1366/1366 PASS`
+`1494/1494 PASS`
 
-The repository full-line audit scans every UTF-8 text/code line in the Gem SSOT plus its GitHub workflow for encoding/control/merge-marker hazards and applies 81 semantic coherence assertions. It is additive to, not a replacement for, domain regression suites.
+Repository full-line audit still scans every UTF-8 text/code line in the Gem SSOT plus workflow and executes its fixed 81 semantic cases.
 
 ## Package audit
 
-Release package name:
-
+Package name:
 `activity-based-elementary-worksheet_Gem_v2.6.3_LTS_10WORKERS_TXT`
 
 Must contain:
 - one main Instructions TXT;
 - exactly ten worker Knowledge TXT files;
-- all five shared profiles embedded in main and worker bundles;
+- five technical shared profiles embedded in every worker bundle;
+- mandatory primary-school pedagogy profile embedded in every worker bundle;
 - W10 metrology worker;
-- actual defect evidence;
-- reports for all 14 regression suites including 66-case measurement-reference regression and 81-case repository full-line audit;
+- current actual-defect evidence and clean-room pedagogy audit;
+- reports for all 17 regression suites;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
 
-Use the exact GitHub Actions artifact only after all gates pass.
+Use the exact GitHub Actions artifact only after every gate passes.
 
 ## Prompt / artifact boundary
 
-Passing `1366/1366 PASS` means:
+Passing `1494/1494 PASS` means the prompt/package is eligible for `PROMPT_RELEASE=APPROVED`.
 
-`PROMPT_RELEASE=APPROVED`
-
-Before actual rendered worksheet inspection:
-
+Before actual worksheet inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-One incorrect learner-read instrument in an actual worksheet means:
-
+Artifact inspection includes metrology plus `ARTIFACT_LEARNER_SIMULATION_QA`. One incorrect instructional instrument, unreadable required content, or learner-visible ambiguity means:
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
-
-and that defect becomes a permanent regression before the next accepted release.
+and the defect becomes permanent regression before the next accepted release.
