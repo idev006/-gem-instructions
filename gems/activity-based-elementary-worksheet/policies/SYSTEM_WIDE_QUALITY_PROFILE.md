@@ -9,6 +9,7 @@ Companion mandatory profiles:
 - `policies/SCALE_LINE_INTEGRITY_PROFILE.md`
 - `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 - `policies/METROLOGY_ASSURANCE_PROFILE.md`
+- `policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md` (mandatory learner-facing contract packaged with every worker)
 
 ## 1. Ownership integrity
 
@@ -197,3 +198,34 @@ If a supplied worksheet contains one wrong learner-read scale:
 `CLASSROOM_RELEASE=BLOCKED`
 
 The defect becomes a permanent regression before the next accepted release artifact. The 2026-08-31 ruler extra-tick defect remains a canonical example.
+
+## 18. Mandatory primary-school learner quality
+
+Every production worksheet also inherits `policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`.
+
+This makes the child's visible experience a release concern, not an aesthetic afterthought. Applicable checks include:
+
+`SYSTEM_PRIMARY_GRADE_APPROPRIATENESS_QA`
+`PROMPT_LEARNER_INSTRUCTION_CLARITY_QA`
+`PROMPT_LEARNER_AMBIGUITY_QA`
+`PROMPT_LEARNER_TYPOGRAPHY_QA`
+`PROMPT_LEARNER_WRITING_SPACE_QA`
+`PROMPT_LEARNER_VISUAL_LOAD_QA`
+`PROMPT_LEARNER_DECORATION_ISOLATION_QA`
+`PROMPT_LEARNER_ITEM_PROGRESSION_QA`
+`PROMPT_TEACHING_INSTRUMENT_SIMPLICITY_QA`
+`PROMPT_LEARNER_ANSWER_FORMAT_QA`
+`PROMPT_LEARNER_PRINT_CONTRAST_QA`
+
+When geometry is academic data, the pedagogy profile additionally requires:
+
+`ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED`
+`GENERATIVE_ART_MAY_NOT_REDRAW_ACADEMIC_GEOMETRY=YES`
+`CANONICAL_COORDINATE_SYSTEM_REQUIRED=YES`
+`POST_LAYOUT_GEOMETRY_TRANSFORM=UNIFORM_SCALE_AND_TRANSLATE_ONLY`
+
+Physical fit is not sufficient if typography, writing space or visual load is unsafe. If pagination is unlocked, paginate before degrading learner-facing readability or instructional geometry.
+
+For Artifact QA, also run `ARTIFACT_LEARNER_SIMULATION_QA`: the item must be understandable and solvable from visible student information alone.
+
+Any applicable pedagogy FAIL/NOT_RUN blocks prompt release; any learner-visible ambiguity in the actual artifact blocks classroom release.
