@@ -4,7 +4,8 @@
 Established release gate: 1366/1366 PASS.
 Additive clock hand endpoint hardening: +32 cases.
 Additive weight-dial visible subdivision hardening: +32 cases.
-Effective current release gate: 1430/1430 PASS.
+Additive primary-school pedagogy/usability hardening: +64 cases.
+Effective current release gate: 1494/1494 PASS.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -21,6 +22,7 @@ SCALE_LINE_PROFILE='policies/SCALE_LINE_INTEGRITY_PROFILE.md'
 REVIEW_PROFILE='policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md'
 METROLOGY_PROFILE='policies/METROLOGY_ASSURANCE_PROFILE.md'
 PAGE_FEASIBILITY_PROFILE='policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md'
+PEDAGOGY_PROFILE='policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'
 WEIGHT_VISIBLE_PROFILE='policies/WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.md'
 SHARED_PROFILES=[SYSTEM_PROFILE,SCALE_LINE_PROFILE,REVIEW_PROFILE,METROLOGY_PROFILE,PAGE_FEASIBILITY_PROFILE]
 
@@ -33,7 +35,7 @@ WORKER_BUNDLES={
 'W06_MONEY_CALENDAR_DATA.txt':['workers/W06_MONEY_CALENDAR_DATA.md','domains/MONEY_ENGINE.md','domains/CALENDAR_ENGINE.md','domains/TABLE_GRAPH_READING_ENGINE.md'],
 'W07_INSTRUMENT_AUDITOR.txt':['workers/W07_INSTRUMENT_AUDITOR.md','domains/INSTRUMENT_READING_ENGINE.md',WEIGHT_VISIBLE_PROFILE],
 'W08_LAYOUT_RENDER_THAI.txt':['workers/W08_LAYOUT_RENDER_THAI.md',WEIGHT_VISIBLE_PROFILE],
-'W09_QA_RELEASE.txt':['workers/W09_QA_RELEASE.md','OUTPUT_CONTRACT.md','ARCHITECTURE.md','KB_ROUTER.md','KB_MANIFEST.md','policies/PARAMETER_POLICY.md','policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md',WEIGHT_VISIBLE_PROFILE,'domains/DOMAIN_REGISTRY.md','domains/MEASUREMENT_COVERAGE_P1_P6.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md','qa/ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md','qa/ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md','qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md','qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md'],
+'W09_QA_RELEASE.txt':['workers/W09_QA_RELEASE.md','OUTPUT_CONTRACT.md','ARCHITECTURE.md','KB_ROUTER.md','KB_MANIFEST.md','policies/PARAMETER_POLICY.md','policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md',WEIGHT_VISIBLE_PROFILE,'domains/DOMAIN_REGISTRY.md','domains/MEASUREMENT_COVERAGE_P1_P6.md','qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md','qa/ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md','qa/ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md','qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md','qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md','qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md'],
 'W10_METROLOGY_ENGINEER.txt':['workers/W10_METROLOGY_ENGINEER.md','domains/INSTRUMENT_READING_ENGINE.md',WEIGHT_VISIBLE_PROFILE],
 }
 
@@ -50,8 +52,8 @@ def gate(script,label):
     return r
 
 def bundle_text(name,sources):
-    effective=[*SHARED_PROFILES,*sources]
-    head=(f'ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {name}\nBASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\nGenerated from GitHub SSOT. Five mandatory shared safety profiles are embedded.\n\nEMBEDDED_SOURCES:\n')
+    effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,*sources]
+    head=(f'ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {name}\nBASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\nGenerated from GitHub SSOT. Five mandatory technical safety profiles plus the mandatory primary-school pedagogy profile are embedded.\n\nEMBEDDED_SOURCES:\n')
     head+='\n'.join(f'- {s}' for s in effective)
     parts=[head]
     for rel in effective:parts.append(f'\n\n===== BEGIN EMBEDDED SSOT: {rel} =====\n\n{read(rel)}\n\n===== END EMBEDDED SSOT: {rel} =====')
@@ -75,6 +77,7 @@ def main():
       ('measurement_reference_artifact_regression_suite.py','66-case measurement reference artifact regression'),
       ('clock_hand_endpoint_regression_suite.py','32-case clock hand endpoint regression'),
       ('weight_dial_visible_subdivision_regression_suite.py','32-case weight dial visible subdivision regression'),
+      ('primary_school_pedagogy_regression_suite.py','64-case primary-school pedagogy regression'),
       ('repository_full_line_audit_suite.py','81-case repository full-line audit'),
     ]
     results=[]
@@ -87,17 +90,19 @@ def main():
     inst=PACKAGE_DIR/'01_MAIN_INSTRUCTIONS';know=PACKAGE_DIR/'02_UPLOAD_10_WORKER_KNOWLEDGE_TXT';guide=PACKAGE_DIR/'03_GUIDE'
     inst.mkdir(parents=True);know.mkdir(parents=True);guide.mkdir(parents=True)
 
-    compact='COMPACT RUNTIME PROFILE\nEstablished baseline 1366/1366 PASS plus 32-case clock endpoint hardening plus 32-case weight visible subdivision hardening; effective 1430/1430 PASS. Exactly 10 base worker Knowledge files.\nMandatory shared profiles: 5\n\n'
+    compact='COMPACT RUNTIME PROFILE\nEstablished baseline 1366/1366 PASS + clock endpoint 32 + weight visible subdivision 32 + primary-school pedagogy 64; effective 1494/1494 PASS. Exactly 10 base worker Knowledge files.\nMandatory technical shared profiles: 5 + mandatory primary-school pedagogy profile.\n\n'
     main_text=(compact+read('GEM_INSTRUCTIONS_PRODUCTION.md')+
       '\n\n===== MANDATORY SYSTEM-WIDE QUALITY PROFILE =====\n\n'+read(SYSTEM_PROFILE)+
       '\n\n===== MANDATORY SCALE-LINE INTEGRITY PROFILE =====\n\n'+read(SCALE_LINE_PROFILE)+
       '\n\n===== MANDATORY INSTRUMENT REVIEW-REVISE PROFILE =====\n\n'+read(REVIEW_PROFILE)+
       '\n\n===== MANDATORY METROLOGY ASSURANCE PROFILE =====\n\n'+read(METROLOGY_PROFILE)+
       '\n\n===== MANDATORY PHYSICAL PAGE FEASIBILITY PROFILE =====\n\n'+read(PAGE_FEASIBILITY_PROFILE)+
+      '\n\n===== MANDATORY PRIMARY-SCHOOL PEDAGOGY PROFILE =====\n\n'+read(PEDAGOGY_PROFILE)+
       '\n\n===== MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK =====\n\n'+read('policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md')+
       '\n\n===== CLOCK HAND ENDPOINT DEFECT EVIDENCE =====\n\n'+read('qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md')+
       '\n\n===== WEIGHT DIAL VISIBLE TICK-SET POLICY =====\n\n'+read(WEIGHT_VISIBLE_PROFILE)+
-      '\n\n===== WEIGHT DIAL VISIBLE SUBDIVISION DEFECT EVIDENCE =====\n\n'+read('qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md'))
+      '\n\n===== WEIGHT DIAL VISIBLE SUBDIVISION DEFECT EVIDENCE =====\n\n'+read('qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md')+
+      '\n\n===== CLEAN-ROOM PEDAGOGY ROOT-CAUSE AUDIT =====\n\n'+read('qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md'))
     (inst/'GEM_ORCHESTRATOR_INSTRUCTIONS.txt').write_text(main_text,encoding='utf-8')
     for out,sources in WORKER_BUNDLES.items():(know/out).write_text(bundle_text(out,sources),encoding='utf-8')
     if len(list(know.glob('*.txt')))!=10:raise RuntimeError('Knowledge bundle count must equal 10')
@@ -113,12 +118,14 @@ def main():
       'ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.txt':read('qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md'),
       'ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.txt':read('qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md'),
       'WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.txt':read(WEIGHT_VISIBLE_PROFILE),
+      'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.txt':read(PEDAGOGY_PROFILE),
+      'FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.txt':read('qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md'),
       'BASELINE_2_6_3_RELEASE_CHECKLIST.txt':read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md'),
     }
     (PACKAGE_DIR/'INSTALL_ME_FIRST.txt').write_text(install,encoding='utf-8')
     for name,text in docs.items():(guide/name).write_text(text,encoding='utf-8')
 
-    report_names=['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt','WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_32_REPORT.txt','PHYSICAL_PAGE_FEASIBILITY_REGRESSION_48_REPORT.txt','ACTUAL_INSTRUMENT_GEOMETRY_REGRESSION_64_REPORT.txt','MEASUREMENT_REFERENCE_ARTIFACT_REGRESSION_66_REPORT.txt','CLOCK_HAND_ENDPOINT_REGRESSION_32_REPORT.txt','WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_32_REPORT.txt','REPOSITORY_FULL_LINE_AUDIT_81_REPORT.txt']
+    report_names=['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt','WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_32_REPORT.txt','PHYSICAL_PAGE_FEASIBILITY_REGRESSION_48_REPORT.txt','ACTUAL_INSTRUMENT_GEOMETRY_REGRESSION_64_REPORT.txt','MEASUREMENT_REFERENCE_ARTIFACT_REGRESSION_66_REPORT.txt','CLOCK_HAND_ENDPOINT_REGRESSION_32_REPORT.txt','WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_32_REPORT.txt','PRIMARY_SCHOOL_PEDAGOGY_REGRESSION_64_REPORT.txt','REPOSITORY_FULL_LINE_AUDIT_81_REPORT.txt']
     for name,r in zip(report_names,results):(guide/name).write_text(r.stdout,encoding='utf-8')
 
     manifest=[]
@@ -136,10 +143,12 @@ def main():
     print('ESTABLISHED BASELINE: 1366/1366 PASS')
     print('CLOCK HAND ENDPOINT HARDENING: 32/32 PASS')
     print('WEIGHT DIAL VISIBLE SUBDIVISION HARDENING: 32/32 PASS')
-    print('EFFECTIVE COMBINED RELEASE GATE: 1430/1430 PASS')
+    print('PRIMARY-SCHOOL PEDAGOGY/USABILITY HARDENING: 64/64 PASS')
+    print('EFFECTIVE COMBINED RELEASE GATE: 1494/1494 PASS')
     print('PACKAGE BUILD: PASS')
     print('Knowledge files: 10')
-    print('Mandatory shared profiles: 5')
+    print('Mandatory technical shared profiles: 5')
+    print('Mandatory primary-school pedagogy profile: INCLUDED in every worker bundle')
     print('Classroom artifact UAT guide: INCLUDED (24 rendered cases)')
     print('Actual weight-dial inactive-gap regression: INCLUDED (32 cases)')
     print('Physical page feasibility regression: INCLUDED (48 cases)')
@@ -147,6 +156,7 @@ def main():
     print('Measurement reference artifact regression: INCLUDED (66 cases)')
     print('Clock hand endpoint regression: INCLUDED (32 cases)')
     print('Weight dial visible subdivision regression: INCLUDED (32 cases)')
+    print('Primary-school pedagogy regression: INCLUDED (64 cases)')
     print('Repository full-line audit: INCLUDED (81 semantic cases + every UTF-8 line scan)')
     print(f'ZIP: {ZIP_PATH}')
     print(f'ZIP SHA256: {sha256(ZIP_PATH)}')
