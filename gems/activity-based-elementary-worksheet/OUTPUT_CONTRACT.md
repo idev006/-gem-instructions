@@ -9,7 +9,7 @@ Product role: `PRODUCTION_WORKSHEET_PROMPT_GENERATOR`
 
 The Gem compiles and verifies a worksheet-generation prompt. It does not claim downstream worksheet pixels have passed visual QA before the artifact is supplied and inspected.
 
-Learner-read prompt release requires owning-domain evidence, W07 geometry evidence, W10 independent metrology evidence, W08 shape-aware page/render evidence, and renderer review/revise prevention loop.
+Learner-read prompt release requires owning-domain evidence, W07 geometry evidence, W10 independent metrology evidence, W08 shape-aware page/render evidence, primary-school pedagogy/usability evidence, and renderer review/revise prevention loop.
 
 ## 2. Default visible package
 
@@ -39,6 +39,8 @@ Only learner-facing title, directions, givens, canonical labels, diagrams and bl
 
 Exactly one student-facing object/row per question. Forbidden when answer key is off: solved answers, target time/weight/length/angle/speed/temperature/level, hand/needle/ray angles, tick indices, target endpoints, liquid levels, renderer relations/hard negatives, W07/W10 audit data.
 
+Student-visible content must also satisfy `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`: age-appropriate language, clear item boundaries, sufficient writing space and no visible ambiguity.
+
 ## 5. Worker/profile compatibility
 
 Before compilation:
@@ -49,15 +51,20 @@ Before compilation:
 - apply W07 geometry audit;
 - apply W10 independent metrology audit;
 - apply W08 shape-aware layout/render/Thai;
+- apply primary-school pedagogy/usability contract;
 - apply W09 conjunctive release.
 
-Every runtime bundle contains five mandatory profiles:
+Every runtime bundle contains five mandatory technical safety profiles:
 
 - `SYSTEM_WIDE_QUALITY_PROFILE.md`
 - `SCALE_LINE_INTEGRITY_PROFILE.md`
 - `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 - `METROLOGY_ASSURANCE_PROFILE.md`
 - `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
+
+and the mandatory learner-facing profile:
+
+- `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
 
 Missing mandatory runtime knowledge blocks release.
 
@@ -70,6 +77,13 @@ Allowed final render paths:
 `DOCUMENT_FIRST | HYBRID | DETERMINISTIC_VECTOR | IMAGE_ONLY`
 
 AUTO resolves before release. Exact learner-read graduations require deterministic geometry; `IMAGE_ONLY` is forbidden if nondeterminism can alter scale geometry.
+
+When the user gives no page override:
+
+`PAGE_SIZE=A4`
+`ORIENTATION=PORTRAIT`
+
+Every generated page remains A4 Portrait; pagination is allowed when `ONE_PAGE_LOCK=OFF`.
 
 One-page-first must not reduce topology/count/spacing/Thai readability/answer space. One-page PASS requires numeric `PHYSICAL_PAGE_STATE` with shape-aware item boxes. `ONE_PAGE_LOCK=OFF` allows pagination; `ONE_PAGE_LOCK=ON` conflicting with safe geometry blocks release.
 
@@ -95,8 +109,28 @@ When learner-read geometry exists:
 `METROLOGY_AUDIT_REQUIRED=YES`
 `PHYSICAL_PAGE_STATE_REQUIRED=YES`
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
+`ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED`
+`GENERATIVE_ART_MAY_NOT_REDRAW_ACADEMIC_GEOMETRY=YES`
+`CANONICAL_COORDINATE_SYSTEM_REQUIRED=YES`
+`POST_LAYOUT_GEOMETRY_TRANSFORM=UNIFORM_SCALE_AND_TRANSLATE_ONLY`
 
-## 8. Scale-line and common-center contract
+## 8. Primary-school learner-facing constraints
+
+Production defaults at intended print size:
+- P1–P3 body text target >=14 pt;
+- P4–P6 body text target >=12 pt;
+- primary title target >=18 pt;
+- learner-read instrument/graph numerals target >=12 pt;
+- handwritten response clear height P1–P3 >=8 mm, P4–P6 >=6 mm;
+- concise grade-appropriate directions;
+- one unambiguous response zone per item;
+- no essential meaning encoded by color alone;
+- no decoration behind learner text or academic geometry;
+- no extra complexity unrelated to the stated objective.
+
+Physical fit without these learner-facing conditions is not sufficient for prompt release.
+
+## 9. Scale-line and common-center contract
 
 Endpoint-inclusive linear scale:
 
@@ -116,7 +150,15 @@ or for protractor:
 
 Pointers/rays must be radial/collinear from the common center.
 
-## 9. Mandatory W10 metrology state
+## 10. Academic vector-primitive ownership
+
+For high-risk learner-read geometry, a natural-language-only description is insufficient. Final renderer metadata must supply deterministic construction formulas or explicit position/primitive manifests adequate to reconstruct the scale/axis and reading state.
+
+The generative/decorative layer may not redraw or independently transform academic ticks, labels, hands, pointers, rays, graph axes or reading levels.
+
+Only uniform scaling and translation of the complete canonical academic geometry are permitted after construction unless the owning domain explicitly defines another transform.
+
+## 11. Mandatory W10 metrology state
 
 For each learner-read canonical template, hidden/teacher metadata includes:
 
@@ -149,9 +191,9 @@ with at least:
 
 This state must not be printed.
 
-## 10. Canonical instrument smoke contracts
+## 12. Canonical instrument smoke contracts
 
-Weight 0–5kg @0.1: top-zero clockwise labels `{0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`, 50/51, gap `(300°,360°)`, zero radial gap marks, pivot=center.
+Weight 0–5kg @0.1: top-zero clockwise labels `{0:0°,1:60°,2:120°,3:180°,4:240°,5:300°}`, 50/51, 10 intervals and 9 interior marks per kilogram, midpoint +0.5 kg intermediate hierarchy, gap `(300°,360°)`, zero radial gap marks, pivot=center.
 
 Speedometer 0–120 @10: 12/13, `target_angle=(240+2*target_kmh) mod 360`, 120° inactive gap, pivot=center, radial needle.
 
@@ -159,7 +201,9 @@ Thermometer 0–50°C @1: 50/51, 6 major/5 intermediate/40 ordinary minor, each1
 
 Protractor 0–180° @1: perfect upper semicircle, 180/181, single active numeric scale default, 0° right/90° top/180° left, common center/origin, radial ticks/rays, width>=70mm at0.60mm floor, no geometric distortion.
 
-## 11. High-risk per-item state
+Clock: 60 minute positions; both hands share center; hour hand moves continuously; exact angle/vector endpoint metadata required for nonzero-minute items.
+
+## 13. High-risk per-item state
 
 Each learner-read item uses one atomic block:
 
@@ -171,7 +215,7 @@ Each learner-read item uses one atomic block:
 
 Radial/angular state also serializes common center/origin identity. No wide Markdown table when wrapping could change field meaning.
 
-## 12. Mandatory renderer review block
+## 14. Mandatory renderer review block
 
 Final prompt with learner-read instruments includes `INSTRUMENT_REVIEW_REVISE_PROTOCOL` and:
 
@@ -181,17 +225,17 @@ Required semantics:
 
 `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-Review includes recount, label order, common center/origin, radial collinearity, shape integrity, target alignment and gap checks. A vague `looks correct` is insufficient.
+Review includes recount, label order, common center/origin, radial collinearity, shape integrity, target alignment, vector/primitive reconstruction and gap checks. A vague `looks correct` is insufficient.
 
-## 13. Prompt QA
+## 15. Prompt QA
 
-Applicable gates include route/compatibility/ownership, academic data, Student Blueprint isolation, resolved render path, field semantics, page provenance, physical page state, shape-aware item boxes, completeness, copy-ready, no-placeholder, scale-line/common-center/shape gates, review/revise gates and all W10 metrology gates.
+Applicable gates include route/compatibility/ownership, academic data, primary grade appropriateness, learner instruction clarity, ambiguity, typography, writing space, visual load, answer-format integrity, Student Blueprint isolation, vector-primitive ownership, resolved render path, field semantics, page provenance, physical page state, shape-aware item boxes, completeness, copy-ready, no-placeholder, scale-line/common-center/shape gates, review/revise gates and all W10 metrology gates.
 
-If W10 audit is missing, copied, contradictory, FAIL or NOT_RUN:
+If required pedagogy evidence or W10 audit is missing, copied, contradictory, FAIL or NOT_RUN:
 
 `PROMPT_RELEASE=BLOCKED`
 
-## 14. Artifact boundary
+## 16. Artifact boundary
 
 Before actual rendered image inspection:
 
@@ -200,7 +244,9 @@ Before actual rendered image inspection:
 
 W07/W10 prompt audits and renderer self-review are prevention only.
 
-One incorrect learner-read scale, label order, pivot/origin, or distorted instrument means:
+Artifact QA additionally includes `ARTIFACT_LEARNER_SIMULATION_QA`: a child must be able to identify the task, the instructional visual/reference and the response area, and derive the answer from visible information alone.
+
+One incorrect learner-read scale, label order, pivot/origin, distorted instrument, unreadable required text or learner-visible ambiguity means:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
