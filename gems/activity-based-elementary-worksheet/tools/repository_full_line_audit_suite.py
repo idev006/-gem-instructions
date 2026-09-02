@@ -3,7 +3,7 @@
 
 This gate reads every text/code line under the Gem SSOT plus its GitHub workflow,
 then runs 81 semantic/coherence assertions. It is additive and does not replace
-any domain regression suite.
+any domain or pedagogy regression suite.
 
 Expected semantic case count: exactly 81.
 """
@@ -43,8 +43,8 @@ add('nontrivial-file-count',len(files)>=40,f'files={len(files)}')
 add('nontrivial-line-count',line_count>=4000,f'lines={line_count}')
 add('nontrivial-byte-count',byte_count>=200000,f'bytes={byte_count}')
 
-# Files required for current architecture. New defect/suite presence is enforced by
-# validate_ssot and release-integrity cases below so the 81-case baseline stays additive/stable.
+# Keep the 29-file architecture baseline stable; new mandatory files are checked
+# by validator/release-integrity cases below so the 81-case count remains stable.
 required=[
 'GEM_INSTRUCTIONS_PRODUCTION.md','ARCHITECTURE.md','OUTPUT_CONTRACT.md','KB_ROUTER.md','KB_MANIFEST.md','README.md','USER_GUIDE.md','GEM_INSTALLATION_GUIDE.md',
 'policies/SYSTEM_WIDE_QUALITY_PROFILE.md','policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md','policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md',
@@ -58,7 +58,7 @@ for i,rel in enumerate(required): add(f'required-{i}',(ROOT/rel).is_file(),rel)
 current_paths=[
 'GEM_INSTRUCTIONS_PRODUCTION.md','ARCHITECTURE.md','OUTPUT_CONTRACT.md','KB_ROUTER.md','KB_MANIFEST.md','README.md','USER_GUIDE.md','GEM_INSTALLATION_GUIDE.md',
 'workers/W02_TIME_CLOCK.md','workers/W03_WEIGHT_SCALE.md','workers/W04_LENGTH_DISTANCE.md','workers/W05_TEMPERATURE_CAPACITY_VOLUME.md','workers/W07_INSTRUMENT_AUDITOR.md','workers/W08_LAYOUT_RENDER_THAI.md','workers/W09_QA_RELEASE.md','workers/W10_METROLOGY_ENGINEER.md',
-'policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md','policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md',
+'policies/SCALE_LINE_INTEGRITY_PROFILE.md','policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md','policies/METROLOGY_ASSURANCE_PROFILE.md','policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md','policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md',
 'domains/INSTRUMENT_READING_ENGINE.md','domains/CLOCK_READING_ENGINE.md','domains/SCALE_READING_ENGINE.md','domains/LENGTH_READING_ENGINE.md','domains/SPEEDOMETER_READING_ENGINE.md','domains/TEMPERATURE_READING_ENGINE.md','domains/CAPACITY_READING_ENGINE.md']
 auth='\n'.join(read(p) for p in current_paths).lower()
 
@@ -73,8 +73,6 @@ for name,needle in [
 ('no-four-mandatory-profiles','four mandatory shared profiles'),
 ]: add(name,needle not in auth,needle)
 
-# OUTPUT_MODE vs RENDER_PATH is context-sensitive: a forbidden example is allowed only
-# when the same line explicitly marks it as invalid/prohibited. Positive misuse is not.
 bad_output_mode_lines=[]
 negative_markers=('never','invalid','forbidden','must not','do not','not ','category error','reject','wrong','≠')
 for rel in current_paths:
@@ -90,18 +88,18 @@ manifest=read('KB_MANIFEST.md'); router=read('KB_ROUTER.md'); install=read('GEM_
 readme=read('README.md'); guide=read('USER_GUIDE.md')
 w09=read('workers/W09_QA_RELEASE.md'); w10=read('workers/W10_METROLOGY_ENGINEER.md')
 scale=read('domains/SCALE_READING_ENGINE.md'); speed=read('domains/SPEEDOMETER_READING_ENGINE.md'); temp=read('domains/TEMPERATURE_READING_ENGINE.md')
-w04=read('workers/W04_LENGTH_DISTANCE.md'); phys=read('policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md')
+w04=read('workers/W04_LENGTH_DISTANCE.md'); phys=read('policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md'); pedagogy=read('policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md')
 positives=[
 ('core-ten','Exactly ten logical workers' in core),
 ('core-physical-profile','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in core),
 ('arch-ten','ten logical Specialist Workers' in arch),
 ('arch-physical-profile','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in arch),
 ('out-five-profiles','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in out),
-('manifest-five','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in manifest and 'five mandatory' in manifest.lower()),
-('router-physical','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in router),
+('manifest-five','five technical safety profiles' in manifest.lower() and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in manifest),
+('router-physical','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in router and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in router),
 ('install-ten','W10_METROLOGY_ENGINEER' in install and '10' in install),
-('install-five','PHYSICAL_PAGE_FEASIBILITY_PROFILE' in install or 'physical page' in install.lower()),
-('readme-current','Version: 2.6.3-LTS' in readme and 'W10_METROLOGY_ENGINEER' in readme),
+('install-five','PHYSICAL_PAGE_FEASIBILITY_PROFILE' in install and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE' in install),
+('readme-current','Version: 2.6.3-LTS' in readme and '1494/1494 PASS' in readme),
 ('guide-current','Version: 2.6.3-LTS' in guide and 'W10' in guide),
 ('w09-physical','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in w09),
 ('w09-common-center','PROMPT_METROLOGY_COMMON_CENTER_QA' in w09),
@@ -111,31 +109,30 @@ positives=[
 ('thermo-hierarchy','6 major' in temp and '5 intermediate' in temp and '40 minor' in temp),
 ('protractor-perfect','perfect' in w04.lower() and 'undistorted upper semicircle' in w04.lower() and 'every graduation is radial from the same center' in w04.lower()),
 ('protractor-body-height','PROTRACTOR_BODY_HEIGHT_MM = PROTRACTOR_BODY_WIDTH_MM/2' in w04),
-('physical-shape-aware','PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA' in phys),
+('physical-shape-aware','PROMPT_SHAPE_AWARE_BOUNDING_BOX_QA' in phys and 'ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED' in pedagogy),
 ]
 for n,o in positives:add(n,o)
 
-# Worker contract structural checks: all ten IDs, required sections.
 workers=['W01_ACADEMIC_CONTENT','W02_TIME_CLOCK','W03_WEIGHT_SCALE','W04_LENGTH_DISTANCE','W05_TEMPERATURE_CAPACITY_VOLUME','W06_MONEY_CALENDAR_DATA','W07_INSTRUMENT_AUDITOR','W08_LAYOUT_RENDER_THAI','W09_QA_RELEASE','W10_METROLOGY_ENGINEER']
 for wid in workers:
     txt=read(f'workers/{wid}.md')
     add(f'worker-{wid}',all(t in txt for t in [f'WORKER_ID={wid}','BASELINE_COMPATIBILITY=2.6.x','WORKER_SCHEMA_VERSION=1','## ACCEPTS','## OWNS','## RETURNS','## MUST_NOT_DECIDE']))
 
-# 4 physical scan + 29 required + 8 stale + 20 positive + 10 workers = 71.
-# Add 10 release-integrity cases => 81.
+# 4 physical +29 required +8 stale/context +20 positive +10 workers =71.
+# Ten release-integrity cases keep total exactly81.
 builder=read('tools/build_install_package.py'); validator=read('tools/validate_ssot.py'); checklist=read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md')
 workflow_text=workflow.read_text(encoding='utf-8')
 release_checks=[
-('builder-geometry64','instrument_geometry_artifact_regression_suite.py' in builder and 'measurement_reference_artifact_regression_suite.py' in builder),
+('builder-geometry-current','instrument_geometry_artifact_regression_suite.py' in builder and 'measurement_reference_artifact_regression_suite.py' in builder and 'clock_hand_endpoint_regression_suite.py' in builder and 'weight_dial_visible_subdivision_regression_suite.py' in builder),
 ('builder-line81','repository_full_line_audit_suite.py' in builder),
-('validator-geometry64','instrument_geometry_artifact_regression_suite.py' in validator and 'measurement_reference_artifact_regression_suite.py' in validator),
+('validator-pedagogy','primary_school_pedagogy_regression_suite.py' in validator and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in validator),
 ('validator-line81','repository_full_line_audit_suite.py' in validator),
-('workflow-geometry64','Actual instrument geometry regression — 64 cases' in workflow_text and 'Measurement reference artifact regression — 66 cases' in workflow_text),
+('workflow-current','Clock hand endpoint regression — 32 cases' in workflow_text and 'Weight dial visible subdivision regression — 32 cases' in workflow_text and 'Primary-school pedagogy regression — 64 cases' in workflow_text),
 ('workflow-line81','Repository full-line audit — 81 semantic cases' in workflow_text),
-('checklist-geometry64','actual instrument geometry regression: 64' in checklist.lower() and 'measurement reference artifact regression: 66' in checklist.lower()),
+('checklist-current','clock hand endpoint regression: 32' in checklist.lower() and 'weight dial visible subdivision regression: 32' in checklist.lower() and 'primary-school pedagogy regression: 64' in checklist.lower()),
 ('checklist-line81','repository full-line audit: 81' in checklist.lower()),
-('release-total-1366',all('1366/1366 PASS' in x for x in [builder,checklist,install,readme])),
-('five-profile-packaging','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in builder and 'Mandatory shared profiles: 5' in builder),
+('release-total-1494',all('1494/1494 PASS' in x for x in [builder,checklist,install,readme])),
+('runtime-profile-packaging','PHYSICAL_PAGE_FEASIBILITY_PROFILE.md' in builder and 'PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in builder and 'PEDAGOGY_PROFILE' in builder),
 ]
 for n,o in release_checks:add(n,o)
 
@@ -155,4 +152,5 @@ print(f'lines_scanned: {line_count}')
 print(f'bytes_scanned: {byte_count}')
 print('semantic_cases: 81/81 PASS')
 print('scope: every UTF-8 text/code line under Gem SSOT + workflow')
+print('current effective release truth: 1494/1494')
 print('artifact QA: NOT_YET_TESTED for future renders')
