@@ -8,7 +8,7 @@ Installation profile: Orchestrator + 10 Specialist Workers
 
 Use the complete generated `01_MAIN_INSTRUCTIONS/GEM_ORCHESTRATOR_INSTRUCTIONS.txt` from the successful CI installation ZIP in the Gem Instructions field.
 
-Do not replace it with a shortened formula dump. Generated Instructions include the Orchestrator and all mandatory shared safety profiles.
+Do not replace it with a shortened formula dump. Generated Instructions include the Orchestrator, all mandatory technical safety profiles, primary-school pedagogy profile and current actual-defect evidence.
 
 ## 2. Knowledge upload — exactly 10 base files
 
@@ -25,23 +25,22 @@ Upload every `.txt` from `02_UPLOAD_10_WORKER_KNOWLEDGE_TXT`:
 9. `W09_QA_RELEASE.txt`
 10. `W10_METROLOGY_ENGINEER.txt`
 
-W10 is a production worker, not a hotfix. It independently audits measuring instruments, common centers/origins, local-span/reference geometry, scale feasibility and shape-aware page evidence.
+W10 independently audits measuring instruments, common centers/origins, local-span/reference geometry, scale feasibility and shape-aware page evidence.
 
-## 3. Five mandatory safety profiles
+## 3. Mandatory runtime safety knowledge
 
-All 10 worker bundles embed:
-
+Every worker bundle embeds five technical safety profiles:
 - `SYSTEM_WIDE_QUALITY_PROFILE.md`
 - `SCALE_LINE_INTEGRITY_PROFILE.md`
 - `INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 - `METROLOGY_ASSURANCE_PROFILE.md`
 - `PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
 
+Every bundle also embeds:
+- `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
+
 Whenever a student reads an instrument:
-
 `OWNING WORKER → W07 → W10 → W08 → W09`
-
-W07 audits geometry. W10 independently recomputes metrology/local-span/reference/common-center/shape/page evidence. Missing either audit blocks prompt release.
 
 `NO WORKER MAY SELF-CERTIFY ITS OWN HIGH-RISK OUTPUT.`
 
@@ -59,125 +58,140 @@ Install only a ZIP whose exact GitHub Actions source commit passed:
 - instrument review/speedometer `60/60`
 - protractor scale safety `24/24`
 - full metrology audit `80/80`
-- actual weight-dial inactive-gap regression `32/32`
-- physical page feasibility regression `48/48`
-- actual instrument geometry regression `64/64`
-- measurement reference artifact regression `66/66`
+- actual weight-dial inactive-gap `32/32`
+- physical page feasibility `48/48`
+- actual instrument geometry `64/64`
+- measurement reference artifact `66/66`
+- clock hand endpoint `32/32`
+- weight dial visible subdivision `32/32`
+- primary-school pedagogy/usability `64/64`
 - repository full-line audit `81/81`
-- combined `1366/1366 PASS`
+- combined effective `1494/1494 PASS`
 - package build PASS
 - ZIP integrity PASS
 - artifact upload PASS
 
-Do not locally rebuild and call it the CI artifact.
+Do not locally rebuild and label it as the CI artifact.
 
 ## 5. Health check after installation
 
 Send:
-
 `ตรวจสุขภาพ Gem`
 
 Expected:
-
-- release family 2.6.3-LTS / compatible baseline 2.6.x
+- release family2.6.3-LTS / compatible baseline2.6.x
 - W01..W10 present
-- worker schema version 1
-- five mandatory shared profiles present
+- worker schema1
+- five mandatory technical shared profiles present
+- mandatory primary-school pedagogy profile present
 - `W10_METROLOGY_ENGINEER` active
 - `KB_COMPATIBILITY_QA=PASS`
 - `INSTALLATION_HEALTH=PASS`
 
-## 6. Critical instrument smoke tests
+## 6. Primary learner defaults
 
-### Clock — continuous hour hand
-`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ มีเวลาประมาณ 2:45 ไม่มีเฉลย`
+Without explicit safe override:
+- A4 Portrait on every page;
+- `ONE_PAGE_LOCK=OFF` and pagination allowed when needed;
+- P1–P3 body text target >=14pt;
+- P4–P6 body text target >=12pt;
+- title target >=18pt;
+- learner-read numerals target >=12pt;
+- response clear height P1–P3 >=8mm, P4–P6 >=6mm;
+- concise grade-appropriate directions;
+- one clear response zone per item;
+- no essential meaning by color alone;
+- no decoration competing with academic data.
 
-Expected: W02+W07+W10+W08+W09; 60 distinct minute positions; for 2:45 minute hand=270° and hour hand=82.5°, exactly 75% from 2 toward 3; short hand must not stay directly on 2; hands share one pivot.
+## 7. Academic geometry mode
+
+For learner-read geometry the generated prompt must carry:
+`ACADEMIC_GEOMETRY_RENDER_MODE=VECTOR_PRIMITIVE_LOCKED`
+`GENERATIVE_ART_MAY_NOT_REDRAW_ACADEMIC_GEOMETRY=YES`
+`CANONICAL_COORDINATE_SYSTEM_REQUIRED=YES`
+`POST_LAYOUT_GEOMETRY_TRANSFORM=UNIFORM_SCALE_AND_TRANSLATE_ONLY`
+
+Free-form image generation can decorate around the instrument but cannot redraw academic ticks, labels, hands, pointers, rays, axes or reading levels.
+
+## 8. Critical smoke tests
+
+### Clock — continuous/vector hour hand
+`ป.3 อ่านนาฬิกาเข็ม 10 ข้อ เน้นครึ่งชั่วโมง ไม่มีเฉลย`
+
+Expected: for every :30 item the minute hand is at 6 and the short hand is exactly halfway to the next numeral. 3:30=105°, not90°; 9:30=285°, not270°. Exact vector endpoints are included in renderer-only state.
 
 ### Ruler — endpoint projection/reference
 `ป.3 วัดความยาววัตถุด้วยไม้บรรทัด เซนติเมตรและมิลลิเมตร เริ่มที่ 0 จำนวน 10 ข้อ ไม่มีเฉลย`
 
-Expected each 1cm @1mm span =10 intervals/11 positions/9 interior; physical edge not graduation; object start aligns exactly with zero graduation; object start/end have thin dashed vertical projection guides to their ruler graduations. For explicit nonzero-start tasks, both guides remain and answer uses `END-START`.
+Expected 1cm @1mm=10 intervals/11 positions/9 interior; edge not graduation; object start aligns zero; dashed vertical start/end projection guides.
 
-### Weight dial — per-kilogram hierarchy
+### Weight dial — visible per-kilogram grammar
 `ป.3 อ่านตราชั่ง 0–5 กก. ขีดย่อย 0.1 กก. 10 ข้อ ไม่มีเฉลย`
 
 Expected:
-- 0 at top, values increase clockwise;
-- labels `0@0°,1@60°,2@120°,3@180°,4@240°,5@300°`;
+- 0 top, values increase clockwise;
 - 50 intervals /51 active positions;
-- exactly 10 intervals in each 1 kg span;
-- existing +0.5 kg position is an intermediate tick longer than ordinary 0.1 kg ticks and shorter/weaker than whole-kilogram major ticks;
-- no extra tick is created at +0.5 kg;
-- inactive gap `(300°,360°)` with zero radial scale-like marks;
-- needle pivot equals dial center.
+- each whole-kilogram span has exactly10 equal intervals,11 endpoint positions,9 interior marks;
+- +0.5kg is the existing fifth interval and visually longer than ordinary minor marks;
+- explicit visible tick position set serialized;
+- inactive gap clean;
+- pivot=center.
 
 ### Protractor
 `ป.4 อ่านมุมจากโพรแทรกเตอร์ 0–180° ขีดละ 1° 10 ข้อ ไม่มีเฉลย`
 
-Expected:
-- perfect upper semicircle;
-- 180 intervals /181 positions;
-- single active numeric scale unless dual-scale is explicitly taught;
-- 0° right/90° top/180° left;
-- exact common center = baseline midpoint = ray origin;
-- all ticks/rays radial;
-- deterministic geometry;
-- width >=70mm at 0.60mm spacing floor;
-- no ellipse/skew/shear/non-uniform transform;
-- page packing uses 35mm semicircle body height at 70mm width plus actual label/answer reserves.
+Expected perfect upper semicircle,180/181,single active numeric scale unless dual-scale is the lesson,common center/ray origin,radial ticks,deterministic vector geometry,width>=70mm,no distortion.
 
 ### Thermometer
 `ป.4 อ่านเทอร์โมมิเตอร์ 0–50°C ขีดละ 1°C 10 ข้อ ไม่มีเฉลย`
 
-Expected 50 intervals/51 positions; 6 major +5 intermediate +40 ordinary minor; each 10°C span has 10 intervals/9 interior; liquid endpoint exactly on target.
+Expected50/51,6 major+5 intermediate+40 ordinary minor,10 intervals per10°C,liquid endpoint exact.
 
 ### Speedometer
 `ป.4 อ่านหน้าปัดความเร็วรถ 0–120 km/h ขีดละ 10 km/h 10 ข้อ ไม่มีเฉลย`
 
-Expected 12 intervals/13 positions, 240° active, 120° inactive, exact mapping, pivot exactly at dial/reading-ring center, and radial needle.
+Expected12/13,240° active,120° inactive,exact mapping,pivot=center,radial needle.
 
-### Graduated container — local-span recount
+### Graduated container
 `ป.4 อ่านปริมาตรจากภาชนะตวง 0–1000 mL ขีดละ 50 mL 10 ข้อ ไม่มีเฉลย`
 
-Expected 20 intervals/21 positions globally; major labels every 100 mL; every adjacent 100 mL span has exactly 2 equal intervals and exactly one interior +50 mL tick; no extra short strokes/pseudo-ticks; explicit level/meniscus convention.
+Expected20/21 globally; each100mL span exactly2 intervals and one interior +50mL tick; no extra pseudo-ticks.
 
 ### Graph axis
 `ป.4 อ่านกราฟแท่งที่แกนตั้งเพิ่มทีละ 5 จำนวน 10 ข้อ`
 
-Expected equal numeric increments map to equal physical spacing and bar endpoints map to canonical data.
+Expected canonical data-first 2D graph, equal numeric increments equal physical spacing, exact bar endpoints and complete content/page packing proof.
 
-## 7. Physical page behavior
+## 9. Physical page behavior
 
-Default:
-
+Implicit default:
+`PAGE_SIZE=A4`
+`ORIENTATION=PORTRAIT`
 `TARGET_PAGE_COUNT=1`
 `ONE_PAGE_PREFERRED=YES`
 `ONE_PAGE_LOCK=OFF`
 
 `NO NUMERIC PACKING PROOF = NO PAGE-FEASIBILITY PASS`
 
-Page calculations use shape-aware item bounding boxes. Circular diameter contributes width and height; a semicircular protractor of width W contributes body height W/2 before labels/answers. When unlocked, an infeasible candidate is paginated rather than degraded.
+Page calculations use shape-aware item boxes. Physical fit is conjunctive with learner typography/writing-space rules. When unlocked, an unsafe or over-dense candidate is paginated rather than degraded.
 
-## 8. Renderer review behavior
+## 10. Renderer review behavior
 
-For every learner-read instrument, final prompt includes:
-
+For every learner-read instrument:
 `NO_FIRST_PASS_RELEASE_FOR_LEARNER_READ_INSTRUMENTS=ON`
-
-and:
 
 `GENERATE → SELF_REVIEW → VERIFY_AGAINST_CANONICAL_STATE → REVISE_IF_NEEDED → RECHECK → FINALIZE_ONLY_IF_PASS`
 
-Review explicitly checks exact global and local-span counts, endpoint/reference projections, labels/order, common center/origin, radial collinearity, continuous clock-hand interpolation, shape integrity, target alignment and inactive regions. `Looks correct` is insufficient.
+Review explicitly checks primitive manifest/global+local counts, references, labels/order, common center/origin, radial collinearity, continuous clock motion, shape integrity, target alignment and inactive regions.
 
-## 9. Prompt vs artifact QA
+## 11. Prompt vs artifact QA
 
 Passing all prompt/package gates does not prove rendered pixels.
 
-Before actual image inspection:
-
+Before image inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
 
-One wrong learner-read scale, local subdivision, reference projection, hour-hand interpolation, label order, pivot/origin, or distorted instrument means `ARTIFACT_QA=FAIL` and `CLASSROOM_RELEASE=BLOCKED`.
+Artifact QA includes `ARTIFACT_LEARNER_SIMULATION_QA`: a child must be able to identify what to read, what evidence to use and where to write, and derive the answer from visible information alone.
+
+Any wrong scale, unreadable required content, ambiguous reference, wrong hand/pivot or distorted instrument blocks classroom release.
