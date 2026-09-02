@@ -71,6 +71,9 @@ jobs:
       - name: Weight dial visible subdivision regression — 32 cases
         run: python gems/activity-based-elementary-worksheet/tools/weight_dial_visible_subdivision_regression_suite.py
 
+      - name: Primary-school pedagogy regression — 64 cases
+        run: python gems/activity-based-elementary-worksheet/tools/primary_school_pedagogy_regression_suite.py
+
       - name: Repository full-line audit — 81 semantic cases
         run: python gems/activity-based-elementary-worksheet/tools/repository_full_line_audit_suite.py
 
