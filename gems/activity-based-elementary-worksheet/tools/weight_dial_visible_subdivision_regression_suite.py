@@ -53,7 +53,7 @@ workflow=(REPO/'.github/workflows/activity-based-elementary-worksheet-gem-ssot.y
 for n,o in [
 ('builder-policy','WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.md' in builder),
 ('builder-suite','weight_dial_visible_subdivision_regression_suite.py' in builder),
-('builder-effective-total','1430/1430 PASS' in builder),
+('builder-effective-total','1494/1494 PASS' in builder),
 ('workflow-suite','Weight dial visible subdivision regression — 32 cases' in workflow),
 ('builder-defect-doc','ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md' in builder),
 ('policy-bundled-team',all(token in builder for token in ["'W03_WEIGHT_SCALE.txt'","'W07_INSTRUMENT_AUDITOR.txt'","'W08_LAYOUT_RENDER_THAI.txt'","'W09_QA_RELEASE.txt'","'W10_METROLOGY_ENGINEER.txt'",'WEIGHT_VISIBLE_PROFILE'])),
