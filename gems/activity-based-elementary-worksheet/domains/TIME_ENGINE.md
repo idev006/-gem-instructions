@@ -136,3 +136,39 @@ Prompt-phase gates:
 `STUDENT_VISIBLE_ANSWER_LEAK_QA`
 
 Any incorrect time relation, invalid time syntax, forbidden crossing, or inconsistent schedule blocks prompt release.
+
+## 11. Canonical state and visual-data separation
+
+Every generated item must first serialize a canonical nonvisual state before theme or decoration is attached:
+
+`TIME_ITEM_STATE = {TASK_TYPE, START_MINUTES, END_MINUTES, DURATION_MINUTES, CROSSING_MODE, DISPLAY_FORMAT, VERIFIED_RELATION}`
+
+The renderer may decorate the context but may not change, cover, split, reorder, or visually contradict any time datum.
+
+Hard negatives:
+- no decorative clock/calendar/icon may look like an additional given time;
+- no timeline ornament may imply a different sequence;
+- no AM/PM badge may be added unless it belongs to the canonical state;
+- no themed object may cover a digit, colon, unit, table cell, or response blank;
+- difficulty must come from the time relation, not from ambiguous visual placement.
+
+For text/table time calculation, canonical data and response zones are authoritative. Decoration is always subordinate.
+
+## 12. Failure diagnosis and repair protocol
+
+A time item is invalid when any parse, range, granularity, forward/reverse relation, crossing rule, schedule order, display-format conversion, or answer-leak check fails.
+
+Repair must operate on the owning canonical state:
+
+1. identify the failed invariant;
+2. discard the inconsistent derived display values;
+3. recompute the complete `TIME_ITEM_STATE` from valid canonical minutes;
+4. independently recompute the requested relation;
+5. re-render the student-visible givens and response area from the repaired state;
+6. re-run all time QA gates and learner-clarity gates.
+
+Do not patch only the displayed answer, one clock label, or one table cell while retaining inconsistent hidden state.
+
+`TIME_REPAIR_REQUIRES_FULL_RELATION_RECHECK=YES`
+
+Any unrepaired mismatch is `CRITICAL_ACADEMIC` and blocks `PROMPT_RELEASE`.
