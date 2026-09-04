@@ -70,3 +70,18 @@ Use deterministic SVG/vector graph generation when possible.
 For learner-read numeric axes also require the applicable `PROMPT_SCALE_*` gates from `SCALE_LINE_INTEGRITY_PROFILE.md`, including `PROMPT_SCALE_LINE_SPEC_QA`, `PROMPT_SCALE_TICK_ANCHOR_QA`, `PROMPT_SCALE_PRINT_SEPARATION_QA`, `PROMPT_SCALE_LABEL_ALIGNMENT_QA`, `PROMPT_SCALE_TARGET_ALIGNMENT_QA`, and `PROMPT_SCALE_LINE_SERIALIZATION_QA`.
 
 Any mismatch between data and visualization, ambiguous scale line, missing/extra axis graduation, or incorrect bar-to-axis mapping blocks release.
+
+## Failure diagnosis and repair protocol
+
+If dataset, table alignment, pictograph key/count, axis scale, bar mapping, label, or visual ambiguity QA fails:
+
+1. return to the canonical dataset;
+2. independently verify every value and requested relation;
+3. rebuild table/graph geometry from canonical data coordinates;
+4. recount axis positions or pictograph quantities where applicable;
+5. regenerate labels and learner questions from the repaired visualization state;
+6. rerun W07 scale audit when a learner reads a numeric axis.
+
+`DATA_READING_REPAIR_REQUIRES_DATA_FIRST_REBUILD=YES`
+
+Never stretch a bar, move an icon, or edit a displayed value by eye while leaving inconsistent canonical data. Any data-to-visual mismatch is `CRITICAL_ACADEMIC`.
