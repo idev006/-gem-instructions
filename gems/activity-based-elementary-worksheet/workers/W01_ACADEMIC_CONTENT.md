@@ -64,3 +64,18 @@ For fill-in tasks, complete target word stays internal. Student view shows only 
 `STUDENT_VISIBLE_ANSWER_LEAK_QA`
 
 Wrong arithmetic, invalid Thai target, wrong word family, unmapped color region, or leaked answer blocks release.
+
+## Failure diagnosis and repair protocol
+
+When arithmetic, Thai spelling/word-family membership, duplicate/distribution, answer-set mapping, or answer-leak QA fails, repair the owning academic state rather than patching only visible text.
+
+1. identify the failed academic invariant;
+2. regenerate or correct the canonical answer/target state;
+3. independently recompute arithmetic or revalidate Thai orthography/category membership;
+4. regenerate all dependent learner-visible expressions/words/regions;
+5. recheck duplicate/distribution constraints and answer leakage;
+6. rerun all applicable W01 QA gates.
+
+`W01_REPAIR_REQUIRES_FULL_DEPENDENCY_RECHECK=YES`
+
+An unresolved wrong answer, invalid Thai target, ambiguous word-family member, or inconsistent color mapping is `CRITICAL_ACADEMIC` and blocks release.
