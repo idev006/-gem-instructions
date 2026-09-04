@@ -170,3 +170,19 @@ Inspect every clock individually:
 `CLOCK_CIRCLE_QA, CLOCK_PIVOT_QA, HAND_COUNT_QA, HAND_LENGTH_QA, MINUTE_INTERVAL_COUNT_QA, MINUTE_POSITION_COUNT_QA, MINUTE_MARK_SPACING_QA, HOUR_POSITION_QA, HOUR_HAND_INTERPOLATION_QA, NONZERO_MINUTE_HOUR_DISPLACEMENT_QA, HALF_HOUR_MIDPOINT_QA, CLOCK_HAND_VECTOR_ENDPOINT_QA, CLOCK_HAND_RADIAL_COLLINEARITY_QA, CLOCK_HAND_ANTI_SNAP_QA, TARGET_TIME_QA, NO_MISSING_TICK_QA, NO_EXTRA_TICK_QA, MINIMUM_SIZE_QA, ONE_CLOCK_TWO_ANSWERS_QA, DAY_NIGHT_MAPPING_QA, DAY_NIGHT_ANSWER_LEAK_QA`.
 
 Any wrong hand position, especially an hour hand pinned to the hour numeral when minutes are nonzero or an endpoint that does not match its formula-derived radial vector, blocks release.
+
+
+## Failure diagnosis and repair protocol
+
+If any clock item fails time-to-angle mapping, continuous hour-hand motion, shared pivot, endpoint/radial alignment, day/night relation, tick topology, or learner-visible ambiguity checks:
+
+1. return to semantic `(hour, minute)`;
+2. recompute minute and hour angles independently;
+3. recompute deterministic vector endpoints from the canonical center/radii;
+4. rebuild both hands from the shared pivot;
+5. rerun topology, endpoint, relation, page and learner-clarity checks;
+6. regenerate the complete clock item rather than moving one hand by eye.
+
+`CLOCK_REPAIR_REQUIRES_CANONICAL_RECOMPUTE=YES`
+
+Manual visual nudging without recomputation is forbidden. Any unresolved clock-reading mismatch is `CRITICAL_ACADEMIC`.
