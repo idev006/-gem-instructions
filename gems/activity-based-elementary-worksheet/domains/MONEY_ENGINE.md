@@ -42,3 +42,17 @@ Verified totals/change remain internal when answer key is off.
 `PRICE_QA, SUM_QA, CHANGE_QA, CURRENCY_UNIT_QA, LABEL_ASSOCIATION_QA, ANSWER_LEAK_QA`
 
 Incorrect arithmetic or ambiguous price association blocks release.
+
+## Failure diagnosis and repair protocol
+
+If price association, denomination validity, sum/change arithmetic, currency formatting, or answer-leak checks fail:
+
+1. return to canonical monetary values in the smallest active currency unit;
+2. recompute totals/change independently;
+3. repair item-to-price or denomination associations at the data layer;
+4. regenerate learner-visible labels/questions from the repaired data;
+5. recheck uniqueness, affordability rule, formatting and answer leakage.
+
+`MONEY_REPAIR_REQUIRES_DATA_RECOMPUTE=YES`
+
+Never patch only a displayed total/change while retaining inconsistent prices or hidden state. Unresolved monetary inconsistency blocks release.
