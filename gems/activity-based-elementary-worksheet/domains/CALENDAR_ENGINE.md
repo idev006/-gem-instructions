@@ -44,3 +44,17 @@ Validate:
 `DATE_VALIDITY_QA, LEAP_YEAR_QA, WEEKDAY_QA, CALENDAR_GRID_QA, DATE_SEQUENCE_QA, TARGET_MARKER_QA`
 
 Any invalid calendar mapping blocks release.
+
+## Failure diagnosis and repair protocol
+
+If date validity, leap-year, weekday, sequence, grid placement, adjacent-month display, or target-marker QA fails:
+
+1. return to canonical `YEAR/MONTH/DATE/WEEK_START`;
+2. recompute the Gregorian month structure and weekday mapping;
+3. rebuild the complete calendar grid from canonical dates;
+4. reapply target markers only after the grid is valid;
+5. rerun date-sequence and learner-clarity checks.
+
+`CALENDAR_REPAIR_REQUIRES_GRID_REBUILD=YES`
+
+Do not move a single date cell by eye. Any duplicate, missing, impossible or weekday-misaligned active-month date blocks release.
