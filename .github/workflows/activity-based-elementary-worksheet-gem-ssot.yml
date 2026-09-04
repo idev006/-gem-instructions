@@ -77,6 +77,9 @@ jobs:
       - name: Repository full-line audit — 81 semantic cases
         run: python gems/activity-based-elementary-worksheet/tools/repository_full_line_audit_suite.py
 
+      - name: Capability quality scorecard — every capability >=95%
+        run: python gems/activity-based-elementary-worksheet/tools/capability_quality_scorecard.py
+
       - name: Build compact installation package
         run: python gems/activity-based-elementary-worksheet/tools/build_install_package.py
 
