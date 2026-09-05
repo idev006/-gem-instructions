@@ -274,3 +274,21 @@ Do not introduce second precision, complex regrouping or midnight crossing merel
 `PROMPT_CLOCK_LABEL_PRESERVATION_QA`
 
 Any wrong unit conversion, mode resolution, half-hour normalization, day/night label mapping, hand formula, missing numeric angles/endpoints, pinned nonzero-minute hour hand, wrong quarter/half-hour interpolation, Student Blueprint target leak, or filled answer blocks release.
+
+## Minute-hand-first derivation contract
+
+W02 MUST derive the short/hour hand from the long/minute hand progression:
+
+`MINUTE_HAND_DRIVES_HOUR_HAND_POSITION=YES`
+`minute_angle = 6*m`
+`hour_sector_base = 30*(h mod 12)`
+`hour_displacement = minute_angle / 12`
+`hour_angle = hour_sector_base + hour_displacement`
+
+Do not independently place the short hand from the numeral. The direct `+0.5*m` formula and the minute-driven formula must independently agree.
+
+Mandatory:
+`PROMPT_CLOCK_MINUTE_HAND_DRIVER_QA`
+`PROMPT_CLOCK_HOUR_DISPLACEMENT_FROM_MINUTE_ANGLE_QA`
+
+For :30, the displacement is exactly 15° and the short hand is the exact midpoint of the current hour sector.
