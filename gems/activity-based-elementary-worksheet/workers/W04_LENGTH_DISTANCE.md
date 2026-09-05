@@ -328,3 +328,23 @@ Use `MEASUREMENT_COVERAGE_P1_P6.md`, `LENGTH_READING_ENGINE.md`, and `SPEEDOMETE
 `PROMPT_INSTRUMENT_SELF_REVIEW_CHECKLIST_QA` for learner-read W04 instruments
 
 Wrong conversion/arithmetic, ruler subdivision, missing/misaligned endpoint projection guides, physical-edge substitution for zero, speedometer mapping/gap/pivot, route relation, protractor geometry/distortion/print spacing/active scale/render path, perimeter/area formula, squared-unit conversion, hidden-target leak, or missing review protocol blocks release.
+
+### Protractor explicit tick/label manifest — mandatory
+
+For learner-read 0–180° @1°, W04 MUST return the complete renderer-only manifests defined in `PROTRACTOR_181_TICK_MANIFEST_PROFILE.md`.
+
+`PROTRACTOR_TICK_MANIFEST` contains exactly 181 degree-indexed records.
+`PROTRACTOR_LABEL_MANIFEST` contains exactly 19 unique labels 0,10,...,180.
+
+Required class counts:
+`MAJOR_TICK_COUNT=19`
+`INTERMEDIATE_TICK_COUNT=18`
+`MINOR_TICK_COUNT=144`
+
+Do not rely on prose such as "draw 1° ticks". The renderer must consume the manifest.
+
+Additional QA:
+`PROMPT_PROTRACTOR_181_POSITION_MANIFEST_QA`
+`PROMPT_PROTRACTOR_TICK_CLASS_COUNT_QA`
+`PROMPT_PROTRACTOR_LABEL_SET_QA`
+`PROMPT_PROTRACTOR_LABEL_UNIQUENESS_QA`
