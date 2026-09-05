@@ -39,3 +39,9 @@ Rebuild global and every local span from canonical values; then redraw level/men
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = global range/resolution, every local 100 mL span, target level and meniscus convention. Local-span hierarchy is reconstructed from canonical positions; no decorative pseudo-ticks.
