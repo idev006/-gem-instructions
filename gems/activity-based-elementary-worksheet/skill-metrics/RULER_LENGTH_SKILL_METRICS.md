@@ -43,3 +43,9 @@ Reconstruct ruler coordinate system and graduation set first; then realign objec
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = zero graduation coordinate, exact mm tick set, start/end graduation coordinates and projection guides. Physical border is never silently promoted to a graduation.
