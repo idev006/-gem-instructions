@@ -304,3 +304,22 @@ For a ruler 1 cm @1 mm, independently verify 10 spaces, 11 endpoint-inclusive po
 For an open-arc dial, inspect the inactive region independently and count radial marks there; expected count is zero unless the owning domain explicitly defines otherwise.
 
 One wrong instructional instrument blocks classroom release.
+
+## Protractor manifest audit
+
+For 0–180° @1° W07 independently audits the full explicit manifests:
+
+- tick degrees are exactly the integer set 0..180 with no duplicates;
+- total tick records = 181;
+- major/intermediate/minor counts = 19/18/144;
+- labels are exactly the unique set 0,10,...,180;
+- each label associates with the same-degree major tick;
+- every tick segment is radial from the common protractor origin.
+
+Required gates:
+`PROMPT_PROTRACTOR_181_POSITION_MANIFEST_QA`
+`PROMPT_PROTRACTOR_TICK_CLASS_COUNT_QA`
+`PROMPT_PROTRACTOR_LABEL_SET_QA`
+`PROMPT_PROTRACTOR_LABEL_UNIQUENESS_QA`
+
+Any missing, extra, merged or duplicate mark is `CRITICAL_ACADEMIC`.
