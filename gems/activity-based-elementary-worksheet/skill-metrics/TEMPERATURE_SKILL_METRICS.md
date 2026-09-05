@@ -40,3 +40,9 @@ Rebuild tick set and target index from canonical range/resolution, then redraw l
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = range/resolution, exact tick set/classes, target index and liquid endpoint. Major 10°C > intermediate 5°C > minor 1°C hierarchy must not add or remove positions.
