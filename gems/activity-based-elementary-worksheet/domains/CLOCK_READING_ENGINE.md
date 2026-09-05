@@ -186,3 +186,31 @@ If any clock item fails time-to-angle mapping, continuous hour-hand motion, shar
 `CLOCK_REPAIR_REQUIRES_CANONICAL_RECOMPUTE=YES`
 
 Manual visual nudging without recomputation is forbidden. Any unresolved clock-reading mismatch is `CRITICAL_ACADEMIC`.
+
+
+## Minute-hand-driven hour-hand derivation — MANDATORY
+
+The minute hand is the authoritative driver of how far the hour hand advances inside the current 30° hour sector.
+
+`MINUTE_HAND_DRIVES_HOUR_HAND_POSITION=YES`
+
+Compute in this order:
+
+1. `minute_hand_angle_deg = 6*m`
+2. `hour_sector_base_deg = 30*(h mod 12)`
+3. `hour_hand_displacement_deg = minute_hand_angle_deg / 12`
+4. `hour_hand_angle_deg = hour_sector_base_deg + hour_hand_displacement_deg`
+
+This is mathematically identical to `30*(h mod 12)+0.5*m`, but the minute-hand-driven form is mandatory renderer reasoning because it makes the dependency explicit.
+
+For :30:
+`minute_hand_angle_deg=180°`
+`hour_hand_displacement_deg=15°`
+
+Therefore every :30 hour hand is exactly 50% through the current hour sector.
+
+Required gates:
+`CLOCK_MINUTE_HAND_DRIVER_QA`
+`CLOCK_HOUR_DISPLACEMENT_FROM_MINUTE_ANGLE_QA`
+
+A renderer that places the hour hand from the hour numeral alone is academically invalid.
