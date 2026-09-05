@@ -40,3 +40,9 @@ Repair canonical monetary data, recompute totals/change, regenerate labels and q
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = exact item-price mapping, paid amount, total and change in smallest active currency unit. Visual item placement cannot reassign prices.
