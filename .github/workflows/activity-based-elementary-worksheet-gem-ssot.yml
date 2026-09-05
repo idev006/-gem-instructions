@@ -89,6 +89,9 @@ jobs:
       - name: Scale tick standard governance — 120 cases
         run: python gems/activity-based-elementary-worksheet/tools/scale_tick_standard_regression_suite.py
 
+      - name: All-skills clean-room audit — 180 cases
+        run: python gems/activity-based-elementary-worksheet/tools/all_skills_clean_room_audit_suite.py
+
       - name: Capability quality scorecard — every capability >=95%
         run: python gems/activity-based-elementary-worksheet/tools/capability_quality_scorecard.py
 
