@@ -232,3 +232,21 @@ Permanent CI:
 `ALL_SKILLS_CLEAN_ROOM_AUDIT=180/180 PASS`
 
 The audit also guards registry version/routing coherence and named canonical one-page semantics.
+
+
+## 16. Protractor deterministic 181-position manifest
+
+Learner-read 0–180° protractors at 1° resolution additionally embed:
+
+- `policies/PROTRACTOR_181_TICK_MANIFEST_PROFILE.md`
+- `qa/ACTUAL_PROTRACTOR_MISSING_TICK_LABEL_REGRESSION_2026_09_05.md`
+
+The renderer must consume:
+- exactly 181 tick records for degrees 0..180;
+- tick-class counts 19 major / 18 intermediate / 144 minor;
+- exactly 19 unique labels 0,10,...,180.
+
+Permanent gate:
+`PROTRACTOR_181_TICK_MANIFEST_REGRESSION=220/220 PASS`
+
+A missing/extra/merged graduation or duplicated/missing label is a critical academic defect.
