@@ -192,6 +192,6 @@ Mandatory per-skill packs: 15/15, matching the capability registry.
 The installer embeds the four central skill-metric documents in every Knowledge bundle and embeds owner-specific packs with W01–W06. All skill-metric documents are also distributed in the installation guide folder.
 
 CI gate:
-`SKILL_METRIC_PACK_REGRESSION=140/140 PASS`
+`SKILL_METRIC_PACK_REGRESSION=161/161 PASS`
 
 A capability-quality score cannot override a failed skill-specific critical metric.
