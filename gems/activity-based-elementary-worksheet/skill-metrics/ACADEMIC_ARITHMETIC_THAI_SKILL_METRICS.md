@@ -40,3 +40,9 @@ Repair canonical answer/word state, regenerate dependents, independently recheck
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = exact operands/operation/answer or Thai target/category membership. Learner-visible expressions/words are derived only after independent verification. Decoration may not alter symbols, spelling, answer regions or category membership.
