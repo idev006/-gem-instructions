@@ -77,7 +77,7 @@ jobs:
       - name: Repository full-line audit — 81 semantic cases
         run: python gems/activity-based-elementary-worksheet/tools/repository_full_line_audit_suite.py
 
-      - name: Skill metric pack governance — 140 cases
+      - name: Skill metric pack governance — 161 cases
         run: python gems/activity-based-elementary-worksheet/tools/skill_metric_pack_regression_suite.py
 
       - name: Capability quality scorecard — every capability >=95%
