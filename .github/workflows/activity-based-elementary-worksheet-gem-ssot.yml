@@ -80,6 +80,9 @@ jobs:
       - name: Skill metric pack governance — 161 cases
         run: python gems/activity-based-elementary-worksheet/tools/skill_metric_pack_regression_suite.py
 
+      - name: Scale tick standard governance — 120 cases
+        run: python gems/activity-based-elementary-worksheet/tools/scale_tick_standard_regression_suite.py
+
       - name: Capability quality scorecard — every capability >=95%
         run: python gems/activity-based-elementary-worksheet/tools/capability_quality_scorecard.py
 
