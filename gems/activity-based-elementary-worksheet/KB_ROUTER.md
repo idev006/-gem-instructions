@@ -119,12 +119,13 @@ When rules conflict:
 5. `policies/SCALE_LINE_INTEGRITY_PROFILE.md` + W07 when applicable
 6. `policies/METROLOGY_ASSURANCE_PROFILE.md` + W10 when applicable
 7. `policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md`
-8. `policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
-9. `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md` when applicable
-10. `policies/PARAMETER_POLICY.md`
-11. W08 layout/render/Thai/print
-12. `OUTPUT_CONTRACT.md`
-13. W09/QA suites
+8. `policies/ALL_SKILLS_RUNTIME_INVARIANT_PROFILE.md`
+9. `policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
+10. `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md` when applicable
+11. `policies/PARAMETER_POLICY.md`
+12. W08 layout/render/Thai/print
+13. `OUTPUT_CONTRACT.md`
+14. W09/QA suites
 
 QA may make release stricter but may not redefine an owning worker formula.
 
@@ -168,3 +169,9 @@ After domain/worker routing, resolve the corresponding `SKILL_ID` and metric pac
 - W06 table/graph/pictograph → DATA_READING
 
 Mixed-domain requests resolve multiple skill packs. W09 must not average skill scores across skills.
+
+
+## All-skills runtime contract
+
+Every resolved `SKILL_ID` inherits `ALL_SKILLS_RUNTIME_INVARIANT_PROFILE.md`.
+The owner emits canonical state first; W07/W10/W08/W09 consume that state without redefining it.
