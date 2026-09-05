@@ -48,3 +48,22 @@ Reconstruct canonical semicircle and radial tick coordinates; then regenerate ta
 
 `CANONICAL_STATE_REQUIRED=YES`
 Canonical state = semicircle center/baseline, 181 exact positions, active scale direction and target ray. Tick hierarchy 10° major > 5° intermediate > 1° minor must reuse canonical positions.
+
+
+## Explicit 181-position manifest contract
+
+This skill inherits `policies/PROTRACTOR_181_TICK_MANIFEST_PROFILE.md`.
+
+For 0–180° @1°:
+- exactly 181 tick records, degrees 0..180;
+- exactly 19 labels, values 0,10,...,180;
+- major count 19;
+- intermediate count 18;
+- minor count 144;
+- label values unique;
+- every tick radial from the same origin.
+
+`PROMPT_PROTRACTOR_181_POSITION_MANIFEST_QA`
+`PROMPT_PROTRACTOR_LABEL_UNIQUENESS_QA`
+
+Missing/extra/merged ticks or duplicate/missing labels are critical academic defects.
