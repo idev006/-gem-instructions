@@ -214,3 +214,21 @@ Permanent gates:
 - clock P3 half-hour one-page regression: 100/100.
 
 This derived one-page requirement does not fabricate `ONE_PAGE_LOCK=ON` provenance and does not override explicit user/accessibility requirements.
+
+
+## 15. All-skills clean-room runtime invariant
+
+Every Knowledge bundle embeds `policies/ALL_SKILLS_RUNTIME_INVARIANT_PROFILE.md`.
+
+All 15 declared skill packs now explicitly carry `CANONICAL_STATE_REQUIRED=YES` and a runtime invariant. The governing sequence is:
+
+`CANONICAL_STATE -> INDEPENDENT_VERIFY -> STUDENT_VIEW_DERIVATION -> LAYOUT -> RELEASE`
+
+Learner-read visual skills additionally require:
+
+`OWNER -> W07 -> W10 -> W08 -> W09`
+
+Permanent CI:
+`ALL_SKILLS_CLEAN_ROOM_AUDIT=180/180 PASS`
+
+The audit also guards registry version/routing coherence and named canonical one-page semantics.
