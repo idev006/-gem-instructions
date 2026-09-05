@@ -122,3 +122,15 @@ Every recorded defect must identify:
 ## 4. Promotion rule
 
 Any repeated or systemic CRITICAL_ACADEMIC defect becomes a permanent regression before the next accepted prompt/package release.
+
+
+## Protractor-specific critical defects
+
+- `PROTRACTOR_MISSING_TICK`: degree position absent from 0..180 canonical set.
+- `PROTRACTOR_EXTRA_TICK`: noncanonical extra graduation creates false interval.
+- `PROTRACTOR_MERGED_TICK`: adjacent degree positions visually collapse into one mark.
+- `PROTRACTOR_DUPLICATE_LABEL`: a major value such as 170 appears more than once.
+- `PROTRACTOR_MISSING_LABEL`: any required 10° label 0,10,...,180 is absent.
+- `PROTRACTOR_LABEL_TO_TICK_MISMATCH`: label is not anchored to its same-degree major tick.
+
+All are `CRITICAL_ACADEMIC_DEFECT` for learner-read 1° protractor worksheets.
