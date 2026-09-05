@@ -466,3 +466,19 @@ When the proof remains valid:
 A two-page 5+5 result under the unchanged feasible state is a layout defect. It may not be justified merely by `ONE_PAGE_LOCK=OFF`.
 
 Any failed minute-driver or canonical one-page gate blocks prompt release for this profile.
+
+
+## Protractor explicit-manifest release gate
+
+For 0–180° @1° learner-read protractors, W09 requires:
+`PROMPT_PROTRACTOR_181_POSITION_MANIFEST_QA=PASS`
+`PROMPT_PROTRACTOR_TICK_CLASS_COUNT_QA=PASS`
+`PROMPT_PROTRACTOR_LABEL_SET_QA=PASS`
+`PROMPT_PROTRACTOR_LABEL_UNIQUENESS_QA=PASS`
+
+Natural-language-only scale instructions are insufficient. Missing/extra/merged graduations or duplicated/missing labels block release.
+
+The supplied 2026-09-05 defective artifact remains:
+`ARTIFACT_PROTRACTOR_TICK_MANIFEST_QA=FAIL`
+`ARTIFACT_PROTRACTOR_LABEL_SET_QA=FAIL`
+`CLASSROOM_RELEASE=BLOCKED`
