@@ -145,3 +145,26 @@ Architecture, scale-safety, pedagogy, visibility, routing, geometry or metrology
 - precedence respected.
 
 `KB_COMPATIBILITY_QA=PASS` only if worker IDs/schema/baseline and runtime profiles match `KB_MANIFEST.md`.
+
+
+## Skill Metric routing overlay
+
+After domain/worker routing, resolve the corresponding `SKILL_ID` and metric pack.
+
+- W01 → ACADEMIC_ARITHMETIC_THAI
+- W02 time calculation → TIME_CALCULATION
+- W02 analog clock → ANALOG_CLOCK
+- W03 → WEIGHT_SCALE
+- W04 ruler/length → RULER_LENGTH
+- W04 distance → DISTANCE
+- W04 speedometer → SPEEDOMETER
+- W04 angle/protractor → ANGLE_PROTRACTOR
+- W04 perimeter/area → PERIMETER_AREA
+- W05 temperature → TEMPERATURE
+- W05 capacity → CAPACITY
+- W05 volume → VOLUME
+- W06 money → MONEY
+- W06 calendar → CALENDAR
+- W06 table/graph/pictograph → DATA_READING
+
+Mixed-domain requests resolve multiple skill packs. W09 must not average skill scores across skills.
