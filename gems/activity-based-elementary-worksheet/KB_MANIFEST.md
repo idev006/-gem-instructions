@@ -156,3 +156,22 @@ Distributed ZIP must contain:
 - ZIP integrity PASS.
 
 Package is generated from GitHub SSOT/CI and never maintained as competing specification.
+
+
+## 12. Capability-quality gate
+
+The installation also embeds `policies/CAPABILITY_QUALITY_GATE.md` as a mandatory cross-cutting quality contract.
+
+It evaluates 15 declared worksheet capabilities independently with a uniform 20-criterion / 100-point rubric.
+
+Release requires:
+`OVERALL_CAPABILITY_SCORE>=95`
+`EVERY_CAPABILITY_SCORE>=95`
+`CAPABILITY_QUALITY_GATE=PASS`
+
+Current 2026-09-05 iteration evidence:
+- 15/15 capabilities = 100%;
+- overall = 100.00%;
+- executable scorecard = 300/300 criteria PASS.
+
+The capability-quality score is prompt/Knowledge-system evidence only and never substitutes for downstream Artifact QA.
