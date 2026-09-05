@@ -41,3 +41,9 @@ Return to canonical segment list, normalize units, recompute each route, regener
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = ordered route/segment list with normalized units and explicit relation type. No decorative route may create an academically implied extra segment.
