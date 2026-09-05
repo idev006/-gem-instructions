@@ -28,6 +28,7 @@ PAGE_FEASIBILITY_PROFILE = 'policies/PHYSICAL_PAGE_FEASIBILITY_PROFILE.md'
 PEDAGOGY_PROFILE = 'policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'
 CAPABILITY_PROFILE = 'policies/CAPABILITY_QUALITY_GATE.md'
 WEIGHT_VISIBLE_PROFILE = 'policies/WEIGHT_DIAL_VISIBLE_TICK_SET_PROFILE.md'
+THAI_CLOCK_RUNTIME_PROFILE = 'policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md'
 SCALE_TICK_PROFILE = 'policies/SCALE_TICK_STANDARD.md'
 TICK_HIERARCHY_PROFILE = 'policies/INSTRUMENT_TICK_HIERARCHY_POLICY.md'
 SHARED_PROFILES = [SYSTEM_PROFILE, SCALE_LINE_PROFILE, REVIEW_PROFILE, METROLOGY_PROFILE, PAGE_FEASIBILITY_PROFILE]
@@ -36,21 +37,20 @@ SKILL_METRIC_GLOBALS = ['skill-metrics/SKILL_METRIC_STANDARD.md', 'skill-metrics
 
 WORKER_BUNDLES = {
     'W01_ACADEMIC_CONTENT.txt': ['workers/W01_ACADEMIC_CONTENT.md', 'skill-metrics/ACADEMIC_ARITHMETIC_THAI_SKILL_METRICS.md'],
-    'W02_TIME_CLOCK.txt': ['workers/W02_TIME_CLOCK.md', 'domains/TIME_ENGINE.md', 'domains/CLOCK_READING_ENGINE.md', 'domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md', 'policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md', 'skill-metrics/TIME_CALCULATION_SKILL_METRICS.md', 'skill-metrics/ANALOG_CLOCK_SKILL_METRICS.md'],
+    'W02_TIME_CLOCK.txt': ['workers/W02_TIME_CLOCK.md', 'domains/TIME_ENGINE.md', 'domains/CLOCK_READING_ENGINE.md', 'domains/CLOCK_DAY_NIGHT_SINGLE_FACE_SPEC.md', THAI_CLOCK_RUNTIME_PROFILE, 'skill-metrics/TIME_CALCULATION_SKILL_METRICS.md', 'skill-metrics/ANALOG_CLOCK_SKILL_METRICS.md'],
     'W03_WEIGHT_SCALE.txt': ['workers/W03_WEIGHT_SCALE.md', 'domains/SCALE_READING_ENGINE.md', WEIGHT_VISIBLE_PROFILE, 'skill-metrics/WEIGHT_SCALE_SKILL_METRICS.md'],
     'W04_LENGTH_DISTANCE.txt': ['workers/W04_LENGTH_DISTANCE.md', 'domains/LENGTH_READING_ENGINE.md', 'domains/SPEEDOMETER_READING_ENGINE.md', 'skill-metrics/RULER_LENGTH_SKILL_METRICS.md', 'skill-metrics/DISTANCE_SKILL_METRICS.md', 'skill-metrics/SPEEDOMETER_SKILL_METRICS.md', 'skill-metrics/ANGLE_PROTRACTOR_SKILL_METRICS.md', 'skill-metrics/PERIMETER_AREA_SKILL_METRICS.md'],
     'W05_TEMPERATURE_CAPACITY_VOLUME.txt': ['workers/W05_TEMPERATURE_CAPACITY_VOLUME.md', 'domains/TEMPERATURE_READING_ENGINE.md', 'domains/CAPACITY_READING_ENGINE.md', 'skill-metrics/TEMPERATURE_SKILL_METRICS.md', 'skill-metrics/CAPACITY_SKILL_METRICS.md', 'skill-metrics/VOLUME_SKILL_METRICS.md'],
     'W06_MONEY_CALENDAR_DATA.txt': ['workers/W06_MONEY_CALENDAR_DATA.md', 'domains/MONEY_ENGINE.md', 'domains/CALENDAR_ENGINE.md', 'domains/TABLE_GRAPH_READING_ENGINE.md', 'skill-metrics/MONEY_SKILL_METRICS.md', 'skill-metrics/CALENDAR_SKILL_METRICS.md', 'skill-metrics/DATA_READING_SKILL_METRICS.md'],
     'W07_INSTRUMENT_AUDITOR.txt': ['workers/W07_INSTRUMENT_AUDITOR.md', 'domains/INSTRUMENT_READING_ENGINE.md', WEIGHT_VISIBLE_PROFILE],
     'W08_LAYOUT_RENDER_THAI.txt': ['workers/W08_LAYOUT_RENDER_THAI.md', WEIGHT_VISIBLE_PROFILE],
-    'W09_QA_RELEASE.txt': ['workers/W09_QA_RELEASE.md', 'OUTPUT_CONTRACT.md', 'ARCHITECTURE.md', 'KB_ROUTER.md', 'KB_MANIFEST.md', 'policies/PARAMETER_POLICY.md', 'policies/THAI_P3_CLOCK_RUNTIME_PROFILE.md', WEIGHT_VISIBLE_PROFILE, 'domains/DOMAIN_REGISTRY.md', 'domains/MEASUREMENT_COVERAGE_P1_P6.md', 'qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md', 'qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md', 'qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md', 'qa/ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md', 'qa/ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md', 'qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md', 'qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md', 'qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md', 'qa/CAPABILITY_QUALITY_ITERATION_REPORT_2026_09_05.md'],
+    'W09_QA_RELEASE.txt': ['workers/W09_QA_RELEASE.md', 'OUTPUT_CONTRACT.md', 'ARCHITECTURE.md', 'KB_ROUTER.md', 'KB_MANIFEST.md', 'policies/PARAMETER_POLICY.md', THAI_CLOCK_RUNTIME_PROFILE, WEIGHT_VISIBLE_PROFILE, 'domains/DOMAIN_REGISTRY.md', 'domains/MEASUREMENT_COVERAGE_P1_P6.md', 'qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md', 'qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md', 'qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md', 'qa/ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md', 'qa/ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md', 'qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md', 'qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md', 'qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md', 'qa/CAPABILITY_QUALITY_ITERATION_REPORT_2026_09_05.md'],
     'W10_METROLOGY_ENGINEER.txt': ['workers/W10_METROLOGY_ENGINEER.md', 'domains/INSTRUMENT_READING_ENGINE.md', WEIGHT_VISIBLE_PROFILE],
 }
 
 def read(rel: str) -> str:
     p = ROOT / rel
-    if not p.is_file():
-        raise FileNotFoundError(rel)
+    if not p.is_file(): raise FileNotFoundError(rel)
     return p.read_text(encoding='utf-8')
 
 def sha256(path: Path) -> str:
@@ -62,9 +62,7 @@ def run_gate(script: str):
 def gate(script: str, label: str):
     r = run_gate(script)
     if r.returncode != 0:
-        print(r.stdout)
-        print(r.stderr, file=sys.stderr)
-        print(f'BUILD BLOCKED: {label} failed', file=sys.stderr)
+        print(r.stdout); print(r.stderr, file=sys.stderr); print(f'BUILD BLOCKED: {label} failed', file=sys.stderr)
     return r
 
 def bundle_text(name: str, sources: list[str]) -> str:
@@ -72,11 +70,8 @@ def bundle_text(name: str, sources: list[str]) -> str:
     effective.extend(SKILL_METRIC_GLOBALS)
     effective.extend(SCALE_TICK_GLOBALS)
     head = (
-        f'ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\n'
-        f'RUNTIME KNOWLEDGE BUNDLE: {name}\n'
-        'BASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\n'
-        'Generated from GitHub SSOT. Five mandatory technical safety profiles plus learner pedagogy, capability-quality, skill-metric, and scale/tick standards are embedded.\n\n'
-        'EMBEDDED_SOURCES:\n'
+        f'ACTIVITY-BASED ELEMENTARY WORKSHEET GENERATOR\nRUNTIME KNOWLEDGE BUNDLE: {name}\nBASELINE=2.6.x\nWORKER_SCHEMA_VERSION=1\n\n'
+        'Generated from GitHub SSOT. Five mandatory technical safety profiles plus learner pedagogy, capability-quality, skill-metric, and scale/tick standards are embedded.\n\nEMBEDDED_SOURCES:\n'
     )
     parts = [head + '\n'.join(f'- {s}' for s in effective)]
     for rel in effective:
@@ -109,16 +104,12 @@ def main() -> int:
     ]
     results = []
     for script, label in gates:
-        r = gate(script, label)
-        results.append(r)
-        if r.returncode != 0:
-            return 1
+        r = gate(script, label); results.append(r)
+        if r.returncode != 0: return 1
 
     if PACKAGE_DIR.exists(): shutil.rmtree(PACKAGE_DIR)
     if ZIP_PATH.exists(): ZIP_PATH.unlink()
-    inst = PACKAGE_DIR / '01_MAIN_INSTRUCTIONS'
-    know = PACKAGE_DIR / '02_UPLOAD_10_WORKER_KNOWLEDGE_TXT'
-    guide = PACKAGE_DIR / '03_GUIDE'
+    inst = PACKAGE_DIR / '01_MAIN_INSTRUCTIONS'; know = PACKAGE_DIR / '02_UPLOAD_10_WORKER_KNOWLEDGE_TXT'; guide = PACKAGE_DIR / '03_GUIDE'
     inst.mkdir(parents=True); know.mkdir(parents=True); guide.mkdir(parents=True)
 
     main_sections = [
@@ -131,6 +122,10 @@ def main() -> int:
         '\n\n===== MANDATORY PHYSICAL PAGE FEASIBILITY PROFILE =====\n\n' + read(PAGE_FEASIBILITY_PROFILE),
         '\n\n===== MANDATORY PRIMARY-SCHOOL PEDAGOGY PROFILE =====\n\n' + read(PEDAGOGY_PROFILE),
         '\n\n===== MANDATORY CAPABILITY QUALITY GATE =====\n\n' + read(CAPABILITY_PROFILE),
+        '\n\n===== MANDATORY RUNTIME PROFILE: THAI P3 ANALOG CLOCK =====\n\n' + read(THAI_CLOCK_RUNTIME_PROFILE),
+        '\n\n===== CLOCK HAND ENDPOINT DEFECT EVIDENCE =====\n\n' + read('qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md'),
+        '\n\n===== WEIGHT DIAL VISIBLE TICK-SET POLICY =====\n\n' + read(WEIGHT_VISIBLE_PROFILE),
+        '\n\n===== WEIGHT DIAL VISIBLE SUBDIVISION DEFECT EVIDENCE =====\n\n' + read('qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md'),
         '\n\n===== SKILL METRIC STANDARD =====\n\n' + read('skill-metrics/SKILL_METRIC_STANDARD.md'),
         '\n\n===== CRITICAL DEFECT POLICY =====\n\n' + read('skill-metrics/CRITICAL_DEFECT_POLICY.md'),
         '\n\n===== ARTIFACT QUALIFICATION PROTOCOL =====\n\n' + read('skill-metrics/ARTIFACT_QUALIFICATION_PROTOCOL.md'),
@@ -143,26 +138,20 @@ def main() -> int:
         '\n\n===== CAPABILITY QUALITY ITERATION REPORT =====\n\n' + read('qa/CAPABILITY_QUALITY_ITERATION_REPORT_2026_09_05.md'),
     ]
     (inst / 'GEM_ORCHESTRATOR_INSTRUCTIONS.txt').write_text(''.join(main_sections), encoding='utf-8')
-    for out, sources in WORKER_BUNDLES.items():
-        (know / out).write_text(bundle_text(out, sources), encoding='utf-8')
-    if len(list(know.glob('*.txt'))) != 10:
-        raise RuntimeError('Knowledge bundle count must equal 10')
+    for out, sources in WORKER_BUNDLES.items(): (know / out).write_text(bundle_text(out, sources), encoding='utf-8')
+    if len(list(know.glob('*.txt'))) != 10: raise RuntimeError('Knowledge bundle count must equal 10')
 
     install = read('GEM_INSTALLATION_GUIDE.md')
     docs = {'GEM_INSTALLATION_GUIDE.txt': install, 'BASELINE_2_6_3_RELEASE_CHECKLIST.txt': read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md')}
     for rel in ['qa/CLASSROOM_ARTIFACT_QUALIFICATION_UAT.md','qa/ACTUAL_WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_2026_08_31.md','qa/CONSOLIDATED_PHYSICAL_PAGE_FEASIBILITY_REGRESSION_2026_08_31.md','qa/ACTUAL_INSTRUMENT_GEOMETRY_DEFECTS_2026_08_31.md','qa/ACTUAL_MEASUREMENT_REFERENCE_DEFECTS_2026_08_31.md','qa/ACTUAL_CLOCK_HAND_ENDPOINT_REGRESSION_2026_09_01.md','qa/ACTUAL_WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_2026_09_01.md','qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md','qa/CAPABILITY_QUALITY_ITERATION_REPORT_2026_09_05.md','qa/INSTRUMENT_SCALE_DEFECT_TAXONOMY.md','qa/EXTERNAL_INSTRUMENT_SCALE_REFERENCE_REVIEW_2026_09_05.md']:
         docs[rel.replace('/','_').replace('.md','.txt')] = read(rel)
-    for rel in [WEIGHT_VISIBLE_PROFILE, PEDAGOGY_PROFILE, CAPABILITY_PROFILE, SCALE_TICK_PROFILE, TICK_HIERARCHY_PROFILE]:
-        docs[rel.replace('/','_').replace('.md','.txt')] = read(rel)
-    for p in sorted((ROOT / 'skill-metrics').glob('*.md')):
-        docs[f'SKILL_METRICS_{p.stem}.txt'] = p.read_text(encoding='utf-8')
+    for rel in [WEIGHT_VISIBLE_PROFILE, PEDAGOGY_PROFILE, CAPABILITY_PROFILE, SCALE_TICK_PROFILE, TICK_HIERARCHY_PROFILE]: docs[rel.replace('/','_').replace('.md','.txt')] = read(rel)
+    for p in sorted((ROOT / 'skill-metrics').glob('*.md')): docs[f'SKILL_METRICS_{p.stem}.txt'] = p.read_text(encoding='utf-8')
     (PACKAGE_DIR / 'INSTALL_ME_FIRST.txt').write_text(install, encoding='utf-8')
-    for name, text in docs.items():
-        (guide / name).write_text(text, encoding='utf-8')
+    for name, text in docs.items(): (guide / name).write_text(text, encoding='utf-8')
 
     report_names = ['SSOT_VALIDATION_REPORT.txt','FULL_DRY_RUN_449_REPORT.txt','FULL_SKILL_MATRIX_360_REPORT.txt','RUNTIME_UAT_REGRESSION_12_REPORT.txt','SEMANTIC_ORACLE_REGRESSION_20_REPORT.txt','SYSTEM_WIDE_QUALITY_REGRESSION_30_REPORT.txt','SCALE_LINE_INTEGRITY_REGRESSION_40_REPORT.txt','INSTRUMENT_REVIEW_SPEEDOMETER_REGRESSION_60_REPORT.txt','PROTRACTOR_SCALE_SAFETY_REGRESSION_24_REPORT.txt','METROLOGY_FULL_AUDIT_REGRESSION_80_REPORT.txt','WEIGHT_DIAL_INACTIVE_GAP_REGRESSION_32_REPORT.txt','PHYSICAL_PAGE_FEASIBILITY_REGRESSION_48_REPORT.txt','ACTUAL_INSTRUMENT_GEOMETRY_REGRESSION_64_REPORT.txt','MEASUREMENT_REFERENCE_ARTIFACT_REGRESSION_66_REPORT.txt','CLOCK_HAND_ENDPOINT_REGRESSION_32_REPORT.txt','WEIGHT_DIAL_VISIBLE_SUBDIVISION_REGRESSION_32_REPORT.txt','PRIMARY_SCHOOL_PEDAGOGY_REGRESSION_64_REPORT.txt','REPOSITORY_FULL_LINE_AUDIT_81_REPORT.txt','SKILL_METRIC_PACK_REGRESSION_161_REPORT.txt','SCALE_TICK_STANDARD_REGRESSION_120_REPORT.txt','CAPABILITY_QUALITY_SCORECARD_300_CRITERIA_REPORT.txt']
-    for name, r in zip(report_names, results):
-        (guide / name).write_text(r.stdout, encoding='utf-8')
+    for name, r in zip(report_names, results): (guide / name).write_text(r.stdout, encoding='utf-8')
 
     manifest = []
     for p in sorted(PACKAGE_DIR.rglob('*')):
@@ -196,5 +185,4 @@ def main() -> int:
     print(f'ZIP SHA256: {sha256(ZIP_PATH)}')
     return 0
 
-if __name__ == '__main__':
-    raise SystemExit(main())
+if __name__ == '__main__': raise SystemExit(main())
