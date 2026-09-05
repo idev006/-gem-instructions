@@ -1,6 +1,6 @@
 # Domain Registry — Activity-Based Elementary Worksheet Generator
 
-Version: 2.6.2-LTS
+Version: 2.6.3-LTS
 Status: Canonical SSOT for domain routing and overall maturity
 Compatible Gem baseline: 2.6.x
 
@@ -58,7 +58,7 @@ Every learner-read instrument/axis must inherit:
 - `policies/SCALE_LINE_INTEGRITY_PROFILE.md` when graduations/ticks/axis intervals are read
 - `policies/INSTRUMENT_REVIEW_REVISE_PROFILE.md`
 
-Required route includes W07 + W08 + W09.
+Required route includes W07 + W10 + W08 + W09.
 
 The renderer-side self-review loop is a prevention layer only; actual pixel correctness remains artifact QA.
 
@@ -69,10 +69,11 @@ Before prompt release:
 1. normalized topic resolves to one primary domain or explicit mixed-domain plan;
 2. owning worker is installed and compatible;
 3. W07 is selected when learner-read geometry carries academic data;
-4. W08/W09 are selected;
-5. mandatory shared instrument profiles are available when applicable;
-6. `KB_ROUTE_QA=PASS`;
-7. `KB_COMPATIBILITY_QA=PASS`.
+4. W10 independently audits metrology/common-center/page feasibility for learner-read geometry;
+5. W08/W09 are selected;
+6. mandatory shared instrument profiles are available when applicable;
+7. `KB_ROUTE_QA=PASS`;
+8. `KB_COMPATIBILITY_QA=PASS`.
 
 ## Maturity rule
 
@@ -98,3 +99,10 @@ Known high-risk families include:
 - graph-axis scale distortion
 
 These failures are converted into permanent prompt and artifact regressions. One wrong learner-read scale blocks classroom release.
+
+
+## All-skills runtime invariant
+
+Every routed skill inherits `policies/ALL_SKILLS_RUNTIME_INVARIANT_PROFILE.md`.
+
+Canonical state is owned by the specialist worker. Downstream audit/layout/release layers may reject or constrain output but may not redefine the academic oracle.
