@@ -136,7 +136,8 @@ All prior tests remain; counts only increase.
 6. scale-line integrity: 40
 7. instrument review/speedometer: 60
 8. protractor scale safety: 24
-9. full metrology audit: 80
+9. protractor 181-tick manifest regression: 220
+10. full metrology audit: 80
 10. actual weight-dial inactive-gap regression: 32
 11. physical page feasibility regression: 48
 12. actual instrument geometry regression: 64
@@ -209,3 +210,16 @@ Artifact inspection includes metrology plus `ARTIFACT_LEARNER_SIMULATION_QA`. On
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
 and the defect becomes permanent regression before the next accepted release.
+
+
+## Mandatory protractor manifest hardening gate
+
+For 0–180° @1° learner-read protractors:
+
+`PROTRACTOR_181_TICK_MANIFEST_REGRESSION=220/220 PASS`
+`EXPECTED_TICK_POSITION_COUNT=181`
+`MAJOR/INTERMEDIATE/MINOR=19/18/144`
+`EXPECTED_LABEL_COUNT=19`
+`LABEL_DUPLICATE_COUNT=0`
+
+Any missing/extra/merged tick or duplicate/missing label blocks release.
