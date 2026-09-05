@@ -83,7 +83,7 @@ for name,ok in [
 ('core-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in core),
 ('output-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in out),
 ('builder-pedagogy-var',"PEDAGOGY_PROFILE='policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'" in builder),
-('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,*sources]' in builder.replace(' ','')),
+('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,*sources]' in builder.replace(' ','')),
 ('builder-main-embed','MANDATORY PRIMARY-SCHOOL PEDAGOGY PROFILE' in builder),
 ('builder-suite','primary_school_pedagogy_regression_suite.py' in builder),
 ('validator-profile','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in validator),
