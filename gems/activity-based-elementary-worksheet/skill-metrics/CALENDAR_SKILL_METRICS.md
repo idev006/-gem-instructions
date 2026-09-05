@@ -40,3 +40,9 @@ Recompute Gregorian month structure from YEAR/MONTH/WEEK_START and rebuild compl
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = year/month/week-start and complete Gregorian date-to-weekday mapping. Layout must be rebuilt from the grid; moving individual date cells by eye is forbidden.
