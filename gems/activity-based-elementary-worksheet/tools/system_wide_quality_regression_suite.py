@@ -22,7 +22,7 @@ compact=builder.replace(' ','')
 checks=[
 ('builder-shared-profile-path','policies/SYSTEM_WIDE_QUALITY_PROFILE.md' in builder),
 ('builder-shared-profile-main','MANDATORY SYSTEM-WIDE QUALITY PROFILE' in builder),
-('builder-shared-profile-workers','SHARED_PROFILES' in builder and 'effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,*sources]' in compact),
+('builder-shared-profile-workers','SHARED_PROFILES' in builder and 'effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,*sources]' in compact),
 ('builder-system-gate','system_wide_quality_regression_suite.py' in builder),
 ('builder-current-total','1494/1494 PASS' in builder),
 ('workflow-system-gate','System-wide quality regression' in workflow),
