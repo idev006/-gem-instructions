@@ -44,3 +44,10 @@ Return to semantic time, recompute angles/endpoints, rebuild both hands from com
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+`MINUTE_HAND_DRIVES_HOUR_HAND_POSITION=YES`
+Canonical state = H:M, `minute_angle=6*m`, `hour_displacement=minute_angle/12`, `hour_angle=30*(h mod 12)+hour_displacement`, common center and exact vector endpoints. For :30 the short hand is exactly midpoint; snap-to-hour is critical. Canonical Thai P3 strict-half-hour 10-item profile also inherits the proved A4 Portrait 2×5 one-page contract.
