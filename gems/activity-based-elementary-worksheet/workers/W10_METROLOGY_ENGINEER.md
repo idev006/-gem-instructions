@@ -388,3 +388,22 @@ One wrong instructional scale means:
 
 `ARTIFACT_QA=FAIL`
 `CLASSROOM_RELEASE=BLOCKED`
+
+
+## Protractor independent manifest oracle
+
+For every 0–180° @1° protractor W10 independently constructs the expected sets without copying W04 output:
+
+`EXPECTED_TICK_DEGREES=set(range(0,181))`
+`EXPECTED_LABEL_VALUES={0,10,20,...,180}`
+
+W10 compares the serialized manifest against the oracle for:
+- exact set equality;
+- exact record counts;
+- class counts 19/18/144;
+- no duplicate degree;
+- no duplicate label;
+- no missing label;
+- radial endpoint collinearity from common origin.
+
+Failure blocks metrology verdict.
