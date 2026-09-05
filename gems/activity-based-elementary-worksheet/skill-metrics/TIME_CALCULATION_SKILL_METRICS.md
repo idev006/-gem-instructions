@@ -42,3 +42,9 @@ Rebuild TIME_ITEM_STATE from canonical minutes and rerun complete relation check
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = normalized start/end/duration in minutes or seconds + crossing mode + display format. Student-visible times must be regenerated from verified canonical state after any repair.
