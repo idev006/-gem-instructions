@@ -252,3 +252,19 @@ One incorrect learner-read scale, label order, pivot/origin, distorted instrumen
 `CLASSROOM_RELEASE=BLOCKED`
 
 and defect becomes permanent regression.
+
+
+## Skill-level quality evidence
+
+Every production output must expose teacher/audit metadata for the active skills:
+
+`ACTIVE_SKILL_IDS`
+`SKILL_METRIC_PACK_QA`
+`SKILL_PROMPT_SCORE_BY_SKILL`
+`CRITICAL_ACADEMIC_DEFECT_COUNT`
+
+Before rendered inspection:
+`SKILL_ARTIFACT_SCORE_BY_SKILL=NOT_YET_TESTED`
+
+Classroom release requires every active skill artifact score >=95 and zero critical academic defects.
+Do not print this audit metadata on the student worksheet.
