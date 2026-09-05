@@ -195,3 +195,22 @@ CI gate:
 `SKILL_METRIC_PACK_REGRESSION=161/161 PASS`
 
 A capability-quality score cannot override a failed skill-specific critical metric.
+
+
+## 14. Analog-clock minute-driver and canonical P3 half-hour page profile
+
+Clock geometry additionally embeds:
+- `policies/CLOCK_MINUTE_HAND_DRIVEN_HOUR_HAND_POLICY.md`
+- `policies/THAI_P3_CLOCK_HALF_HOUR_ONE_PAGE_PROFILE.md`
+
+For analog clocks the minute-hand angle is the explicit driver of hour-hand displacement:
+`hour_displacement = minute_angle / 12`.
+
+For the canonical Thai P3 DAY_NIGHT_PAIR, 10-item, strict-half-hour profile, the audited A4 portrait 2×5 plan requires 186×231 mm inside usable 194×243 mm. When those audited dimensions remain unchanged and PASS:
+`FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`.
+
+Permanent gates:
+- clock half-hour formula regression: 96/96;
+- clock P3 half-hour one-page regression: 100/100.
+
+This derived one-page requirement does not fabricate `ONE_PAGE_LOCK=ON` provenance and does not override explicit user/accessibility requirements.
