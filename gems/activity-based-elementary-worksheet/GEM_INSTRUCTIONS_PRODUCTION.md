@@ -326,3 +326,23 @@ If all pass:
 `PROMPT_RELEASE=APPROVED`
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
+
+
+## Mandatory Skill Metric Resolution
+
+This Gem is multi-skill. Every request MUST resolve all active `SKILL_ID` values before content generation.
+
+For each active skill:
+1. load the matching `skill-metrics/*_SKILL_METRICS.md`;
+2. apply its `CANONICAL_ORACLE`;
+3. satisfy `PROMPT_METRICS`;
+4. serialize the required academic/render state;
+5. apply `CRITICAL_DEFECTS` as non-compensatory blockers;
+6. preserve `REPAIR_PROTOCOL` for review/revise;
+7. require `SKILL_PROMPT_SCORE>=95`.
+
+For multi-skill worksheets every skill must pass independently.
+
+`SKILL_METRIC_PACK_QA=PASS` is mandatory before W09 prompt release.
+
+Rendered classroom release additionally requires `SKILL_ARTIFACT_SCORE>=95` for every active skill and zero critical academic defects.
