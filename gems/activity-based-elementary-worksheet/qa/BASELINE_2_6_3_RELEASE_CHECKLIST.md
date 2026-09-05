@@ -73,7 +73,9 @@ Academic geometry uses:
 
 ### Analog clock
 `minute_angle=6*m`
-`hour_angle=30*(h mod 12)+0.5*m`
+`hour_displacement=minute_angle/12`
+`hour_angle=30*(h mod 12)+hour_displacement`
+Equivalent: `hour_angle=30*(h mod 12)+0.5*m`
 Nonzero minutes require continuous displacement. :15=25%, :30=50%, :45=75%. Renderer-only state includes exact angle plus deterministic vector endpoint. 3:30 hour hand=105°, never 90°; 9:30=285°, never270°.
 
 ### Weight dial 0–5 kg @0.1 kg
@@ -140,15 +142,22 @@ All prior tests remain; counts only increase.
 12. actual instrument geometry regression: 64
 13. measurement reference artifact regression: 66
 14. clock hand endpoint regression: 32
-15. weight dial visible subdivision regression: 32
-16. primary-school pedagogy regression: 64
-17. repository full-line audit: 81
-18. capability quality scorecard: 15 capabilities × 20 criteria = 300 scored criteria
-19. skill metric pack governance: 140
+15. clock half-hour formula regression: 96
+16. clock P3 half-hour one-page regression: 100
+17. weight dial visible subdivision regression: 32
+18. primary-school pedagogy regression: 64
+19. repository full-line audit: 81
+20. capability quality scorecard: 15 capabilities × 20 criteria = 300 scored criteria
+21. skill metric pack governance: 161
+22. scale tick standard governance: 120
 
 Combined mandatory effective gate:
 
 `1494/1494 PASS`
+
+Additional mandatory clock hardening gates:
+`96/96 CLOCK HALF-HOUR FORMULA PASS`
+`100/100 CLOCK P3 HALF-HOUR ONE-PAGE PASS`
 
 Additional mandatory skill-metric gate:
 `161/161 SKILL METRIC PACK GOVERNANCE PASS`
@@ -176,7 +185,7 @@ Must contain:
 - mandatory primary-school pedagogy profile embedded in every worker bundle;
 - W10 metrology worker;
 - current actual-defect evidence and clean-room pedagogy audit;
-- reports for all 17 established regression suites plus the 161-case skill-metric governance suite and capability-quality scorecard;
+- reports for all established regression suites including clock 96/100, plus the 161-case skill-metric and 120-case scale-tick governance suites and capability-quality scorecard;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
