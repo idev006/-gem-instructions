@@ -39,6 +39,9 @@ Five mandatory technical shared runtime profiles:
 Mandatory cross-cutting learner profile:
 `PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md`
 
+Mandatory capability-quality profile:
+`CAPABILITY_QUALITY_GATE.md`
+
 Mandatory learner-read chain:
 `OWNING DOMAIN → W07 GEOMETRY AUDIT → W10 INDEPENDENT METROLOGY AUDIT → W08 LAYOUT/RENDER → W09 RELEASE`
 
@@ -140,10 +143,18 @@ All prior tests remain; counts only increase.
 15. weight dial visible subdivision regression: 32
 16. primary-school pedagogy regression: 64
 17. repository full-line audit: 81
+18. capability quality scorecard: 15 capabilities × 20 criteria = 300 scored criteria
 
 Combined mandatory effective gate:
 
 `1494/1494 PASS`
+
+Additional mandatory capability gate:
+`300/300 SCORED CRITERIA PASS`
+`15/15 CAPABILITIES >=95%`
+`OVERALL_CAPABILITY_SCORE >=95%`
+
+Current iteration result: all 15 capabilities = 100%; overall = 100.00%.
 
 Repository full-line audit still scans every UTF-8 text/code line in the Gem SSOT plus workflow and executes its fixed 81 semantic cases.
 
@@ -159,7 +170,7 @@ Must contain:
 - mandatory primary-school pedagogy profile embedded in every worker bundle;
 - W10 metrology worker;
 - current actual-defect evidence and clean-room pedagogy audit;
-- reports for all 17 regression suites;
+- reports for all 17 regression suites plus the capability-quality scorecard;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
@@ -168,7 +179,7 @@ Use the exact GitHub Actions artifact only after every gate passes.
 
 ## Prompt / artifact boundary
 
-Passing `1494/1494 PASS` means the prompt/package is eligible for `PROMPT_RELEASE=APPROVED`.
+Passing `1494/1494 PASS` plus `CAPABILITY_QUALITY_GATE=PASS` means the prompt/package is eligible for `PROMPT_RELEASE=APPROVED`.
 
 Before actual worksheet inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
