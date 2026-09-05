@@ -217,3 +217,17 @@ This profile proves only that the page plan is physically coherent. It does not 
 Before rendered inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
 `CLASSROOM_RELEASE=WAITING_FOR_ARTIFACT_QA`
+
+
+## Derived mandatory one-page decision after proof
+
+`ONE_PAGE_PREFERRED=YES` means one page is evaluated first. When a specific canonical profile has complete numeric evidence and both inequalities PASS, W08/W09 may set:
+
+`FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`
+
+This is not equivalent to user-provenance `ONE_PAGE_LOCK=ON`. It means that, for the unchanged audited content/minima, pagination is no longer a valid arbitrary aesthetic choice.
+
+Canonical example:
+`THAI_P3_CLOCK_HALF_HOUR_ONE_PAGE_PROFILE.md` proves a 10-item DAY_NIGHT_PAIR strict-half-hour worksheet in A4 portrait using 2×5, required 186×231 mm inside usable 194×243 mm.
+
+If a downstream system wants to paginate that profile, it must show changed audited dimensions or an explicit user/accessibility override that invalidates the prior proof.
