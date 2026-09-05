@@ -175,3 +175,23 @@ Current 2026-09-05 iteration evidence:
 - executable scorecard = 300/300 criteria PASS.
 
 The capability-quality score is prompt/Knowledge-system evidence only and never substitutes for downstream Artifact QA.
+
+
+## 13. Skill Metric Pack SSOT
+
+Every declared skill has a project-standard metric pack under `skill-metrics/`.
+
+Mandatory central documents:
+- `SKILL_METRIC_STANDARD.md`
+- `CRITICAL_DEFECT_POLICY.md`
+- `ARTIFACT_QUALIFICATION_PROTOCOL.md`
+- `SKILL_SCORE_REGISTRY.md`
+
+Mandatory per-skill packs: 15/15, matching the capability registry.
+
+The installer embeds the four central skill-metric documents in every Knowledge bundle and embeds owner-specific packs with W01–W06. All skill-metric documents are also distributed in the installation guide folder.
+
+CI gate:
+`SKILL_METRIC_PACK_REGRESSION=140/140 PASS`
+
+A capability-quality score cannot override a failed skill-specific critical metric.
