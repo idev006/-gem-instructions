@@ -68,6 +68,9 @@ jobs:
       - name: Clock hand endpoint regression — 32 cases
         run: python gems/activity-based-elementary-worksheet/tools/clock_hand_endpoint_regression_suite.py
 
+      - name: Clock half-hour formula regression — 72 cases
+        run: python gems/activity-based-elementary-worksheet/tools/clock_half_hour_formula_regression_suite.py
+
       - name: Weight dial visible subdivision regression — 32 cases
         run: python gems/activity-based-elementary-worksheet/tools/weight_dial_visible_subdivision_regression_suite.py
 
