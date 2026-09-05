@@ -41,3 +41,9 @@ Regenerate scale from canonical open-arc positions and reconstruct pointer from 
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = active arc start/sweep, 10 km/h positions, 20 km/h major hierarchy, labels, target speed/angle and common pivot. Major ticks must be visually stronger than minor 10 km/h ticks without adding positions.
