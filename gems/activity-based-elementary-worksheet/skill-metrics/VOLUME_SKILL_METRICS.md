@@ -39,3 +39,9 @@ Normalize dimensions, rebuild component model, recompute each component and tota
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = solid decomposition, normalized dimensions, non-overlapping components and computed component/total volumes. Diagram is a projection of the canonical solid model, not an independent source of dimensions.
