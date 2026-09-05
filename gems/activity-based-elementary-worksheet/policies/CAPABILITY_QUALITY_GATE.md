@@ -86,3 +86,17 @@ or
 `CLASSROOM_RELEASE=READY`.
 
 Actual rendered worksheets still require Artifact QA.
+
+
+## Skill-specific metric authority
+
+The generic 20-criterion capability rubric is necessary but not sufficient.
+
+Every declared capability MUST also comply with its skill-specific pack under:
+`skill-metrics/*_SKILL_METRICS.md`
+
+Mandatory governance:
+`SKILL_METRIC_PACK_QA=PASS`
+`SKILL_METRIC_PACK_REGRESSION=140/140 PASS`
+
+The skill pack is authoritative for domain-specific critical defects and canonical instrument/data indicators. A generic 100% capability score cannot compensate for a failed skill-specific critical metric.
