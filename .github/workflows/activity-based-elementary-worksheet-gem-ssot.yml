@@ -50,6 +50,9 @@ jobs:
       - name: Protractor scale safety regression — 24 cases
         run: python gems/activity-based-elementary-worksheet/tools/protractor_scale_safety_regression_suite.py
 
+      - name: Protractor 181-tick manifest regression — 220 cases
+        run: python gems/activity-based-elementary-worksheet/tools/protractor_181_tick_manifest_regression_suite.py
+
       - name: Full metrology audit — 80 cases
         run: python gems/activity-based-elementary-worksheet/tools/metrology_full_audit_regression_suite.py
 
