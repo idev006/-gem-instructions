@@ -43,3 +43,9 @@ Return to canonical dataset, rebuild visualization from data coordinates, rerun 
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = dataset, category order, axis origin/increment, pictograph key and exact data-to-visual mapping. Numeric axes inherit scale/tick integrity and no 3D/decorative distortion may alter apparent values.
