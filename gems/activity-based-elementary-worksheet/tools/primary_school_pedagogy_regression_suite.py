@@ -19,6 +19,7 @@ system=read('policies/SYSTEM_WIDE_QUALITY_PROFILE.md')
 core=read('GEM_INSTRUCTIONS_PRODUCTION.md')
 out=read('OUTPUT_CONTRACT.md')
 builder=read('tools/build_install_package.py')
+builder_compact=builder.replace(' ','')
 validator=read('tools/validate_ssot.py')
 checklist=read('qa/BASELINE_2_6_3_RELEASE_CHECKLIST.md')
 audit=read('qa/FULL_CLEAN_ROOM_PEDAGOGY_AUDIT_2026_09_02.md')
@@ -82,8 +83,8 @@ for name,ok in [
 ('system-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in system),
 ('core-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in core),
 ('output-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in out),
-('builder-pedagogy-var',"PEDAGOGY_PROFILE='policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'" in builder),
-('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,*sources]' in builder.replace(' ','')),
+('builder-pedagogy-var',"PEDAGOGY_PROFILE='policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'" in builder_compact),
+('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,*sources]' in builder_compact),
 ('builder-main-embed','MANDATORY PRIMARY-SCHOOL PEDAGOGY PROFILE' in builder),
 ('builder-suite','primary_school_pedagogy_regression_suite.py' in builder),
 ('validator-profile','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in validator),
