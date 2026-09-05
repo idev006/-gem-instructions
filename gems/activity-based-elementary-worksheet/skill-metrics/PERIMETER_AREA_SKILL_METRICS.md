@@ -41,3 +41,9 @@ Return to canonical shape/givens, normalize units, recompute formula, regenerate
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = shape type, normalized dimensions, boundary/component identity and formula state. Diagram labels derive from this state and must not imply unstated dimensions.
