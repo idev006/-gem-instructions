@@ -144,10 +144,16 @@ All prior tests remain; counts only increase.
 16. primary-school pedagogy regression: 64
 17. repository full-line audit: 81
 18. capability quality scorecard: 15 capabilities × 20 criteria = 300 scored criteria
+19. skill metric pack governance: 140
 
 Combined mandatory effective gate:
 
 `1494/1494 PASS`
+
+Additional mandatory skill-metric gate:
+`140/140 SKILL METRIC PACK GOVERNANCE PASS`
+`15/15 SKILL METRIC PACKS PRESENT`
+`CRITICAL_ACADEMIC_DEFECT => RELEASE BLOCKED`
 
 Additional mandatory capability gate:
 `300/300 SCORED CRITERIA PASS`
@@ -170,7 +176,7 @@ Must contain:
 - mandatory primary-school pedagogy profile embedded in every worker bundle;
 - W10 metrology worker;
 - current actual-defect evidence and clean-room pedagogy audit;
-- reports for all 17 regression suites plus the capability-quality scorecard;
+- reports for all 17 established regression suites plus the 140-case skill-metric governance suite and capability-quality scorecard;
 - classroom Artifact UAT guide;
 - checksum manifest;
 - ZIP integrity PASS.
@@ -179,7 +185,7 @@ Use the exact GitHub Actions artifact only after every gate passes.
 
 ## Prompt / artifact boundary
 
-Passing `1494/1494 PASS` plus `CAPABILITY_QUALITY_GATE=PASS` means the prompt/package is eligible for `PROMPT_RELEASE=APPROVED`.
+Passing `1494/1494 PASS` plus `SKILL_METRIC_PACK_REGRESSION=140/140 PASS` plus `CAPABILITY_QUALITY_GATE=PASS` means the prompt/package is eligible for `PROMPT_RELEASE=APPROVED`.
 
 Before actual worksheet inspection:
 `ARTIFACT_QA=NOT_YET_TESTED`
