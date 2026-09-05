@@ -84,7 +84,7 @@ for name,ok in [
 ('core-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in core),
 ('output-pedagogy-ref','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in out),
 ('builder-pedagogy-var',"PEDAGOGY_PROFILE='policies/PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md'" in builder_compact),
-('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,*sources]' in builder_compact),
+('builder-worker-embed','effective=[*SHARED_PROFILES,PEDAGOGY_PROFILE,CAPABILITY_PROFILE,ALL_SKILLS_RUNTIME_PROFILE,*sources]' in builder_compact),
 ('builder-main-embed','MANDATORY PRIMARY-SCHOOL PEDAGOGY PROFILE' in builder),
 ('builder-suite','primary_school_pedagogy_regression_suite.py' in builder),
 ('validator-profile','PRIMARY_SCHOOL_WORKSHEET_PEDAGOGY_PROFILE.md' in validator),
