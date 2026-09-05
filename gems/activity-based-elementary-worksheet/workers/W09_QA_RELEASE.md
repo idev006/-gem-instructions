@@ -445,3 +445,24 @@ Required:
 For multi-skill worksheets, EVERY active skill must independently pass. Do not average one weak skill into a stronger skill.
 
 A missing/extra scale mark, false pointer/hand/ray/level alignment, wrong reference center/zero, or data-to-visual mismatch is non-compensatory and blocks release.
+
+
+## Clock minute-driver + canonical one-page hard gate
+
+For analog clocks, release additionally requires:
+`PROMPT_CLOCK_MINUTE_HAND_DRIVER_QA=PASS`
+`PROMPT_CLOCK_HOUR_DISPLACEMENT_FROM_MINUTE_ANGLE_QA=PASS`
+
+The short hand must be derived from:
+`hour_displacement = minute_angle / 12`.
+
+For the canonical Thai P3 DAY_NIGHT_PAIR, 10-item, strict :30 profile with no explicit page/accessibility override, W09 requires the numeric 2×5 A4 portrait proof from `THAI_P3_CLOCK_HALF_HOUR_ONE_PAGE_PROFILE.md`.
+
+When the proof remains valid:
+`PROMPT_CLOCK_P3_HALF_HOUR_10_ITEM_ONE_PAGE_QA=PASS`
+`PROMPT_CLOCK_P3_HALF_HOUR_2X5_QA=PASS`
+`FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`
+
+A two-page 5+5 result under the unchanged feasible state is a layout defect. It may not be justified merely by `ONE_PAGE_LOCK=OFF`.
+
+Any failed minute-driver or canonical one-page gate blocks prompt release for this profile.
