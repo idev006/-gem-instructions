@@ -85,7 +85,7 @@ When the user gives no page override:
 
 Every generated page remains A4 Portrait; pagination is allowed when `ONE_PAGE_LOCK=OFF`.
 
-One-page-first must not reduce topology/count/spacing/Thai readability/answer space. One-page PASS requires numeric `PHYSICAL_PAGE_STATE` with shape-aware item boxes. `ONE_PAGE_LOCK=OFF` allows pagination; `ONE_PAGE_LOCK=ON` conflicting with safe geometry blocks release.
+One-page-first must not reduce topology/count/spacing/Thai readability/answer space. One-page PASS requires numeric `PHYSICAL_PAGE_STATE` with shape-aware item boxes. `ONE_PAGE_LOCK=OFF` allows pagination when one-page numeric proof fails. If a named canonical profile has `FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`, pagination is not an arbitrary aesthetic option unless changed audited minima or an explicit override invalidates that proof. `ONE_PAGE_LOCK=ON` conflicting with safe geometry blocks release.
 
 ## 7. Global render constraints
 
@@ -268,3 +268,13 @@ Before rendered inspection:
 
 Classroom release requires every active skill artifact score >=95 and zero critical academic defects.
 Do not print this audit metadata on the student worksheet.
+
+
+## 17. All-skills canonical-state runtime contract
+
+Every active skill inherits `ALL_SKILLS_RUNTIME_INVARIANT_PROFILE.md`.
+
+Required internal fields include canonical input state, target oracle, derived visible state, independent verification, repair owner and skill score. High-risk learner-read geometry also requires deterministic geometry/data state.
+
+For the canonical Thai P3 DAY_NIGHT_PAIR 10-item strict-half-hour profile, the proved 2×5 A4 Portrait plan is mandatory when its audited dimensions remain valid:
+`FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`.
