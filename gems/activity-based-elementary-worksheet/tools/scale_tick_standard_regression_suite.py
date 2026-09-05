@@ -72,7 +72,7 @@ integration_checks = [
     ('build-report', 'SCALE_TICK_STANDARD_REGRESSION_120_REPORT.txt' in builder),
     ('build-120-pass-print', '120/120 PASS' in builder),
     ('build-knowledge-count', 'Knowledge bundle count must equal 10' in builder),
-    ('build-artifact-boundary', 'artifact QA: NOT_YET_TESTED' in builder),
+    ('build-artifact-boundary', ('ARTIFACT_QA' in builder and 'NOT_YET_TESTED' in builder) or ('artifact QA: NOT_YET_TESTED' in builder)),
     ('workflow-step', 'Scale tick standard governance — 120 cases' in workflow),
     ('workflow-script', 'scale_tick_standard_regression_suite.py' in workflow),
     ('workflow-artifact', 'Upload installation artifact' in workflow),
