@@ -285,3 +285,31 @@ No theme element may cover question text, answer area, learner-read instrument, 
 `PROMPT_DIMENSION_LABEL_CLEARANCE_QA` when geometry figures are used
 
 Unresolved render path, field-semantic mismatch, missing numeric page proof, unsafe page semantics, unreadable Thai, insufficient answer space, compromised global/local scale geometry, missing/misaligned reference projection, off-center origin, distorted protractor, missing review protocol, ambiguous labels or theme interference blocks release.
+
+## Thai P3 strict-half-hour 10-item one-page layout
+
+W08 inherits `policies/THAI_P3_CLOCK_HALF_HOUR_ONE_PAGE_PROFILE.md`.
+
+When the request resolves to Thai P3 + ANALOG_CLOCK + DAY_NIGHT_PAIR + 10 items + strict `:30` and no explicit page/orientation/accessibility override, use the profile's numerically proved A4 portrait candidate:
+
+`GRID_COLUMNS=2`
+`GRID_ROWS=5`
+`ITEM_MIN_WIDTH_MM=91`
+`ITEM_MIN_HEIGHT_MM=43`
+`COLUMN_GAP_MM=4`
+`ROW_GAP_MM=4`
+`REQUIRED_GRID_WIDTH_MM=186`
+`REQUIRED_GRID_HEIGHT_MM=231`
+`USABLE_WIDTH_MM=194`
+`USABLE_HEIGHT_MM=243`
+
+When these audited dimensions remain valid:
+`FEASIBILITY_CONFIRMED_ONE_PAGE_LAYOUT_REQUIRED=YES`
+
+Do not paginate to 5+5 merely for spaciousness after numeric proof passes. This does not change `ONE_PAGE_LOCK=OFF`; it is a derived decision from a passed physical feasibility proof.
+
+Required:
+`PROMPT_CLOCK_P3_HALF_HOUR_10_ITEM_ONE_PAGE_QA`
+`PROMPT_CLOCK_P3_HALF_HOUR_2X5_QA`
+
+Clock geometry remains immutable under layout. Uniform scale/translation of the whole clock is allowed; independent hand movement, snap, tick deletion or circle distortion is forbidden.
