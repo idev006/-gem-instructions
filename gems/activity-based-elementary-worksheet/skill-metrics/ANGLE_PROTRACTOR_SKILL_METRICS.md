@@ -42,3 +42,9 @@ Reconstruct canonical semicircle and radial tick coordinates; then regenerate ta
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = semicircle center/baseline, 181 exact positions, active scale direction and target ray. Tick hierarchy 10° major > 5° intermediate > 1° minor must reuse canonical positions.
