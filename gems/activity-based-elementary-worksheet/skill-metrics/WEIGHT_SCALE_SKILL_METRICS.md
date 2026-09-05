@@ -44,3 +44,9 @@ Rebuild visible tick set from canonical indices 0..50, then rebuild pointer from
 
 `SKILL_PROMPT_SCORE>=95` is required for prompt release.
 `SKILL_ARTIFACT_SCORE>=95` and zero critical defects are required for classroom release.
+
+
+## RUNTIME_INVARIANT
+
+`CANONICAL_STATE_REQUIRED=YES`
+Canonical state = range/resolution, complete active tick index set, major/intermediate/minor class per index, label map, target tick and common pointer center. Tick hierarchy is data: major > 0.5 kg intermediate > ordinary 0.1 kg minor.
