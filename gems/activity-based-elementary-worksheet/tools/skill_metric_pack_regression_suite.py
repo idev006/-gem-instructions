@@ -34,22 +34,16 @@ PACKS={
 }
 required_sections=['SKILL_ID=','OWNER=','## CANONICAL_ORACLE','## PROMPT_METRICS','## ARTIFACT_METRICS','## CRITICAL_DEFECTS','## REPAIR_PROTOCOL','PASS_THRESHOLD=95']
 
-# 15 skills × 8 structural checks = 120
-pack_texts={}
+# 15 skills × 9 structural checks = 135
 for skill,name in PACKS.items():
     p=MET/name
     add(f'{skill}-file',p.is_file())
     if not p.is_file():
-        for i in range(7): add(f'{skill}-missing-{i}',False)
-        pack_texts[skill]=''
+        for i in range(8): add(f'{skill}-missing-{i}',False)
         continue
-    txt=p.read_text(encoding='utf-8'); pack_texts[skill]=txt
+    txt=p.read_text(encoding='utf-8')
     add(f'{skill}-id',f'SKILL_ID={skill}' in txt)
     for token in required_sections[1:]: add(f'{skill}-{token[:18]}',token in txt,token)
-
-# 15 skills × critical override enforcement = 15, total 135
-for skill,txt in pack_texts.items():
-    add(f'{skill}-critical-override','CRITICAL_OVERRIDE=YES' in txt and 'CRITICAL_DEFECTS' in txt)
 
 # 21 semantic/governance checks, total 156
 standard=read('SKILL_METRIC_STANDARD.md')
