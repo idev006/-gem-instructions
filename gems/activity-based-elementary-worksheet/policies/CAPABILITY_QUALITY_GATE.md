@@ -97,6 +97,6 @@ Every declared capability MUST also comply with its skill-specific pack under:
 
 Mandatory governance:
 `SKILL_METRIC_PACK_QA=PASS`
-`SKILL_METRIC_PACK_REGRESSION=140/140 PASS`
+`SKILL_METRIC_PACK_REGRESSION=161/161 PASS`
 
 The skill pack is authoritative for domain-specific critical defects and canonical instrument/data indicators. A generic 100% capability score cannot compensate for a failed skill-specific critical metric.
