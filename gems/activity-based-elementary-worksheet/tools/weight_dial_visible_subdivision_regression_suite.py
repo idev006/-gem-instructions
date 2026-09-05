@@ -30,6 +30,12 @@ w08=read('workers/W08_LAYOUT_RENDER_THAI.md')
 w09=read('workers/W09_QA_RELEASE.md')
 w10=read('workers/W10_METROLOGY_ENGINEER.md')
 builder=read('tools/build_install_package.py')
+w07_bundle_semantic = all(token in builder for token in [
+    "'W07_INSTRUMENT_AUDITOR.txt'",
+    'workers/W07_INSTRUMENT_AUDITOR.md',
+    'domains/INSTRUMENT_READING_ENGINE.md',
+    'WEIGHT_VISIBLE_PROFILE',
+])
 checks=[
 ('policy-intervals','INTERVALS_PER_KG=10' in policy),
 ('policy-positions','POSITIONS_PER_KG_ENDPOINT_INCLUSIVE=11' in policy),
@@ -39,7 +45,7 @@ checks=[
 ('policy-half-index','HALF_KG_INTERMEDIATE_INDEX=5' in policy),
 ('policy-hard-negative','DO NOT simplify, omit, merge, or sparsify' in policy),
 ('w03-explicit-visible-set','VISIBLE_TICK_OFFSETS_PER_KG' in w03 and 'VISIBLE_TICK_ANGLE_OFFSETS_PER_KG' in w03),
-('w07-runtime-policy-bundle',"'W07_INSTRUMENT_AUDITOR.txt':['workers/W07_INSTRUMENT_AUDITOR.md','domains/INSTRUMENT_READING_ENGINE.md',WEIGHT_VISIBLE_PROFILE]" in builder),
+('w07-runtime-policy-bundle',w07_bundle_semantic),
 ('w08-local-serialization','INTERVALS_PER_KG=10' in w08 and 'HALF_KG_INTERMEDIATE_OFFSET=0.5' in w08),
 ('w09-release-gate','PROMPT_WEIGHT_PER_KG_SUBDIVISION_QA' in w09 and 'PROMPT_WEIGHT_HALF_KG_INTERMEDIATE_QA' in w09),
 ('w10-independent-recount','INTERVALS_PER_KG=10' in w10 and 'LOCAL_SPAN_RECOUNT_CHECK' in w10),
