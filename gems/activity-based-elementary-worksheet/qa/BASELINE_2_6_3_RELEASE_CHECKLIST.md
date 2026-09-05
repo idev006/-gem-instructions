@@ -150,6 +150,7 @@ All prior tests remain; counts only increase.
 20. capability quality scorecard: 15 capabilities × 20 criteria = 300 scored criteria
 21. skill metric pack governance: 161
 22. scale tick standard governance: 120
+23. all-skills clean-room audit: 180
 
 Combined mandatory effective gate:
 
@@ -163,6 +164,10 @@ Additional mandatory skill-metric gate:
 `161/161 SKILL METRIC PACK GOVERNANCE PASS`
 `15/15 SKILL METRIC PACKS PRESENT`
 `CRITICAL_ACADEMIC_DEFECT => RELEASE BLOCKED`
+
+Additional mandatory all-skills gate:
+`180/180 ALL-SKILLS CLEAN-ROOM AUDIT PASS`
+`15/15 SKILLS CANONICAL_STATE_REQUIRED=YES`
 
 Additional mandatory capability gate:
 `300/300 SCORED CRITERIA PASS`
