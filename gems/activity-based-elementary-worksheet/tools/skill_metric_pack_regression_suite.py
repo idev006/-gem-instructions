@@ -5,7 +5,7 @@ Validates that every declared skill has a complete metric pack and that
 high-risk canonical oracles remain mathematically coherent.
 
 Gate is additive governance evidence and does not replace Artifact QA.
-Expected: exactly 140 cases.
+Expected: exactly 161 cases.
 """
 from pathlib import Path
 import math,sys,calendar
@@ -78,7 +78,7 @@ add('oracle-weight-per-kg',math.isclose(1.0/0.1,10.0) and int(round(1.0/0.1))+1=
 add('oracle-protractor',int(180/1)==180 and int(180/1)+1==181)
 add('oracle-capacity',int(1000/50)==20 and int(100/50)==2)
 
-assert len(CASES)==140,len(CASES)
+assert len(CASES)==161,len(CASES)
 failed=[c for c in CASES if not c[1]]
 if failed:
     print(f'SKILL METRIC PACK REGRESSION: FAIL ({len(failed)}/{len(CASES)})')
