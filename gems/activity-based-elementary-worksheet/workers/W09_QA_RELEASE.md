@@ -431,3 +431,17 @@ When user asks for Gem health/self-check, report 2.6.3 release family, W01–W10
 ## Base update policy
 
 W10 is `W10_METROLOGY_ENGINEER`, not a hotfix override. Broad architecture, visibility, worker schema, metrology, geometry or scale-safety changes require canonical SSOT + permanent regression + full rebuild/reinstall.
+
+## Skill Metric Pack release gate
+
+Every request MUST resolve to one or more `SKILL_ID` values and load the corresponding project SSOT under `skill-metrics/`.
+
+Required:
+- `SKILL_METRIC_PACK_QA=PASS`
+- `SKILL_PROMPT_SCORE>=95`
+- no `CRITICAL_ACADEMIC_DEFECT`
+- for classroom release, `SKILL_ARTIFACT_SCORE>=95`
+
+For multi-skill worksheets, EVERY active skill must independently pass. Do not average one weak skill into a stronger skill.
+
+A missing/extra scale mark, false pointer/hand/ray/level alignment, wrong reference center/zero, or data-to-visual mismatch is non-compensatory and blocks release.
