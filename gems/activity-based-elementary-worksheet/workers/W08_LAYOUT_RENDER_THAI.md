@@ -313,3 +313,28 @@ Required:
 `PROMPT_CLOCK_P3_HALF_HOUR_2X5_QA`
 
 Clock geometry remains immutable under layout. Uniform scale/translation of the whole clock is allowed; independent hand movement, snap, tick deletion or circle distortion is forbidden.
+
+
+## Protractor manifest rendering contract
+
+For learner-read 0–180° @1° protractors W08 MUST render from `PROTRACTOR_TICK_MANIFEST` and `PROTRACTOR_LABEL_MANIFEST` supplied by the academic/metrology chain.
+
+The layout layer may uniformly scale/translate the complete protractor object only. It MUST NOT:
+- synthesize additional ticks;
+- omit ticks for visual cleanliness;
+- merge adjacent ticks;
+- duplicate/mutate labels;
+- redraw the arc independently from the tick manifest;
+- alter tick class hierarchy.
+
+Expected visible counts remain:
+- 181 graduation positions;
+- 19 major ticks;
+- 18 intermediate ticks;
+- 144 minor ticks;
+- 19 unique labels 0,10,...,180.
+
+`PROMPT_PROTRACTOR_181_POSITION_MANIFEST_QA`
+`PROMPT_PROTRACTOR_LABEL_UNIQUENESS_QA`
+
+If fitting fails, paginate or enlarge the item; never reduce tick count.
