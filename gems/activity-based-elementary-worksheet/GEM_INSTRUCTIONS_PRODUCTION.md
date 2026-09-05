@@ -346,3 +346,19 @@ For multi-skill worksheets every skill must pass independently.
 `SKILL_METRIC_PACK_QA=PASS` is mandatory before W09 prompt release.
 
 Rendered classroom release additionally requires `SKILL_ARTIFACT_SCORE>=95` for every active skill and zero critical academic defects.
+
+
+## Protractor explicit-manifest hardening
+
+For learner-read 0–180° protractors at 1° resolution, load and enforce:
+`policies/PROTRACTOR_181_TICK_MANIFEST_PROFILE.md`
+
+The final renderer state MUST contain:
+- `PROTRACTOR_TICK_MANIFEST` with exactly 181 records for degrees 0..180;
+- tick class counts 19 major / 18 intermediate / 144 minor;
+- `PROTRACTOR_LABEL_MANIFEST` with exactly 19 unique labels 0,10,...,180;
+- exact radial endpoints from the common protractor origin.
+
+Natural-language-only instructions such as "draw a 1° protractor" are insufficient.
+
+Any missing, extra, merged graduation or duplicated/missing label is a `CRITICAL_ACADEMIC_DEFECT` and blocks release.
